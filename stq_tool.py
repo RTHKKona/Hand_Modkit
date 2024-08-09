@@ -179,10 +179,26 @@ class STQReader(QMainWindow):
             # Split the data based on "00"
             data_parts = windows_data.split("00")
 
-            # Iterate over the parts and display them
+            corrected_parts = []
+            current_part = ""
+
             for part in data_parts:
-                part = part.strip()
-                if part and len(part) % 2 == 0:  # Ensure part is not empty and has an even length
+                current_part += part
+                if len(current_part) % 2 != 0:  # If not even, there's an extra "0" that should belong to the previous part
+                    current_part = current_part[:-1]  # Remove the last "0" from the current part
+                    corrected_parts.append(current_part)  # Append the corrected part to the list
+                    current_part = "0"  # Start a new part with the extra "0"
+                else:
+                    corrected_parts.append(current_part)
+                    current_part = ""
+
+            # If there's any remaining part, add it
+            if current_part:
+                corrected_parts.append(current_part)
+
+            # Iterate over the corrected parts and display them
+            for part in corrected_parts:
+                if part:  # Ensure part is not empty
                     try:
                         # Convert hex to bytes and then decode as ANSI
                         decoded_part = bytes.fromhex(part).decode('ansi')
@@ -192,6 +208,7 @@ class STQReader(QMainWindow):
                     self.append_to_title_column(decoded_part)  # Add the decoded part to the "Title" column
                 else:
                     self.text_edit.append(f"Invalid hex part skipped: {part}")
+
 
     def append_to_title_column(self, text):
         # Find the "Title" column index
