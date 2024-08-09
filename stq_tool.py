@@ -62,7 +62,7 @@ class STQReader(QMainWindow):
         grid = QTableWidget(self)
         grid.setColumnCount(7)
         grid.setHorizontalHeaderLabels([
-            "File Directory",
+            "File Directory",  # Updated header
             "Size of File (bytes)",  # Updated header
             "Number of Samples",
             "Number of Channels",
@@ -75,6 +75,7 @@ class STQReader(QMainWindow):
         grid.horizontalHeader().sectionDoubleClicked.connect(self.resize_column_to_contents)
         grid.horizontalHeader().setStyleSheet("color: black")
         grid.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        grid.setEditTriggers(QTableWidget.AllEditTriggers)  # Allow editing cells
         return grid
 
     def resize_column_to_contents(self, index):
@@ -95,6 +96,7 @@ class STQReader(QMainWindow):
             ("Load .stqr File", self.load_file),
             ("Search Patterns", self.search_patterns),
             ("Clear", self.clear_data),
+            ("Save Changes", self.save_changes),  # New button to save changes
             ("Toggle Dark/Light Mode", self.toggle_theme),
             ("Increase Header Size", self.increase_header_size),
             ("Decrease Header Size", self.decrease_header_size)
@@ -203,24 +205,21 @@ class STQReader(QMainWindow):
                         # Convert hex to bytes and then decode as ANSI
                         decoded_part = bytes.fromhex(part).decode('ansi')
                     except (ValueError, UnicodeDecodeError):
-                        decoded_part = f"Error decoding part: {part}"
+                        continue  # Skip invalid parts
                     self.text_edit.append(decoded_part)
                     self.append_to_title_column(decoded_part)  # Add the decoded part to the "Title" column
-                else:
-                    self.text_edit.append(f"Invalid hex part skipped: {part}")
-
 
     def append_to_title_column(self, text):
-        # Find the "Title" column index
-        title_column_index = 0  # The first column is "Title"
+        # Find the "File Directory" column index
+        file_directory_column_index = 0  # The first column is "File Directory"
         
-        # Start appending text to the first available row in the "Title" column
+        # Start appending text to the first available row in the "File Directory" column
         row_count = self.data_grid.rowCount()
         
         for row in range(row_count):
-            item = self.data_grid.item(row, title_column_index)
+            item = self.data_grid.item(row, file_directory_column_index)
             if item is None or item.text() == "":
-                self.data_grid.setItem(row, title_column_index, QTableWidgetItem(text))
+                self.data_grid.setItem(row, file_directory_column_index, QTableWidgetItem(text))
                 break
 
     def pattern_matches(self, match, pattern):
@@ -234,6 +233,24 @@ class STQReader(QMainWindow):
         for i in range(0, len(hex_data), 8):
             value = struct.unpack('<i', bytes.fromhex(hex_data[i:i + 8]))[0]
             self.data_grid.setItem(row_position, i // 8 + 1, QTableWidgetItem(str(value)))
+
+    def save_changes(self):
+        file_name, _ = QFileDialog.getSaveFileName(self, "Save Modified .stqr File", "", "STQ Files (*.stqr);;All Files (*)")
+        if file_name:
+            with open(file_name, 'wb') as file:
+                # Iterate over the rows and columns to save the grid data
+                for row in range(self.data_grid.rowCount()):
+                    for col in range(self.data_grid.columnCount()):
+                        item = self.data_grid.item(row, col)
+                        if item:
+                            # Convert the item text back to bytes or appropriate format
+                            value = int(item.text()) if col > 0 else item.text().encode('ascii')
+                            if col == 0:
+                                file.write(value + b'\x00')  # File directory strings are likely terminated with null bytes
+                            else:
+                                file.write(struct.pack('<I', value))  # Save integers as little-endian 32-bit
+                        else:
+                            continue
 
     def clear_data(self):
         if QMessageBox.question(self, 'Clear Data', "Are you sure you want to clear all data?",
@@ -283,9 +300,9 @@ class STQReader(QMainWindow):
         layout.addWidget(self.create_icon_label(self.get_resource_path("egg.png"), 100))
         layout.addWidget(about_label)
         layout.addLayout(self.create_link_layout(self.get_resource_path("github.png"),
-                                                 "Github - RTHKKona", "https://github.com/RTHKKona", 64))
+                                                 "Github - RTHKKona", "https://github.com/RTHKKona", 64, 16))  # Larger hyperlink text
         layout.addLayout(self.create_link_layout(self.get_resource_path("ko-fi.png"),
-                                                 "Ko-Fi - Handburger", "https://ko-fi.com/handburger", 64))
+                                                 "Ko-Fi - Handburger", "https://ko-fi.com/handburger", 64, 16))  # Larger hyperlink text
         close_button = QPushButton("Close", dialog)
         close_button.clicked.connect(dialog.close)
         close_button.setStyleSheet("border: 1px solid white; color: black;")
@@ -305,12 +322,12 @@ class STQReader(QMainWindow):
         label.setPixmap(QPixmap(icon_path).scaled(size, size, Qt.KeepAspectRatio))
         return label
 
-    def create_link_layout(self, icon_path, text, url, icon_size):
+    def create_link_layout(self, icon_path, text, url, icon_size, font_size=12):
         layout = QHBoxLayout()
         layout.addWidget(self.create_icon_label(icon_path, icon_size))
         link_label = QLabel(f'<a href="{url}">{text}</a>', self)
         link_label.setOpenExternalLinks(True)
-        link_label.setStyleSheet("color: white;")
+        link_label.setStyleSheet(f"color: white; font-size: {font_size}px;")  # Larger hyperlink text
         layout.addWidget(link_label)
         return layout
 
