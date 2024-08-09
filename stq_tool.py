@@ -1,11 +1,12 @@
 import sys
 import struct
 import os
+import random
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QPushButton, QTextEdit, QFileDialog, QLabel, QDialog, QHBoxLayout, QMessageBox, QSizePolicy, QAction, QSplitter, QTableWidget, QTableWidgetItem, QHeaderView
 )
 from PyQt5.QtGui import QFont, QPixmap, QIcon
-from PyQt5.QtCore import Qt, QRect, QEvent
+from PyQt5.QtCore import Qt, QRect
 
 class STQReader(QMainWindow):
     def __init__(self):
@@ -25,15 +26,17 @@ class STQReader(QMainWindow):
         # Splitter for window resizing
         splitter = QSplitter(Qt.Vertical, main_widget)
 
-        # Faint background egg image setup (top right corner)
+        # Faint foreground egg image setup
         self.background_label = QLabel(main_widget)
         egg_pixmap = QPixmap(self.get_resource_path("egg.png"))
         egg_pixmap = egg_pixmap.scaled(200, 200, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         self.background_label.setPixmap(egg_pixmap)
-        self.background_label.setStyleSheet("opacity: 0.1;")  # Adjusted to make it faint but visible
+        self.background_label.setGeometry(QRect(self.width() - 220, 10, 200, 200))  # Positioned at the top right
+        self.background_label.setStyleSheet("opacity: 0.15;")  # Faint but visible
+        self.background_label.setAlignment(Qt.AlignRight | Qt.AlignTop)
         self.background_label.setAttribute(Qt.WA_TransparentForMouseEvents, True)
-        self.background_label.setGeometry(self.width() - 220, 20, 200, 200)
-        self.background_label.lower()
+        self.background_label.hide()  # Initially hide the egg
+        self.background_label.raise_()  # Ensure the label stays in the foreground
 
         # Text editor for raw hexadecimal data
         self.text_edit = QTextEdit(self, readOnly=True, font=QFont("Consolas", 10))
@@ -55,21 +58,12 @@ class STQReader(QMainWindow):
         self.setup_menu()
         self.apply_styles()  # Apply initial styles
 
-        # Update the position of the background_label when the window is resized
-        self.installEventFilter(self)
-
-    def eventFilter(self, source, event):
-        if event.type() == QEvent.Resize:
-            # Reposition the egg image to always be on the top right
-            self.background_label.setGeometry(self.width() - 220, 20, 200, 200)
-        return super().eventFilter(source, event)
-
     def create_data_grid(self):
         grid = QTableWidget(self)
         grid.setColumnCount(7)
         grid.setHorizontalHeaderLabels([
             "Title",
-            "Size of File (samples)",
+            "Size of File (bytes)",  # Updated header
             "Number of Samples",
             "Number of Channels",
             "Sample Rate Hz",
@@ -77,7 +71,7 @@ class STQReader(QMainWindow):
             "Loop End (samples)"
         ])
         grid.horizontalHeader().setFont(QFont("Arial", weight=QFont.Bold))
-        grid.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)  # Enable column resizing
+        grid.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)  # Resize columns to contents initially
         grid.horizontalHeader().sectionDoubleClicked.connect(self.resize_column_to_contents)
         grid.horizontalHeader().setStyleSheet("color: black")
         grid.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -132,6 +126,7 @@ class STQReader(QMainWindow):
         file_name, _ = QFileDialog.getOpenFileName(self, "Open .stqr File", "", "STQ Files (*.stqr);;All Files (*)")
         if file_name:
             self.loaded_file_name = file_name
+            self.setWindowTitle(f"Handburger's STQ Reader Tool - Editing {os.path.basename(file_name)}")
             with open(file_name, 'rb') as file:
                 content = file.read()
                 if content[:4] != b'STQR':
@@ -139,6 +134,12 @@ class STQReader(QMainWindow):
                 else:
                     self.text_edit.setText(self.format_hex(content))
                     self.pattern_search_button.setEnabled(True)
+
+                    # Show egg.png with 20% probability
+                    if random.random() < 0.2:
+                        self.background_label.show()
+                    else:
+                        self.background_label.hide()
 
     def format_hex(self, content):
         hex_str = content.hex().upper()
@@ -180,14 +181,17 @@ class STQReader(QMainWindow):
 
             # Iterate over the parts and display them
             for part in data_parts:
-                if part:  # Check if the part is not empty
-                    # Convert hex to bytes and then decode as ANSI
+                part = part.strip()
+                if part and len(part) % 2 == 0:  # Ensure part is not empty and has an even length
                     try:
+                        # Convert hex to bytes and then decode as ANSI
                         decoded_part = bytes.fromhex(part).decode('ansi')
-                    except UnicodeDecodeError:
+                    except (ValueError, UnicodeDecodeError):
                         decoded_part = f"Error decoding part: {part}"
                     self.text_edit.append(decoded_part)
                     self.append_to_title_column(decoded_part)  # Add the decoded part to the "Title" column
+                else:
+                    self.text_edit.append(f"Invalid hex part skipped: {part}")
 
     def append_to_title_column(self, text):
         # Find the "Title" column index
@@ -220,7 +224,9 @@ class STQReader(QMainWindow):
             self.text_edit.clear()
             self.data_grid.clearContents()
             self.data_grid.setRowCount(0)
+            self.setWindowTitle("Handburger's STQ Reader Tool")  # Reset the title
             self.pattern_search_button.setEnabled(True)  # Re-enable the search button
+            self.background_label.hide()  # Hide the egg if it was shown
 
     def toggle_theme(self):
         self.dark_mode = not self.dark_mode
@@ -255,7 +261,10 @@ class STQReader(QMainWindow):
         dialog.setGeometry(300, 300, 400, 200)
         layout = QVBoxLayout(dialog)
 
+        about_label = QLabel(self.create_about_text(), self)
+        about_label.setFont(QFont("Arial", 12))  # Increased font size
         layout.addWidget(self.create_icon_label(self.get_resource_path("egg.png"), 100))
+        layout.addWidget(about_label)
         layout.addLayout(self.create_link_layout(self.get_resource_path("github.png"),
                                                  "Github - RTHKKona", "https://github.com/RTHKKona", 64))
         layout.addLayout(self.create_link_layout(self.get_resource_path("ko-fi.png"),
@@ -266,6 +275,13 @@ class STQReader(QMainWindow):
         layout.addWidget(close_button)
 
         dialog.exec_()
+
+    def create_about_text(self):
+        return (
+            "Handburger's STQ Reader Tool\n"
+            "Version 1.0\n\n"
+            "This tool is designed for analyzing and reading .stqr files, providing a comprehensive interface for examining hexadecimal data.\n"
+        )
 
     def create_icon_label(self, icon_path, size):
         label = QLabel(self)
