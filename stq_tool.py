@@ -186,17 +186,17 @@ class STQReader(QMainWindow):
 
             for part in data_parts:
                 current_part += part
-                if len(current_part) % 2 != 0:  # If odd number of digits
-                    if len(corrected_parts) > 0:
-                        # Append last digit to previous part to complete the hex byte
-                        corrected_parts[-1] += current_part[0]
-                        current_part = current_part[1:]
-                    # Ensure remaining current_part is now even
-                    if len(current_part) % 2 != 0 and len(corrected_parts) == 0:
-                        continue  # Skip if there's nothing to correct
+                if len(current_part) % 2 != 0:  # If not even, there's an extra "0" that should belong to the previous part
+                    current_part = current_part[:-1]  # Remove the last "0" from the current part
+                    corrected_parts.append(current_part)  # Append the corrected part to the list
+                    current_part = "0"  # Start a new part with the extra "0"
+                else:
+                    corrected_parts.append(current_part)
+                    current_part = ""
 
+            # If there's any remaining part, add it
+            if current_part:
                 corrected_parts.append(current_part)
-                current_part = ""
 
             # Iterate over the corrected parts and display them
             for part in corrected_parts:
@@ -204,24 +204,23 @@ class STQReader(QMainWindow):
                     try:
                         # Convert hex to bytes and then decode as ANSI
                         decoded_part = bytes.fromhex(part).decode('ansi')
+                        self.append_to_title_column(decoded_part)  # Add the decoded part to the "File Directory" column
                     except (ValueError, UnicodeDecodeError):
                         continue  # Skip invalid parts
-                    self.text_edit.append(decoded_part)
-                    self.append_to_title_column(decoded_part)  # Add the decoded part to the "Title" column
-
 
     def append_to_title_column(self, text):
-        # Find the "File Directory" column index
+        # Ensure the "File Directory" column always has a value
         file_directory_column_index = 0  # The first column is "File Directory"
-        
-        # Start appending text to the first available row in the "File Directory" column
         row_count = self.data_grid.rowCount()
-        
-        for row in range(row_count):
-            item = self.data_grid.item(row, file_directory_column_index)
-            if item is None or item.text() == "":
-                self.data_grid.setItem(row, file_directory_column_index, QTableWidgetItem(text))
-                break
+
+        # Append text to the first available row in the "File Directory" column
+        if row_count == 0 or (self.data_grid.item(row_count - 1, file_directory_column_index) is not None
+                              and self.data_grid.item(row_count - 1, file_directory_column_index).text() != ""):
+            self.data_grid.insertRow(row_count)
+            self.data_grid.setItem(row_count, file_directory_column_index, QTableWidgetItem(text))
+        else:
+            # If there's a row with no "File Directory" value but has other values, set the value here
+            self.data_grid.setItem(row_count - 1, file_directory_column_index, QTableWidgetItem(text))
 
     def pattern_matches(self, match, pattern):
         return all(c == 'X' or c == m for c, m in zip(pattern, match))
