@@ -62,7 +62,7 @@ class STQReader(QMainWindow):
         grid = QTableWidget(self)
         grid.setColumnCount(7)
         grid.setHorizontalHeaderLabels([
-            "File Directory",  # Updated header
+            "File Directory",  # Renamed header
             "Size of File (bytes)",  # Updated header
             "Number of Samples",
             "Number of Channels",
@@ -75,7 +75,7 @@ class STQReader(QMainWindow):
         grid.horizontalHeader().sectionDoubleClicked.connect(self.resize_column_to_contents)
         grid.horizontalHeader().setStyleSheet("color: black")
         grid.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        grid.setEditTriggers(QTableWidget.AllEditTriggers)  # Allow editing cells
+        grid.setEditTriggers(QTableWidget.DoubleClicked)  # Allow cells to be edited on double-click
         return grid
 
     def resize_column_to_contents(self, index):
@@ -96,10 +96,10 @@ class STQReader(QMainWindow):
             ("Load .stqr File", self.load_file),
             ("Search Patterns", self.search_patterns),
             ("Clear", self.clear_data),
-            ("Save Changes", self.save_changes),  # New button to save changes
             ("Toggle Dark/Light Mode", self.toggle_theme),
             ("Increase Header Size", self.increase_header_size),
-            ("Decrease Header Size", self.decrease_header_size)
+            ("Decrease Header Size", self.decrease_header_size),
+            ("Save Changes", self.save_changes)  # Added save button
         ]
 
         button_widgets = []
@@ -181,46 +181,50 @@ class STQReader(QMainWindow):
             # Split the data based on "00"
             data_parts = windows_data.split("00")
 
-            corrected_parts = []
-            current_part = ""
+            # Reconstruct the data to ensure valid hex parts
+            reconstructed_parts = []
+            temp_part = ""
+            digit_count = 0
 
             for part in data_parts:
-                current_part += part
-                if len(current_part) % 2 != 0:  # If not even, there's an extra "0" that should belong to the previous part
-                    current_part = current_part[:-1]  # Remove the last "0" from the current part
-                    corrected_parts.append(current_part)  # Append the corrected part to the list
-                    current_part = "0"  # Start a new part with the extra "0"
-                else:
-                    corrected_parts.append(current_part)
-                    current_part = ""
+                temp_part += part
+                digit_count += len(part)
 
-            # If there's any remaining part, add it
-            if current_part:
-                corrected_parts.append(current_part)
+                # Check for even number of digits
+                if digit_count % 2 != 0:
+                    # Move the last character to the next part
+                    temp_part += part[0]
+                    part = part[1:]
 
-            # Iterate over the corrected parts and display them
-            for part in corrected_parts:
+                # Now process the current part if it has valid length and is ready
+                if len(temp_part) >= 8:  # Assuming minimum valid length is 8 digits
+                    reconstructed_parts.append(temp_part)
+                    temp_part = ""
+                    digit_count = 0
+
+            # Iterate over the parts and display them
+            for part in reconstructed_parts:
                 if part:  # Ensure part is not empty
                     try:
                         # Convert hex to bytes and then decode as ANSI
                         decoded_part = bytes.fromhex(part).decode('ansi')
-                        self.append_to_title_column(decoded_part)  # Add the decoded part to the "File Directory" column
                     except (ValueError, UnicodeDecodeError):
-                        continue  # Skip invalid parts
+                        decoded_part = f"Error decoding part: {part}"
+                    self.text_edit.append(decoded_part)
+                    self.append_to_title_column(decoded_part)  # Add the decoded part to the "File Directory" column
 
     def append_to_title_column(self, text):
-        # Ensure the "File Directory" column always has a value
-        file_directory_column_index = 0  # The first column is "File Directory"
+        # Find the "File Directory" column index
+        title_column_index = 0  # The first column is "File Directory"
+        
+        # Start appending text to the first available row in the "File Directory" column
         row_count = self.data_grid.rowCount()
-
-        # Append text to the first available row in the "File Directory" column
-        if row_count == 0 or (self.data_grid.item(row_count - 1, file_directory_column_index) is not None
-                              and self.data_grid.item(row_count - 1, file_directory_column_index).text() != ""):
-            self.data_grid.insertRow(row_count)
-            self.data_grid.setItem(row_count, file_directory_column_index, QTableWidgetItem(text))
-        else:
-            # If there's a row with no "File Directory" value but has other values, set the value here
-            self.data_grid.setItem(row_count - 1, file_directory_column_index, QTableWidgetItem(text))
+        
+        for row in range(row_count):
+            item = self.data_grid.item(row, title_column_index)
+            if item is None or item.text() == "":
+                self.data_grid.setItem(row, title_column_index, QTableWidgetItem(text))
+                break
 
     def pattern_matches(self, match, pattern):
         return all(c == 'X' or c == m for c, m in zip(pattern, match))
@@ -233,24 +237,6 @@ class STQReader(QMainWindow):
         for i in range(0, len(hex_data), 8):
             value = struct.unpack('<i', bytes.fromhex(hex_data[i:i + 8]))[0]
             self.data_grid.setItem(row_position, i // 8 + 1, QTableWidgetItem(str(value)))
-
-    def save_changes(self):
-        file_name, _ = QFileDialog.getSaveFileName(self, "Save Modified .stqr File", "", "STQ Files (*.stqr);;All Files (*)")
-        if file_name:
-            with open(file_name, 'wb') as file:
-                # Iterate over the rows and columns to save the grid data
-                for row in range(self.data_grid.rowCount()):
-                    for col in range(self.data_grid.columnCount()):
-                        item = self.data_grid.item(row, col)
-                        if item:
-                            # Convert the item text back to bytes or appropriate format
-                            value = int(item.text()) if col > 0 else item.text().encode('ascii')
-                            if col == 0:
-                                file.write(value + b'\x00')  # File directory strings are likely terminated with null bytes
-                            else:
-                                file.write(struct.pack('<I', value))  # Save integers as little-endian 32-bit
-                        else:
-                            continue
 
     def clear_data(self):
         if QMessageBox.question(self, 'Clear Data', "Are you sure you want to clear all data?",
@@ -289,6 +275,25 @@ class STQReader(QMainWindow):
         header_font.setPointSize(header_font.pointSize() - 1)
         self.data_grid.horizontalHeader().setFont(header_font)
 
+    def save_changes(self):
+        # Open a file dialog to select where to save the modified file
+        save_file_name, _ = QFileDialog.getSaveFileName(self, "Save Modified .stqr File", "", "STQ Files (*.stqr);;All Files (*)")
+        if save_file_name:
+            # Example logic to save grid data back to a .stqr file
+            with open(save_file_name, 'wb') as file:
+                # Write header, etc.
+                # Example: file.write(self.header_data)
+
+                # Write grid data
+                for row in range(self.data_grid.rowCount()):
+                    for col in range(self.data_grid.columnCount()):
+                        item = self.data_grid.item(row, col)
+                        if item:
+                            value = int(item.text())
+                            file.write(struct.pack('<i', value))
+            
+            QMessageBox.information(self, "Save Successful", "The file has been saved successfully.")
+
     def show_about_dialog(self):
         dialog = QDialog(self)
         dialog.setWindowTitle("About")
@@ -300,9 +305,9 @@ class STQReader(QMainWindow):
         layout.addWidget(self.create_icon_label(self.get_resource_path("egg.png"), 100))
         layout.addWidget(about_label)
         layout.addLayout(self.create_link_layout(self.get_resource_path("github.png"),
-                                                 "Github - RTHKKona", "https://github.com/RTHKKona", 64, 16))  # Larger hyperlink text
+                                                 "Github - RTHKKona", "https://github.com/RTHKKona", 80))  # Larger hyperlink text
         layout.addLayout(self.create_link_layout(self.get_resource_path("ko-fi.png"),
-                                                 "Ko-Fi - Handburger", "https://ko-fi.com/handburger", 64, 16))  # Larger hyperlink text
+                                                 "Ko-Fi - Handburger", "https://ko-fi.com/handburger", 80))  # Larger hyperlink text
         close_button = QPushButton("Close", dialog)
         close_button.clicked.connect(dialog.close)
         close_button.setStyleSheet("border: 1px solid white; color: black;")
@@ -322,12 +327,12 @@ class STQReader(QMainWindow):
         label.setPixmap(QPixmap(icon_path).scaled(size, size, Qt.KeepAspectRatio))
         return label
 
-    def create_link_layout(self, icon_path, text, url, icon_size, font_size=12):
+    def create_link_layout(self, icon_path, text, url, icon_size):
         layout = QHBoxLayout()
         layout.addWidget(self.create_icon_label(icon_path, icon_size))
         link_label = QLabel(f'<a href="{url}">{text}</a>', self)
         link_label.setOpenExternalLinks(True)
-        link_label.setStyleSheet(f"color: white; font-size: {font_size}px;")  # Larger hyperlink text
+        link_label.setStyleSheet("color: white; font-size: 14px;")  # Larger hyperlink text
         layout.addWidget(link_label)
         return layout
 
