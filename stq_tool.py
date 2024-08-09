@@ -198,18 +198,24 @@ class STQReader(QMainWindow):
         self.dark_mode = not self.dark_mode
         if self.dark_mode:
             style = "background-color: black; color: white;"
-            label_style = "background-color: black; color: white;"
             button_style = "QPushButton {color: white; border: 1px solid white;}"
+            label_style = "QLabel {color: white; background-color: black; border: 1px solid white;}"
         else:
             style = ""
-            label_style = ""
             button_style = "QPushButton {border: 1px solid white;}"
+            label_style = ""
 
         self.setStyleSheet(style)
         self.text_edit.setStyleSheet(style)
-        self.data_grid.setStyleSheet(label_style)
+
+        # Apply styles to buttons
         for i in range(self.buttons.count()):
             self.buttons.itemAt(i).widget().setStyleSheet(button_style)
+
+        # Apply styles to labels in the about dialog
+        labels = self.findChildren(QLabel)
+        for label in labels:
+            label.setStyleSheet(label_style)
 
     def show_about_dialog(self):
         dialog = QDialog(self)
