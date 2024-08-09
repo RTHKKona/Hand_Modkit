@@ -22,6 +22,14 @@ class STQReader(QMainWindow):
         self.setCentralWidget(main_widget)
         main_layout = QVBoxLayout(main_widget)
 
+        # Background egg image setup
+        self.background_label = QLabel(main_widget)
+        egg_pixmap = QPixmap("C:/Users/necro/Downloads/MHGU_Modding/Audio/MHGU-STQReader/egg.png")
+        self.background_label.setPixmap(egg_pixmap.scaled(300, 300, Qt.KeepAspectRatio))
+        self.background_label.setAlignment(Qt.AlignCenter)
+        self.background_label.setGeometry(QRect((self.width() - 300) // 2, (self.height() - 300) // 2, 300, 300))
+        self.background_label.setVisible(True)
+
         self.text_edit = self.create_text_edit(read_only=True)
         self.raw_stq_data = self.create_text_edit(read_only=True)
         self.data_grid = self.create_data_grid()
@@ -34,7 +42,6 @@ class STQReader(QMainWindow):
         main_layout.addLayout(control_layout)
 
         self.setup_menu()
-        self.show_placeholder_image()
 
     def create_text_edit(self, read_only=False):
         text_edit = QTextEdit(self)
@@ -44,14 +51,16 @@ class STQReader(QMainWindow):
 
     def create_data_grid(self):
         grid = QTableWidget(self)
-        grid.setColumnCount(6)
+        grid.setColumnCount(8)
         grid.setHorizontalHeaderLabels([
             "Size of File (samples)",
             "Number of Samples",
             "Number of Channels",
             "Sample Rate Hz",
             "Loop Start (samples)",
-            "Loop End (samples)"
+            "Loop End (samples)",
+            "LINK",
+            "File Name"
         ])
         grid.horizontalHeader().setFont(QFont("Arial", weight=QFont.Bold))
         return grid
@@ -108,17 +117,6 @@ class STQReader(QMainWindow):
 
         self.setStyleSheet(button_style % (border_color, text_color, bg_color))
 
-    def show_placeholder_image(self):
-        self.egg_label = QLabel(self.text_edit)
-        egg_pixmap = QPixmap("C:/Users/necro/Downloads/MHGU_Modding/Audio/MHGU-STQReader/egg.png")
-        self.egg_label.setPixmap(egg_pixmap.scaled(200, 200, Qt.KeepAspectRatio))
-        self.egg_label.setAlignment(Qt.AlignCenter)
-        self.egg_label.setGeometry(QRect((self.text_edit.width() - 200) // 2, (self.text_edit.height() - 200) // 2, 200, 200))
-        self.egg_label.setVisible(True)
-
-    def hide_placeholder_image(self):
-        self.egg_label.setVisible(False)
-
     def load_file(self):
         file_name, _ = QFileDialog.getOpenFileName(self, "Open .stqr File", "", "STQ Files (*.stqr);;All Files (*)")
         if file_name:
@@ -128,10 +126,8 @@ class STQReader(QMainWindow):
 
                 if content[:4] != b'STQR':
                     self.text_edit.setText("Error: The file is not a valid .stqr file.")
-                    self.show_placeholder_image()
                     return
 
-                self.hide_placeholder_image()
                 self.text_edit.setText(self.format_hex(content))
                 self.pattern_search_button.setEnabled(True)
 
@@ -189,21 +185,46 @@ class STQReader(QMainWindow):
                     raw_data_list.append(match + end_hex)
         
         self.raw_stq_data.setText('\n'.join(raw_data_list))
-        self.populate_grid(raw_data_list)
+        self.populate_grid(raw_data_list, content)
         self.pattern_search_button.setEnabled(False)
 
     def pattern_matches(self, match):
         pattern = "XXXXXXXX XXXXXXXX 02000000 80BB0000 XXXXXXXX XXXXXXXX"
         return all(c == 'X' or c == m for c, m in zip(pattern.replace(' ', ''), match))
 
-    def populate_grid(self, raw_data_list):
+    def populate_grid(self, raw_data_list, full_content):
         self.data_grid.setRowCount(len(raw_data_list))
 
         for row_idx, data in enumerate(raw_data_list):
-            split_data = data[:8] + "|" + data[8:16] + "|" + data[16:24] + "|" + data[24:32] + "|" + data[32:40] + "|" + data[40:48]
-            parts = split_data.split("|")
+            parts = [self.convert_hex_to_int(data[i:i+8]) for i in range(0, len(data), 8)]
             for col_idx, part in enumerate(parts):
-                self.data_grid.setItem(row_idx, col_idx, QTableWidgetItem(part))
+                self.data_grid.setItem(row_idx, col_idx, QTableWidgetItem(str(part)))
+
+            # Extracting text after "736F756E64"
+            if "736F756E64" in full_content:
+                text_start = full_content.index("736F756E64") + len("736F756E64")
+                text_data = self.hex_to_text(full_content[text_start:])
+                link, file_name = self.split_text_data(text_data)
+                self.data_grid.setItem(row_idx, 6, QTableWidgetItem(link))
+                self.data_grid.setItem(row_idx, 7, QTableWidgetItem(file_name))
+
+    def convert_hex_to_int(self, hex_str):
+        little_endian_bytes = bytes.fromhex(hex_str)
+        return struct.unpack('<i', little_endian_bytes)[0]
+
+    def hex_to_text(self, hex_data):
+        # Convert hex to ASCII text
+        bytes_data = bytes.fromhex(hex_data)
+        try:
+            return bytes_data.decode('ascii')
+        except UnicodeDecodeError:
+            return bytes_data.decode('latin-1')
+
+    def split_text_data(self, text_data):
+        parts = text_data.split('.')
+        link = parts[0] + "\\" if parts else ""
+        file_name = parts[1] if len(parts) > 1 else ""
+        return link, file_name
 
     def clear_data(self):
         if QMessageBox.question(self, 'Clear Data', "Are you sure you want to clear all data?",
@@ -240,9 +261,9 @@ class STQReader(QMainWindow):
 
         layout.addWidget(self.create_icon_label("C:/Users/necro/Downloads/MHGU_Modding/Audio/MHGU-STQReader/egg.png", 100))
         layout.addLayout(self.create_link_layout("C:/Users/necro/Downloads/MHGU_Modding/Audio/MHGU-STQReader/github.png",
-                                                 "Github - RTHKKona", "https://github.com/RTHKKona"))
+                                                 "Github - RTHKKona", "https://github.com/RTHKKona", 64))
         layout.addLayout(self.create_link_layout("C:/Users/necro/Downloads/MHGU_Modding/Audio/MHGU-STQReader/ko-fi.png",
-                                                 "Ko-Fi - Handburger", "https://ko-fi.com/handburger"))
+                                                 "Ko-Fi - Handburger", "https://ko-fi.com/handburger", 64))
         close_button = QPushButton("Close", dialog)
         close_button.clicked.connect(dialog.close)
         layout.addWidget(close_button)
@@ -255,9 +276,9 @@ class STQReader(QMainWindow):
         label.setPixmap(pixmap.scaled(size, size, Qt.KeepAspectRatio))
         return label
 
-    def create_link_layout(self, icon_path, text, url):
+    def create_link_layout(self, icon_path, text, url, icon_size):
         layout = QHBoxLayout()
-        layout.addWidget(self.create_icon_label(icon_path, 16))
+        layout.addWidget(self.create_icon_label(icon_path, icon_size))
         link_label = QLabel(f'<a href="{url}">{text}</a>', self)
         link_label.setOpenExternalLinks(True)
         layout.addWidget(link_label)
