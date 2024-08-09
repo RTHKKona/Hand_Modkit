@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QPushButton, QTextEdit, QFileDialog, QLabel, QDialog, QHBoxLayout, QMessageBox, QSizePolicy, QAction, QSplitter, QTableWidget, QTableWidgetItem, QHeaderView
 )
 from PyQt5.QtGui import QFont, QPixmap, QIcon
-from PyQt5.QtCore import Qt, QRect
+from PyQt5.QtCore import Qt, QRect, QEvent
 
 class STQReader(QMainWindow):
     def __init__(self):
@@ -15,7 +15,7 @@ class STQReader(QMainWindow):
         self.init_ui()
 
     def init_ui(self):
-        self.setWindowTitle("STQ Reader Tool")
+        self.setWindowTitle("Handburger's STQ Reader Tool")
         self.setGeometry(100, 100, 1200, 800)  # Adjusted size for better splitting and visibility
         self.setWindowIcon(QIcon(self.get_resource_path("egg.png")))
 
@@ -25,15 +25,14 @@ class STQReader(QMainWindow):
         # Splitter for window resizing
         splitter = QSplitter(Qt.Vertical, main_widget)
 
-        # Faint background egg image setup
+        # Faint background egg image setup (top right corner)
         self.background_label = QLabel(main_widget)
         egg_pixmap = QPixmap(self.get_resource_path("egg.png"))
-        egg_pixmap = egg_pixmap.scaled(400, 400, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        egg_pixmap = egg_pixmap.scaled(200, 200, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         self.background_label.setPixmap(egg_pixmap)
-        self.background_label.setGeometry(QRect((self.width() - 400) // 2, (self.height() - 400) // 2, 400, 400))
-        self.background_label.setStyleSheet("opacity: 0.1;")
-        self.background_label.setAlignment(Qt.AlignCenter)
+        self.background_label.setStyleSheet("opacity: 0.1;")  # Adjusted to make it faint but visible
         self.background_label.setAttribute(Qt.WA_TransparentForMouseEvents, True)
+        self.background_label.setGeometry(self.width() - 220, 20, 200, 200)
         self.background_label.lower()
 
         # Text editor for raw hexadecimal data
@@ -56,6 +55,15 @@ class STQReader(QMainWindow):
         self.setup_menu()
         self.apply_styles()  # Apply initial styles
 
+        # Update the position of the background_label when the window is resized
+        self.installEventFilter(self)
+
+    def eventFilter(self, source, event):
+        if event.type() == QEvent.Resize:
+            # Reposition the egg image to always be on the top right
+            self.background_label.setGeometry(self.width() - 220, 20, 200, 200)
+        return super().eventFilter(source, event)
+
     def create_data_grid(self):
         grid = QTableWidget(self)
         grid.setColumnCount(7)
@@ -69,10 +77,22 @@ class STQReader(QMainWindow):
             "Loop End (samples)"
         ])
         grid.horizontalHeader().setFont(QFont("Arial", weight=QFont.Bold))
-        grid.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        grid.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)  # Enable column resizing
+        grid.horizontalHeader().sectionDoubleClicked.connect(self.resize_column_to_contents)
         grid.horizontalHeader().setStyleSheet("color: black")
         grid.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         return grid
+
+    def resize_column_to_contents(self, index):
+        # Resize the column to fit its contents perfectly
+        self.data_grid.resizeColumnToContents(index)
+        
+        # Ensure the column does not exceed the screen width
+        available_width = self.data_grid.viewport().width()
+        column_width = self.data_grid.columnWidth(index)
+        
+        if column_width > available_width:
+            self.data_grid.setColumnWidth(index, available_width)
 
     def create_buttons(self):
         layout = QHBoxLayout()
