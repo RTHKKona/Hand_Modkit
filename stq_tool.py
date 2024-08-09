@@ -81,7 +81,9 @@ class STQReader(QMainWindow):
             ("Load .stqr File", self.load_file),
             ("Search Patterns", self.search_patterns),
             ("Clear", self.clear_data),
-            ("Toggle Dark/Light Mode", self.toggle_theme)
+            ("Toggle Dark/Light Mode", self.toggle_theme),
+            ("Increase Header Size", self.increase_header_size),
+            ("Decrease Header Size", self.decrease_header_size)
         ]
 
         button_widgets = []
@@ -90,8 +92,8 @@ class STQReader(QMainWindow):
             button = QPushButton(label, self)
             button.clicked.connect(callback)
             button.setStyleSheet(
-                "border: 1px solid black; color: black; padding-top: 10px; padding-bottom: 10px; text-align: center;"
-            )  # Padding to create space above and below the text
+                "border: 1px solid black; color: black; padding-top: 10px; padding-bottom: 10px; text-align: center; font-weight: bold;"
+            )  # Padding to create space above and below the text, and bold font
             layout.addWidget(button)
             button_widgets.append(button)
 
@@ -169,7 +171,7 @@ class STQReader(QMainWindow):
 
     def append_to_title_column(self, text):
         # Find the "Title" column index
-        title_column_index = self.data_grid.horizontalHeaderItem(0).text().index("Title")
+        title_column_index = 0  # The first column is "Title"
         
         # Start appending text to the first available row in the "Title" column
         row_count = self.data_grid.rowCount()
@@ -207,15 +209,25 @@ class STQReader(QMainWindow):
     def apply_styles(self):
         if self.dark_mode:
             style = "background-color: black; color: white;"
-            button_style = "border: 1px solid white; color: white; padding-top: 10px; padding-bottom: 10px;"
+            button_style = "border: 1px solid white; color: white; padding-top: 10px; padding-bottom: 10px; font-weight: bold;"
         else:
             style = "background-color: white; color: black;"
-            button_style = "border: 1px solid black; color: black; padding-top: 10px; padding-bottom: 10px;"
+            button_style = "border: 1px solid black; color: black; padding-top: 10px; padding-bottom: 10px; font-weight: bold;"
 
         self.setStyleSheet(style)
         self.text_edit.setStyleSheet(style)
         for i in range(self.buttons.count()):
             self.buttons.itemAt(i).widget().setStyleSheet(button_style)
+
+    def increase_header_size(self):
+        header_font = self.data_grid.horizontalHeader().font()
+        header_font.setPointSize(header_font.pointSize() + 1)
+        self.data_grid.horizontalHeader().setFont(header_font)
+
+    def decrease_header_size(self):
+        header_font = self.data_grid.horizontalHeader().font()
+        header_font.setPointSize(header_font.pointSize() - 1)
+        self.data_grid.horizontalHeader().setFont(header_font)
 
     def show_about_dialog(self):
         dialog = QDialog(self)
