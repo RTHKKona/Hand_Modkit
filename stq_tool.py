@@ -76,6 +76,7 @@ class STQReader(QMainWindow):
 
     def create_buttons(self):
         layout = QHBoxLayout()
+        layout.setContentsMargins(0, 20, 0, 20)  # 20px margin above and below the button area
         buttons = [
             ("Load .stqr File", self.load_file),
             ("Search Patterns", self.search_patterns),
@@ -88,7 +89,9 @@ class STQReader(QMainWindow):
         for label, callback in buttons:
             button = QPushButton(label, self)
             button.clicked.connect(callback)
-            button.setStyleSheet("border: 1px solid white; color: black;")
+            button.setStyleSheet(
+                "border: 1px solid black; color: black; padding-top: 10px; padding-bottom: 10px; text-align: center;"
+            )  # Padding to create space above and below the text
             layout.addWidget(button)
             button_widgets.append(button)
 
@@ -151,7 +154,6 @@ class STQReader(QMainWindow):
             # Add the title and data to grid
             self.populate_grid_with_titles(windows_data)
 
-
     def pattern_matches(self, match, pattern):
         return all(c == 'X' or c == m for c, m in zip(pattern, match))
 
@@ -170,25 +172,6 @@ class STQReader(QMainWindow):
             value = struct.unpack('<i', bytes.fromhex(hex_data[i:i + 8]))[0]
             self.data_grid.setItem(row_position, i // 8 + 1, QTableWidgetItem(str(value)))
 
-    def populate_grid_with_titles(self, windows_data):
-        title_count = 1
-
-        # Convert the hex to an ANSI string and split by spaces
-        windows = self.convert_to_windows_ansi(bytes.fromhex(windows_data)).split()
-
-        for window in windows:
-            row_position = self.data_grid.rowCount()
-            self.data_grid.insertRow(row_position)
-
-            # Insert the Title count
-            self.data_grid.setItem(row_position, 0, QTableWidgetItem(str(title_count)))
-
-            # Insert the string data into the grid
-            self.data_grid.setItem(row_position, 1, QTableWidgetItem(window))
-
-            title_count += 1
-
-
     def clear_data(self):
         if QMessageBox.question(self, 'Clear Data', "Are you sure you want to clear all data?",
                                 QMessageBox.Yes | QMessageBox.No, QMessageBox.No) == QMessageBox.Yes:
@@ -204,25 +187,15 @@ class STQReader(QMainWindow):
     def apply_styles(self):
         if self.dark_mode:
             style = "background-color: black; color: white;"
-            button_style = "border: 1px solid white; color: white;"
-            label_style = "background-color: black; color: white;"
+            button_style = "border: 1px solid white; color: white; padding-top: 10px; padding-bottom: 10px;"
         else:
             style = "background-color: white; color: black;"
-            button_style = "border: 1px solid white; color: black;"
-            label_style = "background-color: black; color: white;"
+            button_style = "border: 1px solid black; color: black; padding-top: 10px; padding-bottom: 10px;"
 
         self.setStyleSheet(style)
         self.text_edit.setStyleSheet(style)
         for i in range(self.buttons.count()):
             self.buttons.itemAt(i).widget().setStyleSheet(button_style)
-
-        # Apply label styles to the grid items
-        for row in range(self.data_grid.rowCount()):
-            for col in range(self.data_grid.columnCount()):
-                item = self.data_grid.item(row, col)
-                if item:
-                    item.setBackground(Qt.black)
-                    item.setForeground(Qt.white)
 
     def show_about_dialog(self):
         dialog = QDialog(self)
