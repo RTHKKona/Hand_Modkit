@@ -54,6 +54,7 @@ class STQReader(QMainWindow):
         main_layout.addLayout(self.buttons)
 
         self.setup_menu()
+        self.apply_styles()  # Apply initial styles
 
     def create_data_grid(self):
         grid = QTableWidget(self)
@@ -86,6 +87,7 @@ class STQReader(QMainWindow):
         for label, callback in buttons:
             button = QPushButton(label, self)
             button.clicked.connect(callback)
+            button.setStyleSheet("border: 1px solid white; color: black;")
             layout.addWidget(button)
             button_widgets.append(button)
 
@@ -196,26 +198,30 @@ class STQReader(QMainWindow):
 
     def toggle_theme(self):
         self.dark_mode = not self.dark_mode
+        self.apply_styles()
+
+    def apply_styles(self):
         if self.dark_mode:
             style = "background-color: black; color: white;"
-            button_style = "QPushButton {color: white; border: 1px solid white;}"
-            label_style = "QLabel {color: white; background-color: black; border: 1px solid white;}"
+            button_style = "border: 1px solid white; color: white;"
+            label_style = "background-color: black; color: white;"
         else:
-            style = ""
-            button_style = "QPushButton {border: 1px solid white;}"
-            label_style = ""
+            style = "background-color: white; color: black;"
+            button_style = "border: 1px solid white; color: black;"
+            label_style = "background-color: black; color: white;"
 
         self.setStyleSheet(style)
         self.text_edit.setStyleSheet(style)
-
-        # Apply styles to buttons
         for i in range(self.buttons.count()):
             self.buttons.itemAt(i).widget().setStyleSheet(button_style)
 
-        # Apply styles to labels in the about dialog
-        labels = self.findChildren(QLabel)
-        for label in labels:
-            label.setStyleSheet(label_style)
+        # Apply label styles to the grid items
+        for row in range(self.data_grid.rowCount()):
+            for col in range(self.data_grid.columnCount()):
+                item = self.data_grid.item(row, col)
+                if item:
+                    item.setBackground(Qt.black)
+                    item.setForeground(Qt.white)
 
     def show_about_dialog(self):
         dialog = QDialog(self)
@@ -230,6 +236,7 @@ class STQReader(QMainWindow):
                                                  "Ko-Fi - Handburger", "https://ko-fi.com/handburger", 64))
         close_button = QPushButton("Close", dialog)
         close_button.clicked.connect(dialog.close)
+        close_button.setStyleSheet("border: 1px solid white; color: black;")
         layout.addWidget(close_button)
 
         dialog.exec_()
@@ -244,6 +251,7 @@ class STQReader(QMainWindow):
         layout.addWidget(self.create_icon_label(icon_path, icon_size))
         link_label = QLabel(f'<a href="{url}">{text}</a>', self)
         link_label.setOpenExternalLinks(True)
+        link_label.setStyleSheet("color: white;")
         layout.addWidget(link_label)
         return layout
 
