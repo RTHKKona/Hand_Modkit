@@ -70,6 +70,7 @@ class STQReader(QMainWindow):
         ])
         grid.horizontalHeader().setFont(QFont("Arial", weight=QFont.Bold))
         grid.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        grid.horizontalHeader().setStyleSheet("color: black")
         grid.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         return grid
 
@@ -150,6 +151,7 @@ class STQReader(QMainWindow):
             # Add the title and data to grid
             self.populate_grid_with_titles(windows_data)
 
+
     def pattern_matches(self, match, pattern):
         return all(c == 'X' or c == m for c, m in zip(pattern, match))
 
@@ -171,22 +173,21 @@ class STQReader(QMainWindow):
     def populate_grid_with_titles(self, windows_data):
         title_count = 1
 
-        # Assuming that each 'window' of data is separated by spaces or newlines and should be split accordingly
-        windows = windows_data.split()
-        for i in range(0, len(windows), 6):  # 6 because we have 6 data columns
-            if len(windows[i:i+6]) == 6:
-                row_position = self.data_grid.rowCount()
-                self.data_grid.insertRow(row_position)
+        # Convert the hex to an ANSI string and split by spaces
+        windows = self.convert_to_windows_ansi(bytes.fromhex(windows_data)).split()
 
-                # Insert the Title count
-                self.data_grid.setItem(row_position, 0, QTableWidgetItem(str(title_count)))
+        for window in windows:
+            row_position = self.data_grid.rowCount()
+            self.data_grid.insertRow(row_position)
 
-                # Insert the data into the grid
-                for j in range(6):
-                    value = struct.unpack('<i', bytes.fromhex(windows[i+j]))[0]
-                    self.data_grid.setItem(row_position, j + 1, QTableWidgetItem(str(value)))
+            # Insert the Title count
+            self.data_grid.setItem(row_position, 0, QTableWidgetItem(str(title_count)))
 
-                title_count += 1
+            # Insert the string data into the grid
+            self.data_grid.setItem(row_position, 1, QTableWidgetItem(window))
+
+            title_count += 1
+
 
     def clear_data(self):
         if QMessageBox.question(self, 'Clear Data', "Are you sure you want to clear all data?",
