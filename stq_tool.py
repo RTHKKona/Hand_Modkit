@@ -58,9 +58,9 @@ class STQReader(QMainWindow):
 
     def create_data_grid(self):
         grid = QTableWidget(self)
-        grid.setColumnCount(7)  # Added a new column for "Title"
+        grid.setColumnCount(7)
         grid.setHorizontalHeaderLabels([
-            "Title",  # New label for the counted titles
+            "Title",
             "Size of File (samples)",
             "Number of Samples",
             "Number of Channels",
@@ -126,6 +126,9 @@ class STQReader(QMainWindow):
         )
 
     def search_patterns(self):
+        # Disable the search button after pressing
+        self.pattern_search_button.setEnabled(False)
+        
         content = self.text_edit.toPlainText().replace(' ', '').replace('\n', '')
         self.text_edit.clear()
         self.data_grid.clearContents()
@@ -148,20 +151,37 @@ class STQReader(QMainWindow):
         start_pattern = "0000000000000000736F756E64"
         start_index = content.find(start_pattern)
         if start_index != -1:
-            windows_data = content[start_index:]
-            self.text_edit.append(self.convert_to_windows_ansi(bytes.fromhex(windows_data)))
+            windows_data = content[start_index + len(start_pattern):]  # Skip the start pattern itself
 
-            # Add the title and data to grid
-            self.populate_grid_with_titles(windows_data)
+            # Split the data based on "00"
+            data_parts = windows_data.split("00")
+
+            # Iterate over the parts and display them
+            for part in data_parts:
+                if part:  # Check if the part is not empty
+                    # Convert hex to bytes and then decode as ANSI
+                    try:
+                        decoded_part = bytes.fromhex(part).decode('ansi')
+                    except UnicodeDecodeError:
+                        decoded_part = f"Error decoding part: {part}"
+                    self.text_edit.append(decoded_part)
+                    self.append_to_title_column(decoded_part)  # Add the decoded part to the "Title" column
+
+    def append_to_title_column(self, text):
+        # Find the "Title" column index
+        title_column_index = self.data_grid.horizontalHeaderItem(0).text().index("Title")
+        
+        # Start appending text to the first available row in the "Title" column
+        row_count = self.data_grid.rowCount()
+        
+        for row in range(row_count):
+            item = self.data_grid.item(row, title_column_index)
+            if item is None or item.text() == "":
+                self.data_grid.setItem(row, title_column_index, QTableWidgetItem(text))
+                break
 
     def pattern_matches(self, match, pattern):
         return all(c == 'X' or c == m for c, m in zip(pattern, match))
-
-    def convert_to_windows_ansi(self, data):
-        try:
-            return data.decode('ansi')
-        except UnicodeDecodeError:
-            return "Error decoding data to Windows ANSI format."
 
     def populate_grid(self, hex_data):
         row_position = self.data_grid.rowCount()
@@ -178,7 +198,7 @@ class STQReader(QMainWindow):
             self.text_edit.clear()
             self.data_grid.clearContents()
             self.data_grid.setRowCount(0)
-            self.pattern_search_button.setEnabled(False)
+            self.pattern_search_button.setEnabled(True)  # Re-enable the search button
 
     def toggle_theme(self):
         self.dark_mode = not self.dark_mode
