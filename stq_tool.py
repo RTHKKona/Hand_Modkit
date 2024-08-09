@@ -186,17 +186,17 @@ class STQReader(QMainWindow):
 
             for part in data_parts:
                 current_part += part
-                if len(current_part) % 2 != 0:  # If not even, there's an extra "0" that should belong to the previous part
-                    current_part = current_part[:-1]  # Remove the last "0" from the current part
-                    corrected_parts.append(current_part)  # Append the corrected part to the list
-                    current_part = "0"  # Start a new part with the extra "0"
-                else:
-                    corrected_parts.append(current_part)
-                    current_part = ""
+                if len(current_part) % 2 != 0:  # If odd number of digits
+                    if len(corrected_parts) > 0:
+                        # Append last digit to previous part to complete the hex byte
+                        corrected_parts[-1] += current_part[0]
+                        current_part = current_part[1:]
+                    # Ensure remaining current_part is now even
+                    if len(current_part) % 2 != 0 and len(corrected_parts) == 0:
+                        continue  # Skip if there's nothing to correct
 
-            # If there's any remaining part, add it
-            if current_part:
                 corrected_parts.append(current_part)
+                current_part = ""
 
             # Iterate over the corrected parts and display them
             for part in corrected_parts:
@@ -208,6 +208,7 @@ class STQReader(QMainWindow):
                         continue  # Skip invalid parts
                     self.text_edit.append(decoded_part)
                     self.append_to_title_column(decoded_part)  # Add the decoded part to the "Title" column
+
 
     def append_to_title_column(self, text):
         # Find the "File Directory" column index
