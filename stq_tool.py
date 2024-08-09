@@ -62,7 +62,7 @@ class STQReader(QMainWindow):
         grid = QTableWidget(self)
         grid.setColumnCount(7)
         grid.setHorizontalHeaderLabels([
-            "Title",
+            "File Directory",
             "Size of File (bytes)",  # Updated header
             "Number of Samples",
             "Number of Channels",
