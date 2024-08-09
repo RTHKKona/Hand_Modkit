@@ -1,9 +1,9 @@
 import sys
 import struct
 from PyQt5.QtWidgets import (
-    QApplication, QMainWindow, QWidget, QVBoxLayout, QPushButton, QTextEdit, QFileDialog, QAction, QLabel, QDialog, QHBoxLayout, QMessageBox
+    QApplication, QMainWindow, QWidget, QVBoxLayout, QPushButton, QTextEdit, QFileDialog, QAction, QLabel, QDialog, QHBoxLayout, QMessageBox, QTableWidget, QTableWidgetItem
 )
-from PyQt5.QtGui import QFont, QPixmap, QIcon, QTextCursor, QColor, QPalette, QBrush
+from PyQt5.QtGui import QFont, QPixmap, QIcon, QColor
 from PyQt5.QtCore import Qt, QRect
 
 class STQReader(QMainWindow):
@@ -24,9 +24,11 @@ class STQReader(QMainWindow):
 
         self.text_edit = self.create_text_edit(read_only=True)
         self.raw_stq_data = self.create_text_edit(read_only=True)
+        self.data_grid = self.create_data_grid()
 
         main_layout.addWidget(self.text_edit)
         main_layout.addWidget(self.raw_stq_data)
+        main_layout.addWidget(self.data_grid)
 
         control_layout = self.create_control_buttons()
         main_layout.addLayout(control_layout)
@@ -39,6 +41,20 @@ class STQReader(QMainWindow):
         text_edit.setFont(QFont("Consolas", 10))
         text_edit.setReadOnly(read_only)
         return text_edit
+
+    def create_data_grid(self):
+        grid = QTableWidget(self)
+        grid.setColumnCount(6)
+        grid.setHorizontalHeaderLabels([
+            "Size of File (samples)",
+            "Number of Samples",
+            "Number of Channels",
+            "Sample Rate Hz",
+            "Loop Start (samples)",
+            "Loop End (samples)"
+        ])
+        grid.horizontalHeader().setFont(QFont("Arial", weight=QFont.Bold))
+        return grid
 
     def create_control_buttons(self):
         layout = QHBoxLayout()
@@ -173,17 +189,29 @@ class STQReader(QMainWindow):
                     raw_data_list.append(match + end_hex)
         
         self.raw_stq_data.setText('\n'.join(raw_data_list))
+        self.populate_grid(raw_data_list)
         self.pattern_search_button.setEnabled(False)
 
     def pattern_matches(self, match):
         pattern = "XXXXXXXX XXXXXXXX 02000000 80BB0000 XXXXXXXX XXXXXXXX"
         return all(c == 'X' or c == m for c, m in zip(pattern.replace(' ', ''), match))
 
+    def populate_grid(self, raw_data_list):
+        self.data_grid.setRowCount(len(raw_data_list))
+
+        for row_idx, data in enumerate(raw_data_list):
+            split_data = data[:8] + "|" + data[8:16] + "|" + data[16:24] + "|" + data[24:32] + "|" + data[32:40] + "|" + data[40:48]
+            parts = split_data.split("|")
+            for col_idx, part in enumerate(parts):
+                self.data_grid.setItem(row_idx, col_idx, QTableWidgetItem(part))
+
     def clear_data(self):
         if QMessageBox.question(self, 'Clear Data', "Are you sure you want to clear all data?",
                                 QMessageBox.Yes | QMessageBox.No, QMessageBox.No) == QMessageBox.Yes:
             self.text_edit.clear()
             self.raw_stq_data.clear()
+            self.data_grid.clearContents()
+            self.data_grid.setRowCount(0)
             self.pattern_search_button.setEnabled(False)
 
     def export_raw_stq_data(self):
@@ -200,7 +228,6 @@ class STQReader(QMainWindow):
                 file.write(formatted_data)
 
     def format_raw_stq_data(self, data):
-        # Replace spaces in the pattern with '|'
         parts = data.split('\n')
         formatted_parts = ['|'.join(part[i:i+8] for i in range(0, len(part), 8)) for part in parts]
         return '\n'.join(formatted_parts)
