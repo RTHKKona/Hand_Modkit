@@ -82,14 +82,6 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 - Special thanks to the contributors of PyQt5 for providing the tools necessary to build this application.
 - Inspired by the need to manage and inspect `.stqr` files effectively in a user-friendly way.
 
-## Screenshots
-
-![Main Interface](screenshots/main_interface.png)
-*The main interface of Handburger's STQ Reader Tool.*
-
-![Dark Mode](screenshots/dark_mode.png)
-*Toggle dark mode for better readability in low-light conditions.*
-
 ## Support
 
 If you encounter any issues or have questions, feel free to open an issue in the [GitHub repository](https://github.com/YourUsername/your-repo-name/issues) or reach out via email.
