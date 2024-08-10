@@ -16,8 +16,8 @@
 
 ### Prerequisites
 
-- Python 3.x
-- PyQt5
+None!
+(Unless you're on Mac or Linux then use the Python file in the source!)
 
 ### Installation Steps
 
@@ -37,10 +37,6 @@
     ```
 
 3. **Run the application:**
-
-    ```bash
-    python stq_tool.py
-    ```
 
 ## Usage
 
@@ -75,7 +71,7 @@ Contributions are welcome! Please follow these steps to contribute:
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the GNU License. See the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgements
 
