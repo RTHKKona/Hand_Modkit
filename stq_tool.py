@@ -62,7 +62,7 @@ class STQReader(QMainWindow):
         grid = QTableWidget(self)
         grid.setColumnCount(7)
         grid.setHorizontalHeaderLabels([
-            "File Directory",  # Renamed header
+            "File Directory",  # Updated header
             "Size of File (bytes)",  # Updated header
             "Number of Samples",
             "Number of Channels",
@@ -75,7 +75,7 @@ class STQReader(QMainWindow):
         grid.horizontalHeader().sectionDoubleClicked.connect(self.resize_column_to_contents)
         grid.horizontalHeader().setStyleSheet("color: black")
         grid.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        grid.setEditTriggers(QTableWidget.DoubleClicked)  # Allow cells to be edited on double-click
+        grid.setEditTriggers(QTableWidget.DoubleClicked)  # Allow editing on double-click
         return grid
 
     def resize_column_to_contents(self, index):
@@ -95,11 +95,11 @@ class STQReader(QMainWindow):
         buttons = [
             ("Load .stqr File", self.load_file),
             ("Search Patterns", self.search_patterns),
+            ("Save Changes", self.save_changes),  # New button to save changes
             ("Clear", self.clear_data),
             ("Toggle Dark/Light Mode", self.toggle_theme),
             ("Increase Header Size", self.increase_header_size),
-            ("Decrease Header Size", self.decrease_header_size),
-            ("Save Changes", self.save_changes)  # Added save button
+            ("Decrease Header Size", self.decrease_header_size)
         ]
 
         button_widgets = []
@@ -178,40 +178,31 @@ class STQReader(QMainWindow):
         if start_index != -1:
             windows_data = content[start_index + len(start_pattern):]  # Skip the start pattern itself
 
-            # Split the data based on "00"
-            data_parts = windows_data.split("00")
-
-            # Reconstruct the data to ensure valid hex parts
-            reconstructed_parts = []
-            temp_part = ""
             digit_count = 0
+            buffer = ""
 
-            for part in data_parts:
-                temp_part += part
-                digit_count += len(part)
+            while windows_data:
+                # Take 2 digits at a time
+                part = windows_data[:2]
+                windows_data = windows_data[2:]
 
-                # Check for even number of digits
-                if digit_count % 2 != 0:
-                    # Move the last character to the next part
-                    temp_part += part[0]
-                    part = part[1:]
-
-                # Now process the current part if it has valid length and is ready
-                if len(temp_part) >= 8:  # Assuming minimum valid length is 8 digits
-                    reconstructed_parts.append(temp_part)
-                    temp_part = ""
+                # Check if we encounter "00"
+                if part == "00":
+                    if digit_count >= 8:
+                        try:
+                            # Decode buffer as ANSI
+                            decoded_part = bytes.fromhex(buffer).decode('ansi')
+                            self.text_edit.append(decoded_part)
+                            self.append_to_title_column(decoded_part)  # Add the decoded part to the "File Directory" column
+                        except (ValueError, UnicodeDecodeError):
+                            pass
+                    # Reset count and buffer
                     digit_count = 0
-
-            # Iterate over the parts and display them
-            for part in reconstructed_parts:
-                if part:  # Ensure part is not empty
-                    try:
-                        # Convert hex to bytes and then decode as ANSI
-                        decoded_part = bytes.fromhex(part).decode('ansi')
-                    except (ValueError, UnicodeDecodeError):
-                        decoded_part = f"Error decoding part: {part}"
-                    self.text_edit.append(decoded_part)
-                    self.append_to_title_column(decoded_part)  # Add the decoded part to the "File Directory" column
+                    buffer = ""
+                else:
+                    # Accumulate the hex digits and increase count
+                    buffer += part
+                    digit_count += 2
 
     def append_to_title_column(self, text):
         # Find the "File Directory" column index
@@ -276,23 +267,29 @@ class STQReader(QMainWindow):
         self.data_grid.horizontalHeader().setFont(header_font)
 
     def save_changes(self):
-        # Open a file dialog to select where to save the modified file
-        save_file_name, _ = QFileDialog.getSaveFileName(self, "Save Modified .stqr File", "", "STQ Files (*.stqr);;All Files (*)")
-        if save_file_name:
-            # Example logic to save grid data back to a .stqr file
-            with open(save_file_name, 'wb') as file:
-                # Write header, etc.
-                # Example: file.write(self.header_data)
-
-                # Write grid data
+        file_name, _ = QFileDialog.getSaveFileName(self, "Save STQR File", "", "STQ Files (*.stqr);;All Files (*)")
+        if file_name:
+            with open(file_name, 'wb') as file:
+                # Gather data from the grid to save to the file
                 for row in range(self.data_grid.rowCount()):
+                    row_data = []
                     for col in range(self.data_grid.columnCount()):
                         item = self.data_grid.item(row, col)
                         if item:
-                            value = int(item.text())
-                            file.write(struct.pack('<i', value))
-            
-            QMessageBox.information(self, "Save Successful", "The file has been saved successfully.")
+                            row_data.append(item.text())
+                        else:
+                            row_data.append("")
+                    # Convert the row data back to binary format and write to the file
+                    # This is just an example; adjust this as needed for your specific file format.
+                    file.write(self.convert_row_to_binary(row_data))
+
+    def convert_row_to_binary(self, row_data):
+        # Example conversion of row data to binary format
+        binary_data = b""
+        for data in row_data:
+            # Convert each string to binary; this needs to be adjusted to your specific format
+            binary_data += data.encode('ascii') + b'\x00'
+        return binary_data
 
     def show_about_dialog(self):
         dialog = QDialog(self)
@@ -305,9 +302,9 @@ class STQReader(QMainWindow):
         layout.addWidget(self.create_icon_label(self.get_resource_path("egg.png"), 100))
         layout.addWidget(about_label)
         layout.addLayout(self.create_link_layout(self.get_resource_path("github.png"),
-                                                 "Github - RTHKKona", "https://github.com/RTHKKona", 80))  # Larger hyperlink text
+                                                 "Github - RTHKKona", "https://github.com/RTHKKona", 64))
         layout.addLayout(self.create_link_layout(self.get_resource_path("ko-fi.png"),
-                                                 "Ko-Fi - Handburger", "https://ko-fi.com/handburger", 80))  # Larger hyperlink text
+                                                 "Ko-Fi - Handburger", "https://ko-fi.com/handburger", 64))
         close_button = QPushButton("Close", dialog)
         close_button.clicked.connect(dialog.close)
         close_button.setStyleSheet("border: 1px solid white; color: black;")
@@ -332,7 +329,8 @@ class STQReader(QMainWindow):
         layout.addWidget(self.create_icon_label(icon_path, icon_size))
         link_label = QLabel(f'<a href="{url}">{text}</a>', self)
         link_label.setOpenExternalLinks(True)
-        link_label.setStyleSheet("color: white; font-size: 14px;")  # Larger hyperlink text
+        link_label.setFont(QFont("Arial", 12))  # Increase font size for hyperlinks
+        link_label.setStyleSheet("color: white;")
         layout.addWidget(link_label)
         return layout
 
