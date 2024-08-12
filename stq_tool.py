@@ -16,6 +16,8 @@ class STQReader(QMainWindow):
         self.loaded_file_name = ""
         self.original_content = b""
         self.pattern_offsets = []
+        self.undo_stack = []  # Initialize the undo stack
+        self.redo_stack = []  # Initialize the redo stack
         self.init_ui()
 
     def init_ui(self):
@@ -82,6 +84,8 @@ class STQReader(QMainWindow):
             ("Search Patterns", self.search_patterns),
             ("Save Changes", self.save_changes),
             ("Clear", self.clear_data),
+            ("Undo", self.undo),
+            ("Redo", self.redo),  # New Redo button
             ("Toggle Dark/Light Mode", self.toggle_theme),
             ("Increase Header Size", self.increase_header_size),
             ("Decrease Header Size", self.decrease_header_size)
@@ -93,6 +97,7 @@ class STQReader(QMainWindow):
         self.pattern_search_button = layout.itemAt(1).widget()
         self.pattern_search_button.setEnabled(False)
         return layout
+
 
     def setup_menu(self):
         about_action = QAction("About", self)
@@ -130,6 +135,7 @@ class STQReader(QMainWindow):
         content = self.original_content.hex().upper().replace(' ', '').replace('\n', '')
         self.data_grid.clearContents()
         self.data_grid.setRowCount(0)
+        self.pattern_offsets.clear()  # Ensure pattern offsets are reset
 
         self.text_panel.show()  # Show the new text panel
         self.text_panel.clear()  # Clear any previous content
@@ -142,6 +148,7 @@ class STQReader(QMainWindow):
                 formatted_hex = self.format_hex(bytes.fromhex(window_data))
                 self.text_panel.append(f"Found pattern at index {index // 2}:\n{formatted_hex}\n")
                 self.populate_grid(window_data)
+                self.pattern_offsets.append(index // 2)  # Store the offset
 
         self.text_panel.append("\n")
 
@@ -192,29 +199,109 @@ class STQReader(QMainWindow):
             self.data_grid.setItem(row_position, i // 8 + 1, QTableWidgetItem(str(value)))
 
     def save_changes(self):
-        file_name, _ = QFileDialog.getSaveFileName(self, "Save STQR File", "", "STQ Files (*.stqr);;All Files (*)")
+        if not self.loaded_file_name:
+            QMessageBox.warning(self, "No File Loaded", "Please load a file before trying to save.")
+            return
+
+        # Revalidate the offsets list before saving
+        if len(self.pattern_offsets) != self.data_grid.rowCount():
+            QMessageBox.critical(self, "Save Failed", "Pattern offsets do not match the number of rows in the grid. Unable to save changes.")
+            return
+
+        file_name, _ = QFileDialog.getSaveFileName(self, "Save STQR File", self.loaded_file_name, "STQ Files (*.stqr);;All Files (*)")
         if file_name:
-            modified_content = bytearray(self.original_content)
-            for row in range(self.data_grid.rowCount()):
-                offset = self.pattern_offsets[row]
-                for col in range(1, 7):
-                    int_value = int(self.data_grid.item(row, col).text())
-                    hex_value = struct.pack('<i', int_value)
-                    start = offset + (col - 1) * 4
-                    modified_content[start:start + 4] = hex_value
-            with open(file_name, 'wb') as file:
-                file.write(modified_content)
+            try:
+                modified_content = bytearray(self.original_content)
+                for row in range(self.data_grid.rowCount()):
+                    offset = self.pattern_offsets[row]
+                    for col in range(1, 7):
+                        cell_item = self.data_grid.item(row, col)
+                        if not cell_item:
+                            raise ValueError(f"Missing data at row {row}, column {col}. Unable to save changes.")
+
+                        int_value = int(cell_item.text())
+                        hex_value = struct.pack('<i', int_value)
+                        start = offset + (col - 1) * 4
+                        modified_content[start:start + 4] = hex_value
+
+                with open(file_name, 'wb') as file:
+                    file.write(modified_content)
+                QMessageBox.information(self, "Save Successful", f"File saved successfully to {file_name}")
+            except IndexError as e:
+                QMessageBox.critical(self, "Save Failed", f"An error occurred: {str(e)}")
+            except ValueError as e:
+                QMessageBox.critical(self, "Save Failed", f"An error occurred: {str(e)}")
+            except Exception as e:
+                QMessageBox.critical(self, "Save Failed", f"An unexpected error occurred: {str(e)}")
+
 
     def clear_data(self):
-        if QMessageBox.question(self, 'Clear Data', "Are you sure you want to clear all data?",
-                                QMessageBox.Yes | QMessageBox.No, QMessageBox.No) == QMessageBox.Yes:
-            self.text_panel.clear()
-            self.text_panel.hide()  # Hide the text panel when clearing
-            self.data_grid.clearContents()
-            self.data_grid.setRowCount(0)
-            self.setWindowTitle("Handburger's STQ Reader Tool")
-            self.pattern_search_button.setEnabled(True)
-            self.background_label.hide()
+        reply = QMessageBox.question(
+            self, 'Clear Data', 
+            "Are you sure you want to clear all data? This action cannot be undone.",
+            QMessageBox.Yes | QMessageBox.No, QMessageBox.No
+        )
+
+        if reply == QMessageBox.Yes:
+            self.store_state()  # Store the current state before clearing
+            self.text_edit.clear()  # Clear the original hex code display
+            self.text_panel.clear()  # Clear the additional text panel
+            self.text_panel.hide()   # Hide the text panel when clearing
+            self.data_grid.clearContents()  # Clear the grid content
+            self.data_grid.setRowCount(0)  # Reset the row count in the grid
+            self.pattern_offsets.clear()  # Clear the pattern offsets
+            self.setWindowTitle("Handburger's STQ Reader Tool")  # Reset the window title
+            self.pattern_search_button.setEnabled(True)  # Re-enable the search button
+            self.background_label.hide()  # Hide the background label
+            self.loaded_file_name = ""  # Clear the loaded file name
+            self.original_content = b""  # Reset the original content
+            QMessageBox.information(self, "Clear Successful", "All data has been cleared.")
+            
+    def undo(self):
+        if self.undo_stack:
+            current_state = {
+                'text_edit': self.text_edit.toPlainText(),
+                'text_panel': self.text_panel.toPlainText(),
+                'grid_data': [],
+                'pattern_offsets': self.pattern_offsets[:],
+                'file_name': self.loaded_file_name,
+                'original_content': self.original_content
+            }
+            
+            for row in range(self.data_grid.rowCount()):
+                row_data = []
+                for col in range(self.data_grid.columnCount()):
+                    item = self.data_grid.item(row, col)
+                    row_data.append(item.text() if item else "")
+                current_state['grid_data'].append(row_data)
+            
+            self.redo_stack.append(current_state)  # Push the current state to the redo stack
+            
+            previous_state = self.undo_stack.pop()  # Pop the last state from the undo stack
+            self.restore_state(previous_state)  # Restore the previous state
+
+    def redo(self):
+        if self.redo_stack:
+            current_state = {
+                'text_edit': self.text_edit.toPlainText(),
+                'text_panel': self.text_panel.toPlainText(),
+                'grid_data': [],
+                'pattern_offsets': self.pattern_offsets[:],
+                'file_name': self.loaded_file_name,
+                'original_content': self.original_content
+            }
+            
+            for row in range(self.data_grid.rowCount()):
+                row_data = []
+                for col in range(self.data_grid.columnCount()):
+                    item = self.data_grid.item(row, col)
+                    row_data.append(item.text() if item else "")
+                current_state['grid_data'].append(row_data)
+            
+            self.undo_stack.append(current_state)  # Push the current state to the undo stack
+            
+            next_state = self.redo_stack.pop()  # Pop the last state from the redo stack
+            self.restore_state(next_state)  # Restore the next state
 
     def toggle_theme(self):
         self.dark_mode = not self.dark_mode
@@ -238,6 +325,43 @@ class STQReader(QMainWindow):
         header_font = self.data_grid.horizontalHeader().font()
         header_font.setPointSize(header_font.pointSize() - 1)
         self.data_grid.horizontalHeader().setFont(header_font)
+    def store_state(self):
+        state = {
+            'text_edit': self.text_edit.toPlainText(),
+            'text_panel': self.text_panel.toPlainText(),
+            'grid_data': [],
+            'pattern_offsets': self.pattern_offsets[:],
+            'file_name': self.loaded_file_name,
+            'original_content': self.original_content
+        }
+        
+        for row in range(self.data_grid.rowCount()):
+            row_data = []
+            for col in range(self.data_grid.columnCount()):
+                item = self.data_grid.item(row, col)
+                row_data.append(item.text() if item else "")
+            state['grid_data'].append(row_data)
+        
+        # Push the current state to the undo stack and clear the redo stack
+        self.undo_stack.append(state)
+        self.redo_stack.clear()
+
+    def restore_state(self, state):
+        self.text_edit.setText(state['text_edit'])
+        self.text_panel.setText(state['text_panel'])
+        self.text_panel.setVisible(bool(state['text_panel']))  # Show text panel if there is content
+
+        self.data_grid.setRowCount(len(state['grid_data']))
+        for row, row_data in enumerate(state['grid_data']):
+            for col, cell_data in enumerate(row_data):
+                self.data_grid.setItem(row, col, QTableWidgetItem(cell_data))
+        
+        self.pattern_offsets = state['pattern_offsets']
+        self.loaded_file_name = state['file_name']
+        self.original_content = state['original_content']
+        self.setWindowTitle(f"Handburger's STQ Reader Tool - Editing {os.path.basename(self.loaded_file_name)}")
+
+
 
     def show_about_dialog(self):
         dialog = QDialog(self)
@@ -263,7 +387,7 @@ class STQReader(QMainWindow):
     def create_about_text(self):
         return (
             "Handburger's STQ Reader Tool\n"
-            "Version 1.1\n\n"
+            "Version 1.2\n\n"
             "This tool is designed for analyzing and reading .stqr files, providing a comprehensive interface for examining hexadecimal data.\n"
         )
 
