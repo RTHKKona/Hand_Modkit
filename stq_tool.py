@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtGui import QFont, QPixmap, QIcon
 from PyQt5.QtCore import Qt, QRect
 
-class STQReader(QMainWindow):
+class STQTool(QMainWindow):
     def __init__(self):
         super().__init__()
         self.dark_mode = False
@@ -391,9 +391,9 @@ class STQReader(QMainWindow):
 
     def create_about_text(self):
         return (
-            "Handburger's STQ Reader Tool\n"
-            "Version 1.2\n\n"
-            "This tool is designed for analyzing and reading .stqr files, providing a comprehensive interface for examining hexadecimal data.\n"
+            "Handburger's STQ Tool\n"
+            "Version 1.3\n\n"
+            "Handburger's STQTool, capable of editing, viewing, and pattern analyzing STQ/STQR files.\n"
         )
 
     def create_icon_label(self, icon_path, size):
@@ -416,6 +416,6 @@ class STQReader(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    reader = STQReader()
+    reader = STQTool()
     reader.show()
     sys.exit(app.exec_())
