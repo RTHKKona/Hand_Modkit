@@ -74,8 +74,13 @@ class STQReader(QMainWindow):
         ])
         grid.horizontalHeader().setFont(QFont("Arial", weight=QFont.Bold))
         grid.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        
+        # Set the header background color to grey
+        grid.horizontalHeader().setStyleSheet("QHeaderView::section { background-color: grey; color: white; }")
+        
         grid.setEditTriggers(QTableWidget.DoubleClicked)
         return grid
+
 
     def create_buttons(self):
         layout = QHBoxLayout()
