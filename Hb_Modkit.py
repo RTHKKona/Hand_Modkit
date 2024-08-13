@@ -65,14 +65,14 @@ def show_splash_screen(app):
         print(f"Error: Splash image '{splash_image_path}' not found.")
         return None
 
-    pixmap = QPixmap(splash_image_path).scaled(500, 500, Qt.KeepAspectRatio)  # Smaller egg image
+    pixmap = QPixmap(splash_image_path).scaled(550, 550, Qt.KeepAspectRatio)  # Splash Scale
     splash = QSplashScreen(pixmap, Qt.WindowStaysOnTopHint)
     splash.setMask(pixmap.mask())
 
     splash.show()
 
-    # Splash screen lasts for 2.5 seconds
-    QTimer.singleShot(2840, splash.close)
+    # Splash screen timer
+    QTimer.singleShot(3400, splash.close)
 
     return splash
 
