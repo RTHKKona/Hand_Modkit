@@ -1,13 +1,15 @@
-# Handburger's MHGU Mod Platform
+# Handburger's MHGU Mod Platform (Hand_Modkit)
 
 ## Overview
 
-My MHGU Mod Platform, also known as Hand_Modkit is a comprehensive tool designed for modding Monster Hunter Generations Ultimate (MHGU). This platform integrates multiple tools into a single, user-friendly application, allowing users to easily modify and customize their game files.
+My MHGU Mod Platform, also known as Hand_Modkit, is a comprehensive tool designed for modding Monster Hunter Generations Ultimate (MHGU). This platform integrates multiple tools into a single, user-friendly application, allowing users to easily modify and customize their game files.
 
 ### Features
 
 - **STQ Tool**: Edit and manage .opus STQR files with an intuitive hex editor.
 - **Opus Header Injector**: Modify and inject headers into headerless OPUS audio files.
+- **FolderMaker** : Create a directory to the exact name of the file you want to replace.
+- **Hex De/Encoder** : Convert from hexadecimal to little Endian 32-bit signed integer and Windows ANSI.
 - **Audio Calculator**: Convert between audio samples and duration in MM:SS.s format, with support for high-precision calculations. (For Opus Header Injector)
 - **Adjustable Font Size**: Increase or decrease the font size within the application using `Ctrl +` and `Ctrl -` hotkeys.
 
@@ -41,7 +43,7 @@ Ensure you have the following installed on your system:
 
 3. **Run the application**:
     ```bash
-    python Hb_Modtool.py
+    python Hb_Modkit.py
     ```
 
 ### Usage
