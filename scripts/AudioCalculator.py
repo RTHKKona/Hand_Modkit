@@ -63,10 +63,13 @@ class AudioCalculator(QMainWindow):
         calculate_button = QPushButton("Calculate", self)
         calculate_button.clicked.connect(self.calculate)
 
+        clear_button = QPushButton("Clear", self)
+        clear_button.clicked.connect(self.clear_inputs)
+
         toggle_theme_button = QPushButton("Toggle Theme", self)
         toggle_theme_button.clicked.connect(self.toggle_theme)
 
-        for widget in [self.settings_label, self.mode_samples_to_duration, self.mode_duration_to_samples, calculate_button, toggle_theme_button]:
+        for widget in [self.settings_label, self.mode_samples_to_duration, self.mode_duration_to_samples, calculate_button, clear_button, toggle_theme_button]:
             center_layout.addWidget(widget)
         
         return center_frame
@@ -104,6 +107,11 @@ class AudioCalculator(QMainWindow):
         except (InvalidOperation, ValueError) as e:
             self.result_output.setText("Invalid input! Please enter a valid value.")
             print(f"Error: {e}")
+
+    def clear_inputs(self):
+        """Clears the input and output fields."""
+        self.audio_input.clear()
+        self.result_output.clear()
 
     def update_font_size(self):
         font = QFont()

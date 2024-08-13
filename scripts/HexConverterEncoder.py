@@ -1,7 +1,7 @@
 import sys
 import struct
 from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QTextEdit, QPushButton, QWidget, QApplication, QComboBox, QRadioButton, QButtonGroup, QFrame
-from PyQt5.QtGui import QColor, QFont
+from PyQt5.QtGui import QColor, QFont, QTextCursor
 from PyQt5.QtCore import Qt
 
 class HexConverterEncoder(QMainWindow):
@@ -70,6 +70,10 @@ class HexConverterEncoder(QMainWindow):
         clipboard_button = QPushButton("Copy to Clipboard", self)
         clipboard_button.clicked.connect(self.copy_to_clipboard)
         center_layout.addWidget(clipboard_button)
+
+        clear_button = QPushButton("Clear", self)
+        clear_button.clicked.connect(self.clear_fields)
+        center_layout.addWidget(clear_button)
 
         # Right Column - Output
         right_frame = QFrame(self)
@@ -148,6 +152,10 @@ class HexConverterEncoder(QMainWindow):
     def copy_to_clipboard(self):
         clipboard = QApplication.clipboard()
         clipboard.setText(self.result_output.toPlainText())
+
+    def clear_fields(self):
+        self.hex_input.clear()
+        self.result_output.clear()
 
     def toggle_dark_mode(self):
         dark_mode = self.palette().color(self.backgroundRole()) == QColor(Qt.black)
