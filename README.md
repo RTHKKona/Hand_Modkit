@@ -75,6 +75,7 @@ Contributions are welcome! If you'd like to contribute, please follow these step
 3. Commit your changes (`git commit -m 'Add some new feature'`).
 4. Push to the branch (`git push origin feature/new-feature`).
 5. Open a Pull Request.
+6. [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/L3L711AIP8) ;) 
 
 Please ensure that your code follows the project's style guidelines and includes appropriate tests.
 
