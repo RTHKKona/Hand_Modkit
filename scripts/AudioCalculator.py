@@ -132,6 +132,7 @@ class AudioCalculator(QMainWindow):
             QLabel { color: #ffebcd; }
             QRadioButton { color: #ffebcd; }
             QPushButton { background-color: #4d4d4d; color: #ffebcd; }
+            QFrame { background-color: #2b2b2b; color: #ffebcd; }
         """ if self.dark_mode else ""
         self.setStyleSheet(stylesheet)
 

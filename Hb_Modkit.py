@@ -5,20 +5,22 @@ from PyQt5.QtGui import QIcon, QPixmap, QKeySequence
 from PyQt5.QtCore import Qt, QTimer
 from scripts import stq_tool, OpusHeaderInjector, AudioCalculator, FolderMaker, HexConverterEncoder  # Ensure this line is included
 
-class MHGU_Mod_Platform(QMainWindow):
+class MHGU_Modkit_Platform(QMainWindow):
     def __init__(self):
         super().__init__()
         self.init_ui()
 
     def init_ui(self):
         try:
-            self.setWindowTitle("Handburger's MHGU Mod Platform Alpha v0.0.3")
-            self.setGeometry(100, 100, 1400, 800)
+            self.setWindowTitle("Handburger's MHGU Modkit Platform Alpha v0.0.4")  # Updated version
+            self.setGeometry(250, 250, 1400, 800)  # Updated location
             self.setStyleSheet("QMainWindow { background-color: #f0f0f0; }")
             self.setWindowIcon(QIcon(self.get_resource_path("egg.ico")))
 
             self.tab_widget = QTabWidget(movable=True)
-            self.tab_widget.setStyleSheet("QTabBar::tab { min-width: 150px; font-size: 12px; }")
+            self.tab_widget.setStyleSheet("""
+                QTabBar::tab { min-width: 150px; font-size: 12px; padding: 10px; }  # Added padding
+            """)
             self.setCentralWidget(self.tab_widget)
 
             self.add_tabs()
@@ -71,8 +73,8 @@ def show_splash_screen(app):
 
     splash.show()
 
-    # Splash screen timer
-    QTimer.singleShot(3400, splash.close)
+    # Splash screen timer set to 4 seconds (4000 milliseconds)
+    QTimer.singleShot(4000, splash.close)
 
     return splash
 
@@ -82,7 +84,7 @@ if __name__ == '__main__':
         
         splash = show_splash_screen(app)
         
-        main_window = MHGU_Mod_Platform()
+        main_window = MHGU_Modkit_Platform()
         main_window.show()
 
         if splash:

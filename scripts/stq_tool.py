@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtGui import QFont, QPixmap, QIcon
 from PyQt5.QtCore import Qt, QRect
 
+
 class STQTool(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -21,8 +22,13 @@ class STQTool(QMainWindow):
         self.init_ui()
 
     def get_resource_path(self, filename):
-        base_dir =  os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        base_dir = os.path.dirname(script_dir)
         assets_path = os.path.join(base_dir, 'assets', filename)
+        
+        if not os.path.exists(assets_path):
+            self.show_error_message("Error", f"Resource not found: {filename} in {assets_path}. Sadge")
+            return None
         return assets_path
 
     def init_ui(self):
@@ -67,6 +73,28 @@ class STQTool(QMainWindow):
         self.setup_menu()
         self.apply_styles()
 
+    def show_message_box(self, icon, title, message):
+        msg_box = QMessageBox(self)
+        msg_box.setIcon(icon)
+        msg_box.setWindowTitle(title)
+        msg_box.setText(message)
+        
+        # Apply dark mode styling if enabled
+        if self.dark_mode:
+            msg_box.setStyleSheet("""
+                QMessageBox { background-color: #4d4d4d; color: #ffebcd; }
+                QPushButton { background-color: #4d4d4d; color: #ffebcd; }
+                QLabel { color: #ffebcd; }
+            """)
+        
+        msg_box.exec_()
+
+    def show_info_message(self, title, message):
+        self.show_message_box(QMessageBox.Information, title, message)
+
+    def show_error_message(self, title, message):
+        self.show_message_box(QMessageBox.Critical, title, message)
+
     def create_data_grid(self):
         grid = QTableWidget(self)
         grid.setColumnCount(7)
@@ -77,7 +105,6 @@ class STQTool(QMainWindow):
         ])
         grid.horizontalHeader().setFont(QFont("Arial", weight=QFont.Bold))
         grid.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
-
         grid.setEditTriggers(QTableWidget.DoubleClicked)
         return grid
 
@@ -89,7 +116,7 @@ class STQTool(QMainWindow):
             ("Save Changes", self.save_changes),
             ("Clear", self.clear_data),
             ("Undo", self.undo),
-            ("Redo", self.redo),  # New Redo button
+            ("Redo", self.redo),
             ("Toggle Theme", self.toggle_theme),
             ("Increase Header Size", self.increase_header_size),
             ("Decrease Header Size", self.decrease_header_size)
@@ -157,28 +184,27 @@ class STQTool(QMainWindow):
         start_pattern = "0000000000000000736F756E64"
         start_index = content.find(start_pattern)
         if start_index != -1:
-            windows_data = content[start_index + len(start_pattern):]
+            self.extract_directory_data(content[start_index + len(start_pattern):])
 
-            digit_count = 0
-            buffer = ""
-
-            while windows_data:
-                part = windows_data[:2]
-                windows_data = windows_data[2:]
-
-                if part == "00":
-                    if digit_count >= 8:
-                        try:
-                            decoded_part = bytes.fromhex(buffer).decode('ansi')
-                            self.text_panel.append(f"Found directory: {decoded_part}\n")
-                            self.append_to_title_column(decoded_part)
-                        except (ValueError, UnicodeDecodeError):
-                            pass
-                    digit_count = 0
-                    buffer = ""
-                else:
-                    buffer += part
-                    digit_count += 2
+    def extract_directory_data(self, data):
+        digit_count = 0
+        buffer = ""
+        while data:
+            part = data[:2]
+            data = data[2:]
+            if part == "00":
+                if digit_count >= 8:
+                    try:
+                        decoded_part = bytes.fromhex(buffer).decode('ansi')
+                        self.text_panel.append(f"Found directory: {decoded_part}\n")
+                        self.append_to_title_column(decoded_part)
+                    except (ValueError, UnicodeDecodeError):
+                        pass
+                digit_count = 0
+                buffer = ""
+            else:
+                buffer += part
+                digit_count += 2
 
     def append_to_title_column(self, text):
         title_column_index = 0
@@ -195,20 +221,17 @@ class STQTool(QMainWindow):
     def populate_grid(self, hex_data):
         row_position = self.data_grid.rowCount()
         self.data_grid.insertRow(row_position)
-
-        # Populate grid with decoded integer values from hex_data in little-endian format
         for i in range(0, len(hex_data), 8):
             value = struct.unpack('<i', bytes.fromhex(hex_data[i:i + 8]))[0]
             self.data_grid.setItem(row_position, i // 8 + 1, QTableWidgetItem(str(value)))
 
     def save_changes(self):
         if not self.loaded_file_name:
-            QMessageBox.warning(self, "No File Loaded", "Please load a file before trying to save.")
+            self.show_error_message("No File Loaded", "Please load a file before trying to save.")
             return
 
-        # Revalidate the offsets list before saving
         if len(self.pattern_offsets) != self.data_grid.rowCount():
-            QMessageBox.critical(self, "Save Failed", "Pattern offsets do not match the number of rows in the grid. Unable to save changes.")
+            self.show_error_message("Save Failed", "Pattern offsets do not match the number of rows in the grid. Unable to save changes.")
             return
 
         file_name, _ = QFileDialog.getSaveFileName(self, "Save STQR File", self.loaded_file_name, "STQ Files (*.stqr);;All Files (*)")
@@ -221,7 +244,6 @@ class STQTool(QMainWindow):
                         cell_item = self.data_grid.item(row, col)
                         if not cell_item:
                             raise ValueError(f"Missing data at row {row}, column {col}. Unable to save changes.")
-
                         int_value = int(cell_item.text())
                         hex_value = struct.pack('<i', int_value)
                         start = offset + (col - 1) * 4
@@ -230,81 +252,81 @@ class STQTool(QMainWindow):
                 with open(file_name, 'wb') as file:
                     file.write(modified_content)
                 QMessageBox.information(self, "Save Successful", f"File saved successfully to {file_name}")
-            except IndexError as e:
-                QMessageBox.critical(self, "Save Failed", f"An error occurred: {str(e)}")
-            except ValueError as e:
-                QMessageBox.critical(self, "Save Failed", f"An error occurred: {str(e)}")
             except Exception as e:
                 QMessageBox.critical(self, "Save Failed", f"An unexpected error occurred: {str(e)}")
 
     def clear_data(self):
-        reply = QMessageBox.question(
-            self, 'Clear Data', 
+        if QMessageBox.question(
+            self, 'Clear Data',
             "Are you sure you want to clear all data? This action cannot be undone.",
             QMessageBox.Yes | QMessageBox.No, QMessageBox.No
-        )
-
-        if reply == QMessageBox.Yes:
-            self.store_state()  # Store the current state before clearing
-            self.text_edit.clear()  # Clear the original hex code display
-            self.text_panel.clear()  # Clear the additional text panel
-            self.text_panel.hide()   # Hide the text panel when clearing
-            self.data_grid.clearContents()  # Clear the grid content
-            self.data_grid.setRowCount(0)  # Reset the row count in the grid
-            self.pattern_offsets.clear()  # Clear the pattern offsets
-            self.setWindowTitle("Handburger's STQ Reader Tool")  # Reset the window title
-            self.pattern_search_button.setEnabled(True)  # Re-enable the search button
-            self.background_label.hide()  # Hide the background label
-            self.loaded_file_name = ""  # Clear the loaded file name
-            self.original_content = b""  # Reset the original content
+        ) == QMessageBox.Yes:
+            self.store_state()
+            self.text_edit.clear()
+            self.text_panel.clear()
+            self.text_panel.hide()
+            self.data_grid.clearContents()
+            self.data_grid.setRowCount(0)
+            self.pattern_offsets.clear()
+            self.setWindowTitle("Handburger's STQ Reader Tool")
+            self.pattern_search_button.setEnabled(True)
+            self.background_label.hide()
+            self.loaded_file_name = ""
+            self.original_content = b""
             QMessageBox.information(self, "Clear Successful", "All data has been cleared.")
 
     def undo(self):
         if self.undo_stack:
-            current_state = {
-                'text_edit': self.text_edit.toPlainText(),
-                'text_panel': self.text_panel.toPlainText(),
-                'grid_data': [],
-                'pattern_offsets': self.pattern_offsets[:],
-                'file_name': self.loaded_file_name,
-                'original_content': self.original_content
-            }
-
-            for row in range(self.data_grid.rowCount()):
-                row_data = []
-                for col in range(self.data_grid.columnCount()):
-                    item = self.data_grid.item(row, col)
-                    row_data.append(item.text() if item else "")
-                current_state['grid_data'].append(row_data)
-
-            self.redo_stack.append(current_state)  # Push the current state to the redo stack
-
-            previous_state = self.undo_stack.pop()  # Pop the last state from the undo stack
-            self.restore_state(previous_state)  # Restore the previous state
+            self.redo_stack.append(self.capture_current_state())
+            self.restore_state(self.undo_stack.pop())
 
     def redo(self):
         if self.redo_stack:
-            current_state = {
-                'text_edit': self.text_edit.toPlainText(),
-                'text_panel': self.text_panel.toPlainText(),
-                'grid_data': [],
-                'pattern_offsets': self.pattern_offsets[:],
-                'file_name': self.loaded_file_name,
-                'original_content': self.original_content
-            }
+            self.undo_stack.append(self.capture_current_state())
+            self.restore_state(self.redo_stack.pop())
 
-            for row in range(self.data_grid.rowCount()):
-                row_data = []
-                for col in range(self.data_grid.columnCount()):
-                    item = self.data_grid.item(row, col)
-                    row_data.append(item.text() if item else "")
-                current_state['grid_data'].append(row_data)
+    def capture_current_state(self):
+        return {
+            'text_edit': self.text_edit.toPlainText(),
+            'text_panel': self.text_panel.toPlainText(),
+            'grid_data': [
+                [self.data_grid.item(row, col).text() if self.data_grid.item(row, col) else "" for col in range(self.data_grid.columnCount())]
+                for row in range(self.data_grid.rowCount())
+            ],
+            'pattern_offsets': self.pattern_offsets[:],
+            'file_name': self.loaded_file_name,
+            'original_content': self.original_content
+        }
 
-            self.undo_stack.append(current_state)  # Push the current state to the undo stack
+    def restore_state(self, state):
+        self.text_edit.setText(state['text_edit'])
+        self.text_panel.setText(state['text_panel'])
+        self.text_panel.setVisible(bool(state['text_panel']))
+        self.data_grid.setRowCount(len(state['grid_data']))
+        for row, row_data in enumerate(state['grid_data']):
+            for col, cell_data in enumerate(row_data):
+                self.data_grid.setItem(row, col, QTableWidgetItem(cell_data))
+        self.pattern_offsets = state['pattern_offsets']
+        self.loaded_file_name = state['file_name']
+        self.original_content = state['original_content']
+        self.setWindowTitle(f"Handburger's STQ Reader Tool - Editing {os.path.basename(self.loaded_file_name)}")
+    def store_state(self):
+        state = {
+            'text_edit': self.text_edit.toPlainText(),
+            'text_panel': self.text_panel.toPlainText(),
+            'grid_data': [
+                [self.data_grid.item(row, col).text() if self.data_grid.item(row, col) else "" for col in range(self.data_grid.columnCount())]
+                for row in range(self.data_grid.rowCount())
+            ],
+            'pattern_offsets': self.pattern_offsets[:],
+            'file_name': self.loaded_file_name,
+            'original_content': self.original_content
+        }
 
-            next_state = self.redo_stack.pop()  # Pop the last state from the redo stack
-            self.restore_state(next_state)  # Restore the next state
-
+        # Push the current state to the undo stack and clear the redo stack
+        self.undo_stack.append(state)
+        self.redo_stack.clear()
+        
     def toggle_theme(self):
         self.dark_mode = not self.dark_mode
         self.apply_styles()
@@ -320,7 +342,6 @@ class STQTool(QMainWindow):
             QMenuBar { background-color: #4d4d4d; color: #ffebcd; }
             QMenu { background-color: #4d4d4d; color: #ffebcd; }
         """ if self.dark_mode else ""
-
         self.setStyleSheet(style)
 
     def increase_header_size(self):
@@ -333,42 +354,6 @@ class STQTool(QMainWindow):
         header_font.setPointSize(header_font.pointSize() - 1)
         self.data_grid.horizontalHeader().setFont(header_font)
 
-    def store_state(self):
-        state = {
-            'text_edit': self.text_edit.toPlainText(),
-            'text_panel': self.text_panel.toPlainText(),
-            'grid_data': [],
-            'pattern_offsets': self.pattern_offsets[:],
-            'file_name': self.loaded_file_name,
-            'original_content': self.original_content
-        }
-
-        for row in range(self.data_grid.rowCount()):
-            row_data = []
-            for col in range(self.data_grid.columnCount()):
-                item = self.data_grid.item(row, col)
-                row_data.append(item.text() if item else "")
-            state['grid_data'].append(row_data)
-
-        # Push the current state to the undo stack and clear the redo stack
-        self.undo_stack.append(state)
-        self.redo_stack.clear()
-
-    def restore_state(self, state):
-        self.text_edit.setText(state['text_edit'])
-        self.text_panel.setText(state['text_panel'])
-        self.text_panel.setVisible(bool(state['text_panel']))  # Show text panel if there is content
-
-        self.data_grid.setRowCount(len(state['grid_data']))
-        for row, row_data in enumerate(state['grid_data']):
-            for col, cell_data in enumerate(row_data):
-                self.data_grid.setItem(row, col, QTableWidgetItem(cell_data))
-
-        self.pattern_offsets = state['pattern_offsets']
-        self.loaded_file_name = state['file_name']
-        self.original_content = state['original_content']
-        self.setWindowTitle(f"Handburger's STQ Reader Tool - Editing {os.path.basename(self.loaded_file_name)}")
-
     def show_about_dialog(self):
         dialog = QDialog(self)
         dialog.setWindowTitle("About")
@@ -377,12 +362,27 @@ class STQTool(QMainWindow):
 
         about_label = QLabel(self.create_about_text(), self)
         about_label.setFont(QFont("Arial", 12))
+
+        if "background-color: #2b2b2b;" in self.styleSheet():
+            # Dark mode is active
+            dialog.setStyleSheet("""
+                QDialog { background-color: #4d4d4d; color: #ffebcd; }
+                QLabel { color: #ffebcd; }
+                QPushButton { background-color: #4d4d4d; color: #ffebcd; }
+                QLabel a { color: yellow; }  # Set link color to yellow in dark mode
+            """)
+        else:
+            # Light mode or no specific theme
+            dialog.setStyleSheet("""
+                QLabel a { color: blue; }  # Default link color in light mode
+            """)
+
         layout.addWidget(self.create_icon_label(self.get_resource_path("egg.png"), 100))
         layout.addWidget(about_label)
         layout.addLayout(self.create_link_layout(self.get_resource_path("github.png"),
-                                                 "Github - RTHKKona", "https://github.com/RTHKKona", 64))
+                                                "Github - RTHKKona", "https://github.com/RTHKKona", 64))
         layout.addLayout(self.create_link_layout(self.get_resource_path("ko-fi.png"),
-                                                 "Ko-Fi - Handburger", "https://ko-fi.com/handburger", 64))
+                                                "Ko-Fi - Handburger", "https://ko-fi.com/handburger", 64))
         close_button = QPushButton("Close", dialog)
         close_button.clicked.connect(dialog.close)
         close_button.setStyleSheet("border: 1px solid white; color: black;")
@@ -405,12 +405,21 @@ class STQTool(QMainWindow):
     def create_link_layout(self, icon_path, text, url, icon_size):
         layout = QHBoxLayout()
         layout.addWidget(self.create_icon_label(icon_path, icon_size))
-        link_label = QLabel(f'<a href="{url}">{text}</a>', self)
+
+        # Define the link color explicitly in the HTML
+        if "background-color: #2b2b2b;" in self.styleSheet():  # Check if dark mode is active
+            link_color = "yellow"
+        else:
+            link_color = "blue"
+
+        # Create the QLabel with HTML styling
+        link_label = QLabel(f'<a href="{url}" style="color:{link_color};">{text}</a>', self)
         link_label.setOpenExternalLinks(True)
         link_label.setFont(QFont("Arial", 12))
-        link_label.setStyleSheet("color: white;" if self.dark_mode else "color: black;")
+
         layout.addWidget(link_label)
         return layout
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
