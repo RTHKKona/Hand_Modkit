@@ -43,7 +43,7 @@ Ensure you have the following installed on your system:
 
 3. **Run the application**:
     ```bash
-    python Hb_Modtool.py
+    python Hb_Modkit.py
     ```
 
 ### Usage
