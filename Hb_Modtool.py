@@ -4,6 +4,9 @@ from PyQt5.QtGui import QFont, QKeySequence
 from PyQt5.QtCore import Qt
 from decimal import Decimal, getcontext, InvalidOperation
 
+# Adjusted imports for scripts now located in the /scripts/ directory
+sys.path.append('scripts')  # Add the scripts directory to the system path
+
 import stq_tool
 import OpusHeaderInjector
 
@@ -99,6 +102,10 @@ class MHGU_Mod_Platform(QMainWindow):
 
         # Create the tab widget
         self.tab_widget = QTabWidget()
+        self.tab_widget.setMovable(True)
+
+        # Set minimum tab width to ensure titles are fully visible
+        self.tab_widget.setStyleSheet("QTabBar::tab { min-width: 150px; font-size: 12px; }")
 
         # Initialize and add the STQ Tool tab
         self.stq_tool = stq_tool.STQTool()
@@ -117,7 +124,7 @@ class MHGU_Mod_Platform(QMainWindow):
         self.setWindowTitle(self.description)
 
         # Set stylesheet for title bar and window
-        self.setStyleSheet("QMainWindow { background-color: #f0f0f0; } QTabBar::tab { font-size: 12px; }")
+        self.setStyleSheet("QMainWindow { background-color: #f0f0f0; }")
 
     def keyPressEvent(self, event):
         # Ctrl + = to increase font size
