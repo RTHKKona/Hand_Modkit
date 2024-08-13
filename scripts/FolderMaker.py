@@ -10,12 +10,14 @@ class FolderMaker(QWidget):
         super().__init__()
         self.dark_mode = True  # Start in dark mode by default
         self.initUI()
+        self.toggle_theme()  # Apply dark mode by default
+        self.toggle_theme()
 
     def initUI(self):
         layout = QVBoxLayout()
 
         self.folder_input = QLineEdit(self)
-        self.folder_input.setPlaceholderText("Click 'Browse' to select a folder...")
+        self.folder_input.setPlaceholderText("Click 'Browse' to select a directory you'd like to analyze... (likely nativeNX)")
         layout.addWidget(self.folder_input)
 
         browse_button = QPushButton("Browse", self)
@@ -26,7 +28,7 @@ class FolderMaker(QWidget):
         self.file_input.setPlaceholderText("Input exact name of file that you want to replace (i.e bgm_v03.opus)")
         layout.addWidget(self.file_input)
 
-        create_button = QPushButton("Create Folders", self)
+        create_button = QPushButton("Create Directory/Folders", self)
         create_button.clicked.connect(self.create_folders)
         layout.addWidget(create_button)
 
@@ -38,8 +40,9 @@ class FolderMaker(QWidget):
         layout.addWidget(self.toggle_theme_btn)
 
         self.setLayout(layout)
-        self.setWindowTitle('Folder Creation Tool')
-        
+        self.setWindowTitle('FolderMaker')
+        self.setGeometry(100, 100, 1600, 800)  # Set the window size to 1600x800, positioned at 100,100
+
         # Increase font size by 1
         self.setFont(QFont(self.font().family(), self.font().pointSize() + 1))
 

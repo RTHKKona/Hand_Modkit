@@ -1,84 +1,139 @@
 import sys
-from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QLineEdit, QRadioButton, QPushButton, QApplication
+from PyQt5.QtWidgets import (
+    QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QWidget, QRadioButton, QFrame, QTextEdit, QSizePolicy
+)
 from PyQt5.QtGui import QFont, QColor
 from PyQt5.QtCore import Qt
+
 from decimal import Decimal, getcontext, InvalidOperation
 
 # Set precision high enough to handle all operations accurately
 getcontext().prec = 20
 SAMPLE_RATE = Decimal('48000')
 
-class AudioCalculator(QWidget):
+class AudioCalculator(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.font_size = 12  # Default font size
         self.dark_mode = True  # Start in dark mode by default
         self.init_ui()
+        self.apply_initial_theme()
 
     def init_ui(self):
-        layout = QGridLayout(self)
-        self.display = QLineEdit(self, placeholderText="Enter value (e.g., 03:09.9 for duration)")
-        layout.addWidget(self.display, 0, 0, 1, 4)
+        self.setWindowTitle("Audio Calculator")
+        self.setGeometry(100, 100, 1600, 800)
 
+        # Main widget and layout
+        central_widget = QWidget(self)
+        main_layout = QHBoxLayout(central_widget)
+
+        # Create and add columns to the main layout
+        main_layout.addWidget(self.create_left_column())
+        main_layout.addWidget(self.create_center_column())
+        main_layout.addWidget(self.create_right_column())
+
+        self.setCentralWidget(central_widget)
+
+        # Increase the font size
+        self.update_font_size()
+
+    def create_left_column(self):
+        left_frame = QFrame(self)
+        left_frame.setFrameShape(QFrame.Box)
+        left_layout = QVBoxLayout(left_frame)
+
+        self.input_label = QLabel("Audio Input", self)
+        self.audio_input = QTextEdit(self)
+        self.audio_input.setPlaceholderText("Enter value (e.g., 03:09.9 for duration)")
+        
+        left_layout.addWidget(self.input_label)
+        left_layout.addWidget(self.audio_input)
+        
+        return left_frame
+
+    def create_center_column(self):
+        center_frame = QFrame(self)
+        center_frame.setFrameShape(QFrame.Box)
+        center_layout = QVBoxLayout(center_frame)
+
+        self.settings_label = QLabel("Conversion Settings", self)
         self.mode_samples_to_duration = QRadioButton("Samples to Duration", self)
         self.mode_duration_to_samples = QRadioButton("Duration to Samples", self)
         self.mode_samples_to_duration.setChecked(True)
-        layout.addWidget(self.mode_samples_to_duration, 1, 0, 1, 2)
-        layout.addWidget(self.mode_duration_to_samples, 1, 2, 1, 2)
+        
+        calculate_button = QPushButton("Calculate", self)
+        calculate_button.clicked.connect(self.calculate)
 
-        self.calculate_btn = QPushButton("Calculate", self, clicked=self.calculate)
-        layout.addWidget(self.calculate_btn, 2, 0, 1, 4)
+        toggle_theme_button = QPushButton("Toggle Theme", self)
+        toggle_theme_button.clicked.connect(self.toggle_theme)
 
-        self.result_label = QLabel("Result will be shown here", self)
-        layout.addWidget(self.result_label, 3, 0, 1, 4)
+        for widget in [self.settings_label, self.mode_samples_to_duration, self.mode_duration_to_samples, calculate_button, toggle_theme_button]:
+            center_layout.addWidget(widget)
+        
+        return center_frame
 
-        self.toggle_theme_btn = QPushButton("Toggle Theme", self)
-        self.toggle_theme_btn.clicked.connect(self.toggle_theme)
-        layout.addWidget(self.toggle_theme_btn, 4, 0, 1, 4)
+    def create_right_column(self):
+        right_frame = QFrame(self)
+        right_frame.setFrameShape(QFrame.Box)
+        right_layout = QVBoxLayout(right_frame)
 
-        self.setLayout(layout)
-        self.update_font_size()
+        self.result_label = QLabel("Converted Result", self)
+        self.result_output = QTextEdit(self)
+        self.result_output.setReadOnly(True)
+        
+        right_layout.addWidget(self.result_label)
+        right_layout.addWidget(self.result_output)
+        
+        return right_frame
 
     def calculate(self):
-        input_text = self.display.text().strip()
+        input_text = self.audio_input.toPlainText().strip()
         try:
             if self.mode_samples_to_duration.isChecked():
                 samples = Decimal(input_text)
                 minutes, seconds = divmod(samples / SAMPLE_RATE, 60)
-                self.result_label.setText(f"Duration: {int(minutes):02}:{seconds:06.3f}")
+                result = f"Duration: {int(minutes):02}:{seconds:06.3f}"
             else:
-                if ':' in input_text:
-                    minutes, seconds = map(Decimal, input_text.split(':'))
+                time_parts = input_text.split(':')
+                if len(time_parts) == 2:
+                    minutes, seconds = map(Decimal, time_parts)
                     total_seconds = minutes * 60 + seconds
                 else:
                     total_seconds = Decimal(input_text)
-                samples = total_seconds * SAMPLE_RATE
-                self.result_label.setText(f"Samples: {samples}")
-        except InvalidOperation:
-            self.result_label.setText("Invalid input! Please enter a valid value.")
+                result = f"Samples: {total_seconds * SAMPLE_RATE}"
+            self.result_output.setText(result)
+        except (InvalidOperation, ValueError) as e:
+            self.result_output.setText("Invalid input! Please enter a valid value.")
+            print(f"Error: {e}")
 
     def update_font_size(self):
         font = QFont()
-        font.setPointSize(self.font_size)
-        for widget in [self.display, self.mode_samples_to_duration, self.mode_duration_to_samples, self.calculate_btn, self.result_label, self.toggle_theme_btn]:
+        font.setPointSize(11)  # Increased font size by 1 point
+        widgets = [
+            self.input_label, self.audio_input, self.settings_label,
+            self.mode_samples_to_duration, self.mode_duration_to_samples,
+            self.result_label, self.result_output
+        ]
+        for widget in widgets:
             widget.setFont(font)
-
-    def change_font_size(self, increment):
-        self.font_size = max(1, self.font_size + increment)
-        self.update_font_size()
 
     def toggle_theme(self):
         self.dark_mode = not self.dark_mode
-        if self.dark_mode:
-            self.setStyleSheet("""
-                QWidget { background-color: #2b2b2b; color: #ffebcd; }
-                QLineEdit { background-color: #4d4d4d; color: #ffebcd; }
-                QLabel { color: #ffebcd; }
-                QRadioButton { color: #ffebcd; }
-                QPushButton { background-color: #4d4d4d; color: #ffebcd; }
-            """)
-        else:
-            self.setStyleSheet("")
+        self.apply_theme()
+
+    def apply_initial_theme(self):
+        """Apply the theme once during initialization."""
+        self.apply_theme()
+
+    def apply_theme(self):
+        """Apply the appropriate stylesheet based on the current theme."""
+        stylesheet = """
+            QMainWindow { background-color: #2b2b2b; color: #ffebcd; }
+            QTextEdit { background-color: #4d4d4d; color: #ffebcd; }
+            QLabel { color: #ffebcd; }
+            QRadioButton { color: #ffebcd; }
+            QPushButton { background-color: #4d4d4d; color: #ffebcd; }
+        """ if self.dark_mode else ""
+        self.setStyleSheet(stylesheet)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
