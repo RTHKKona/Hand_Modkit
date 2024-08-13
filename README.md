@@ -1,87 +1,88 @@
-# Handburger's STQ Reader Tool
+# Handburger's MHGU Mod Platform
 
-**Handburger's STQ Reader Tool** is a Python-based application designed to analyze and read `.stqr` files, providing a comprehensive interface for examining hexadecimal data. This tool is particularly useful for those working with audio files and data within the `.stqr` format, offering easy-to-use functionality to inspect and manage hex data, with features such as pattern recognition and flexible grid views.
+## Overview
 
-## Features
+My MHGU Mod Platform, also known as Hand_Modkit is a comprehensive tool designed for modding Monster Hunter Generations Ultimate (MHGU). This platform integrates multiple tools into a single, user-friendly application, allowing users to easily modify and customize their game files.
 
-- **Hexadecimal Viewer**: Display and inspect raw hex data from `.stqr` files in an organized and readable format.
-- **Pattern Recognition**: Automatically detect and process specific data patterns within the hex content, such as sound file references and metadata.
-- **Interactive Data Grid**: Visualize parsed data in a table format with resizable and auto-adjusting headers.
-- **Random Easter Egg**: 20% chance of displaying an `egg.png` image upon loading a file, adding a bit of fun to your work.
-- **Theming**: Toggle between dark and light modes for better readability depending on your preference.
-- **Customizable Interface**: Adjust header sizes, and the application automatically spaces out headers to ensure they are legible on startup.
-- **Dynamic App Title**: The application title dynamically updates to include the currently loaded file, making it easy to keep track of your work.
+### Features
 
-## Installation
+- **STQ Tool**: Edit and manage .opus STQR files with an intuitive hex editor.
+- **Opus Header Injector**: Modify and inject headers into headerless OPUS audio files.
+- **Audio Calculator**: Convert between audio samples and duration in MM:SS.s format, with support for high-precision calculations. (For Opus Header Injector)
+- **Adjustable Font Size**: Increase or decrease the font size within the application using `Ctrl +` and `Ctrl -` hotkeys.
+
+## Getting Started
 
 ### Prerequisites
 
-None!
-(Unless you're on Mac or Linux then use the Python file in the source!)
+Ensure you have the following installed on your system:
 
-### Installation Steps
+- Python 3.6 or higher
+- PyQt5
+- Decimal module (included in Python's standard library)
 
-1. **Clone the repository:**
+### Installation
 
+1. **Clone the repository**:
     ```bash
-    git clone https://github.com/YourUsername/your-repo-name.git
-    cd your-repo-name
+    git clone https://github.com/your-username/Hand_Modkit.git
+    cd Hand_Modkit
     ```
 
-2. **Install dependencies:**
-
-    You can install the required Python packages using pip:
-
+2. **Install the required Python packages**:
     ```bash
     pip install -r requirements.txt
     ```
 
-3. **Run the application:**
+   **Note**: If a `requirements.txt` file is not available, you can manually install `PyQt5`:
+    ```bash
+    pip install PyQt5
+    ```
 
-## Usage
+3. **Run the application**:
+    ```bash
+    python Hb_Modtool.py
+    ```
 
-1. **Loading a File:**
-   - Click the "Load .stqr File" button to open and load a `.stqr` file. The application will parse the file and display its contents in both a text editor and a data grid.
+### Usage
 
-2. **Viewing Hex Data:**
-   - The hex data of the loaded file is displayed in the text editor, where you can inspect the raw data.
+- **STQ Tool**: Open, view, and edit STQR files. Use the hex editor to directly modify file contents in the grid.
+- **Opus Header Injector**: Load OPUS files, modify their headers, and save the changes. Preview the header modifications before saving.
+- **Audio Calculator**: Convert audio samples to duration and vice versa. Enter duration in `MM:SS.s` format for accurate sample calculations.
 
-3. **Pattern Search:**
-   - Use the "Search Patterns" button to automatically identify and parse known patterns in the hex data, such as sound file references.
+### Hotkeys
 
-4. **Customizing the Interface:**
-   - Double-click column headers to auto-size them to fit the content.
-   - Use the "Increase Header Size" and "Decrease Header Size" buttons to adjust the font size of the headers.
+- **Increase Font Size**: `Ctrl +`
+- **Decrease Font Size**: `Ctrl -`
 
-5. **Toggle Dark/Light Mode:**
-   - Switch between dark and light themes to suit your preferences.
+## Screenshots
 
-6. **Clear Data:**
-   - Use the "Clear" button to reset the interface and start over with a new file.
+![STQ Tool]( https://pasteboard.co/j6gPsFq6w7gD.png )
+*Caption: A screenshot showing the STQ Tool in action.*
+
+![Opus Header Injector]( https://pasteboard.co/mUEDUFRfqaKt.png )
+*Caption: A screenshot of the Opus Header Injector interface.*
+
+![Audio Calculator]( https://pasteboard.co/Sxcxi9jAFd22.png )
+*Caption: The Audio Calculator performing a conversion.*
 
 ## Contributing
 
-Contributions are welcome! Please follow these steps to contribute:
+Contributions are welcome! If you'd like to contribute, please follow these steps:
 
 1. Fork the repository.
-2. Create a new branch for your feature or bug fix.
-3. Commit your changes with a descriptive message.
-4. Push your changes to your forked repository.
-5. Open a pull request to the main repository.
+2. Create a new feature branch (`git checkout -b feature/new-feature`).
+3. Commit your changes (`git commit -m 'Add some new feature'`).
+4. Push to the branch (`git push origin feature/new-feature`).
+5. Open a Pull Request.
+
+Please ensure that your code follows the project's style guidelines and includes appropriate tests.
 
 ## License
 
-This project is licensed under the GNU License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Acknowledgements
+## Acknowledgments
 
-- Special thanks to the contributors of PyQt5 for providing the tools necessary to build this application.
-- Inspired by the need to manage and inspect `.stqr` files effectively in a user-friendly way.
-
-## Support
-
-If you encounter any issues or have questions, feel free to open an issue in the [GitHub repository](https://github.com/YourUsername/your-repo-name/issues) or reach out via email.
-
----
-
-*Handburger's STQ Reader Tool* is designed with flexibility and ease of use in mind, ensuring that your work with `.stqr` files is as smooth as possible. Enjoy!
+- Special thanks to the MHGU modding community for their ongoing support and contributions.
+- [PyQt5](https://www.riverbankcomputing.com/software/pyqt/intro) for the GUI framework.
