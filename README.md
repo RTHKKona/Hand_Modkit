@@ -57,13 +57,13 @@ Ensure you have the following installed on your system:
 
 ## Screenshots
 
-![STQ Tool](/Cap1.png) 
+![STQ Tool](/assets/Cap1.png) 
 *Caption: A screenshot showing the STQ Tool in action.*
 
-![Opus Header Injector](/Cap2.png)
+![Opus Header Injector](/assets/Cap2.png)
 *Caption: A screenshot of the Opus Header Injector interface.*
 
-![Audio Calculator](/Cap3.png)
+![Audio Calculator](/assets/Cap3.png)
 *Caption: The Audio Calculator performing a conversion.*
 
 ## Contributing
