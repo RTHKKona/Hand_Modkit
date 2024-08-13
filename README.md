@@ -87,4 +87,3 @@ This project is licensed under the GPL 3.0 License - see the [LICENSE](LICENSE) 
 
 - Special thanks to the MHGU modding community for their ongoing support and contributions.
 - [PyQt5](https://www.riverbankcomputing.com/software/pyqt/intro) for the GUI framework.
-- [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/L3L711AIP8)
