@@ -19,7 +19,12 @@ class STQTool(QMainWindow):
         self.undo_stack = []  # Initialize the undo stack
         self.redo_stack = []  # Initialize the redo stack
         self.init_ui()
-
+        
+    def get_resource_path(self, filename):
+        base_dir =  os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        assets_path = os.path.join(base_dir, 'assets', filename)
+        return assets_path
+    
     def init_ui(self):
         self.setWindowTitle("Handburger's STQ Reader Tool")
         self.setGeometry(100, 100, 1600, 800)  # Extended width to accommodate the new text panel
@@ -410,9 +415,6 @@ class STQTool(QMainWindow):
         link_label.setStyleSheet("color: white;" if self.dark_mode else "color: black;")
         layout.addWidget(link_label)
         return layout
-
-    def get_resource_path(self, filename):
-        return os.path.join(os.getcwd(), filename)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

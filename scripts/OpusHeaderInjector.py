@@ -11,8 +11,10 @@ from PyQt5.QtCore import Qt
 class OpusHeaderInjector(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.dark_mode = False  # Initialize dark mode
         self.loaded_file_name = ""
         self.edited_header = b""
+        self.second_file_loaded = False  # Track if the second file is loaded
         self.headers = [
             "Stream Total Samples", "Number of Channels", "Loop Start (samples)", "Loop End (samples)",
             "Buffer 1", "Buffer 2", "Buffer 3", "Buffer 4", "Unknown 1", "Unknown 2", "Unknown 3", "Unknown 4"
@@ -51,12 +53,14 @@ class OpusHeaderInjector(QMainWindow):
         self.table_widget = QTableWidget(self)
         self.table_widget.setColumnCount(12)
         self.table_widget.setHorizontalHeaderLabels(self.headers)
-        self.table_widget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.table_widget.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)  # Adjusting section resize mode
+        self.table_widget.horizontalHeader().setFont(QFont("Arial", weight=QFont.Bold))
+        self.table_widget.horizontalHeader().setStyleSheet("QHeaderView::section { background-color: grey; color: white; }")
+        self.table_widget.setStyleSheet("gridline-color: black;")  # Setting thicker grid lines
         self.table_widget.setEditTriggers(QTableWidget.AllEditTriggers)
 
         splitter.addWidget(self.hex_view)
         splitter.addWidget(self.table_widget)
-        
         button_layout = QHBoxLayout()
         self.load_button = QPushButton("Load Opus File", self)
         self.load_button.clicked.connect(self.load_file)
@@ -74,12 +78,17 @@ class OpusHeaderInjector(QMainWindow):
         self.preview_button.clicked.connect(self.preview_appended_header)
         button_layout.addWidget(self.preview_button)
 
+        self.dark_mode_button = QPushButton("Toggle Dark/Light Mode", self)
+        self.dark_mode_button.clicked.connect(self.toggle_theme)
+        button_layout.addWidget(self.dark_mode_button)
+
         main_layout = QVBoxLayout(main_widget)
         main_layout.addWidget(top_widget)
         main_layout.addWidget(splitter)
         main_layout.addLayout(button_layout)
 
         self.init_menu()
+        self.apply_styles()  # Apply the initial styles
         self.show()
 
     def init_menu(self):
@@ -110,7 +119,6 @@ class OpusHeaderInjector(QMainWindow):
             "8. Test and listen to your new opus file with correct looping, sample, and header, fit for MHGU."
         )
         QMessageBox.information(self, "Opus Header Injector Help", help_text)
-        
     def load_file(self):
         options = QFileDialog.Options()
         file_name, _ = QFileDialog.getOpenFileName(self, "Open OPUS File", "", "Opus Files (*.opus);;All Files (*)", options=options)
@@ -118,23 +126,24 @@ class OpusHeaderInjector(QMainWindow):
             with open(file_name, "rb") as file:
                 self.original_content = file.read()
                 self.loaded_file_name = file_name
-            self.setWindowTitle(f"Opus Header Injector - Editing: {os.path.basename(file_name)}")
-            header_end_offset = self.find_header_end()
-            self.display_hex_content(header_end_offset)
-            self.populate_grid(header_end_offset)
-            self.header_info_label.setText(f"Header Size: {header_end_offset} bytes")
+            if self.second_file_loaded:
+                self.display_second_file_header()
+            else:
+                self.setWindowTitle(f"Opus Header Injector - Editing: {os.path.basename(file_name)}")
+                header_end_offset = self.find_header_end()
+                self.display_hex_content(header_end_offset)
+                self.populate_grid(header_end_offset)
+                self.header_info_label.setText(f"Header Size: {header_end_offset} bytes")
+                self.second_file_loaded = True
 
     def find_header_end(self):
-        # Always include the first 12 4-byte chunks in the header.
         header_end_offset = 48
-        # Continue to include values until the pattern is detected.
         pattern_index = self.original_content.find(self.target_pattern, header_end_offset)
         if pattern_index != -1:
             return pattern_index
         return len(self.original_content)
 
     def display_hex_content(self, header_end_offset):
-        # Display the header in the text box (everything before the pattern)
         hex_view = '\n'.join(
             ' '.join(
                 [self.original_content[i+j:i+j+4].hex().upper() for j in range(0, 32, 4)]
@@ -143,32 +152,64 @@ class OpusHeaderInjector(QMainWindow):
         self.hex_view.setText(hex_view)
 
     def populate_grid(self, header_end_offset):
-        # Convert the first 12 4-byte chunks within the header into signed int32 and populate the grid
         self.table_widget.setRowCount(1)  # Only one row since we're dealing with 12 columns
         for col in range(12):
             offset = col * 4
             if offset + 4 <= header_end_offset:
                 int_value = struct.unpack('<i', self.original_content[offset:offset+4])[0]
                 item = QTableWidgetItem(str(int_value))
-                # If the data is between the 12th chunk and the pattern, make it non-editable and greyed out
                 if offset >= 48 and offset < header_end_offset:
                     item.setFlags(item.flags() & ~Qt.ItemIsEditable)
                     item.setForeground(QColor(150, 150, 150))  # Grey out non-editable cells
                 self.table_widget.setItem(0, col, item)
+        self.table_widget.itemChanged.connect(self.on_item_changed)
+
+    def on_item_changed(self, item):
+        row = item.row()
+        col = item.column()
+        value = int(item.text())
+        offset = col * 4
+        hex_value = struct.pack('<i', value)
+        original_hex = self.original_content[offset:offset+4]
+        color = QColor("red") if hex_value != original_hex else QColor("black")
+        if self.dark_mode:
+            color = QColor("yellow") if hex_value != original_hex else QColor("white")
+
+        # Update hex display
+        cursor = self.hex_view.textCursor()
+        cursor.movePosition(cursor.Start)
+        cursor.movePosition(cursor.Down, cursor.MoveAnchor, row)
+        cursor.movePosition(cursor.Right, cursor.MoveAnchor, col * 8)  # Move to the correct column
+        cursor.movePosition(cursor.Right, cursor.KeepAnchor, 8)  # Select the hex string
+        cursor.insertText(hex_value.hex().upper(), QColor(color))
+    def display_second_file_header(self):
+        header_end_offset = 48  # Show first 12 4-byte chunks
+        hex_view = []
+        for i in range(0, min(header_end_offset, len(self.original_content)), 32):
+            row = []
+            for j in range(0, 32, 4):
+                hex_chunk = self.original_content[i+j:i+j+4].hex().upper()
+                offset = (i + j) // 4
+                original_chunk = self.table_widget.item(0, offset).text()
+                if hex_chunk != original_chunk:
+                    color = "red" if not self.dark_mode else "yellow"
+                else:
+                    color = "black" if not self.dark_mode else "white"
+                row.append(f'<span style="color:{color}">{hex_chunk}</span>')
+            hex_view.append(' '.join(row))
+        self.hex_view.setHtml('<br>'.join(hex_view))
 
     def save_file_as(self):
         if not self.loaded_file_name:
             QMessageBox.warning(self, "Error", "No file loaded to save.")
             return
 
-        # Pre-set name with "new" prefix and save to the same directory as the input file
         base_name = os.path.basename(self.loaded_file_name)
         directory = os.path.dirname(self.loaded_file_name)
         save_file_name = os.path.join(directory, f"new_{base_name}")
         options = QFileDialog.Options()
         save_file_name, _ = QFileDialog.getSaveFileName(self, "Save OPUS File As", save_file_name, "Opus Files (*.opus);;All Files (*)", options=options)
         if save_file_name:
-            # Save the edited grid data back to the new file
             self.edited_header = bytearray(self.original_content[:48])
             for col in range(12):
                 item = self.table_widget.item(0, col)
@@ -194,20 +235,17 @@ class OpusHeaderInjector(QMainWindow):
             with open(file_name, "rb") as file:
                 original_content = file.read()
             
-            # Pre-set name with "new" prefix and save to the same directory as the input file
             base_name = os.path.basename(file_name)
             directory = os.path.dirname(file_name)
             save_file_name = os.path.join(directory, f"new_{base_name}")
             options = QFileDialog.Options()
             save_file_name, _ = QFileDialog.getSaveFileName(self, "Save Appended OPUS File As", save_file_name, "Opus Files (*.opus);;All Files (*)", options=options)
             if save_file_name:
-                # Create a new file with the full header (data header + additional values) at the beginning of the original content
                 with open(save_file_name, "wb") as file:
                     file.write(self.original_content[:self.find_header_end()] + original_content)
 
                 QMessageBox.information(self, "Saved", f"Appended file saved as: {os.path.basename(save_file_name)}")
                 self.clear_all()
-
     def preview_appended_header(self):
         if not self.edited_header:
             QMessageBox.warning(self, "Error", "No header data available to preview.")
@@ -240,8 +278,22 @@ class OpusHeaderInjector(QMainWindow):
             preview_dialog.setGeometry(100, 100, 1600, 800)
             preview_dialog.show()
 
+    def toggle_theme(self):
+        self.dark_mode = not self.dark_mode
+        self.apply_styles()
+
+    def apply_styles(self):
+        style = "background-color: black; color: white;" if self.dark_mode else "background-color: white; color: black;"
+        button_style = "border: 1px solid white; color: white; padding-top: 10px; padding-bottom: 10px; font-weight: bold;" if self.dark_mode else "border: 1px solid black; color: black; padding-top: 10px; padding-bottom: 10px; font-weight: bold;"
+        self.setStyleSheet(style)
+        self.hex_view.setStyleSheet(style)
+        for i in range(self.centralWidget().layout().count()):
+            widget = self.centralWidget().layout().itemAt(i).widget()
+            if isinstance(widget, QPushButton):
+                widget.setStyleSheet(button_style)
+        self.table_widget.setStyleSheet(f"QTableWidget::item {{ border: 2px solid {'white' if self.dark_mode else 'black'}; }}")
+
     def clear_all(self):
-        # Clear all UI components and reset state
         self.loaded_file_name = ""
         self.edited_header = b""
         self.hex_view.clear()
@@ -249,6 +301,7 @@ class OpusHeaderInjector(QMainWindow):
         self.table_widget.setRowCount(0)
         self.header_info_label.setText("No header loaded")
         self.setWindowTitle("Opus Header Injector")
+        self.second_file_loaded = False
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
