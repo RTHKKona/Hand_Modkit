@@ -12,19 +12,19 @@ from PyQt5.QtCore import Qt, QRect
 class STQTool(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.dark_mode = False
+        self.dark_mode = True  # Start in dark mode by default
         self.loaded_file_name = ""
         self.original_content = b""
         self.pattern_offsets = []
         self.undo_stack = []  # Initialize the undo stack
         self.redo_stack = []  # Initialize the redo stack
         self.init_ui()
-        
+
     def get_resource_path(self, filename):
         base_dir =  os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         assets_path = os.path.join(base_dir, 'assets', filename)
         return assets_path
-    
+
     def init_ui(self):
         self.setWindowTitle("Handburger's STQ Reader Tool")
         self.setGeometry(100, 100, 1600, 800)  # Extended width to accommodate the new text panel
@@ -46,11 +46,9 @@ class STQTool(QMainWindow):
 
         self.text_edit = QTextEdit(self, readOnly=True, font=QFont("Consolas", 10))
         self.text_edit.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.text_edit.setStyleSheet("background-color: rgba(255, 255, 255, 0.8);")
 
         self.text_panel = QTextEdit(self, readOnly=True, font=QFont("Consolas", 10))
         self.text_panel.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.text_panel.setStyleSheet("background-color: rgba(255, 255, 255, 0.8);")
         self.text_panel.hide()  # Initially hidden
 
         top_splitter = QSplitter(Qt.Horizontal)
@@ -79,13 +77,9 @@ class STQTool(QMainWindow):
         ])
         grid.horizontalHeader().setFont(QFont("Arial", weight=QFont.Bold))
         grid.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
-        
-        # Set the header background color to grey
-        grid.horizontalHeader().setStyleSheet("QHeaderView::section { background-color: grey; color: white; }")
-        
+
         grid.setEditTriggers(QTableWidget.DoubleClicked)
         return grid
-
 
     def create_buttons(self):
         layout = QHBoxLayout()
@@ -96,7 +90,7 @@ class STQTool(QMainWindow):
             ("Clear", self.clear_data),
             ("Undo", self.undo),
             ("Redo", self.redo),  # New Redo button
-            ("Toggle Dark/Light Mode", self.toggle_theme),
+            ("Toggle Theme", self.toggle_theme),
             ("Increase Header Size", self.increase_header_size),
             ("Decrease Header Size", self.decrease_header_size)
         ]
@@ -108,12 +102,10 @@ class STQTool(QMainWindow):
         self.pattern_search_button.setEnabled(False)
         return layout
 
-
     def setup_menu(self):
         about_action = QAction("About", self)
         about_action.triggered.connect(self.show_about_dialog)
         menubar = self.menuBar()
-        menubar.setStyleSheet("background-color: grey;")
         menubar.addMenu("Help").addAction(about_action)
 
     def load_file(self):
@@ -196,6 +188,7 @@ class STQTool(QMainWindow):
             if item is None or item.text() == "":
                 self.data_grid.setItem(row, title_column_index, QTableWidgetItem(text))
                 break
+
     def pattern_matches(self, match, pattern):
         return all(c == 'X' or c == m for c, m in zip(pattern, match))
 
@@ -244,7 +237,6 @@ class STQTool(QMainWindow):
             except Exception as e:
                 QMessageBox.critical(self, "Save Failed", f"An unexpected error occurred: {str(e)}")
 
-
     def clear_data(self):
         reply = QMessageBox.question(
             self, 'Clear Data', 
@@ -266,7 +258,7 @@ class STQTool(QMainWindow):
             self.loaded_file_name = ""  # Clear the loaded file name
             self.original_content = b""  # Reset the original content
             QMessageBox.information(self, "Clear Successful", "All data has been cleared.")
-            
+
     def undo(self):
         if self.undo_stack:
             current_state = {
@@ -277,16 +269,16 @@ class STQTool(QMainWindow):
                 'file_name': self.loaded_file_name,
                 'original_content': self.original_content
             }
-            
+
             for row in range(self.data_grid.rowCount()):
                 row_data = []
                 for col in range(self.data_grid.columnCount()):
                     item = self.data_grid.item(row, col)
                     row_data.append(item.text() if item else "")
                 current_state['grid_data'].append(row_data)
-            
+
             self.redo_stack.append(current_state)  # Push the current state to the redo stack
-            
+
             previous_state = self.undo_stack.pop()  # Pop the last state from the undo stack
             self.restore_state(previous_state)  # Restore the previous state
 
@@ -300,16 +292,16 @@ class STQTool(QMainWindow):
                 'file_name': self.loaded_file_name,
                 'original_content': self.original_content
             }
-            
+
             for row in range(self.data_grid.rowCount()):
                 row_data = []
                 for col in range(self.data_grid.columnCount()):
                     item = self.data_grid.item(row, col)
                     row_data.append(item.text() if item else "")
                 current_state['grid_data'].append(row_data)
-            
+
             self.undo_stack.append(current_state)  # Push the current state to the undo stack
-            
+
             next_state = self.redo_stack.pop()  # Pop the last state from the redo stack
             self.restore_state(next_state)  # Restore the next state
 
@@ -318,13 +310,18 @@ class STQTool(QMainWindow):
         self.apply_styles()
 
     def apply_styles(self):
-        style = "background-color: black; color: white;" if self.dark_mode else "background-color: white; color: black;"
-        button_style = "border: 1px solid white; color: white; padding-top: 10px; padding-bottom: 10px; font-weight: bold;" if self.dark_mode else "border: 1px solid black; color: black; padding-top: 10px; padding-bottom: 10px; font-weight: bold;"
+        style = """
+            QMainWindow { background-color: #2b2b2b; color: #ffebcd; }
+            QTextEdit { background-color: #4d4d4d; color: #ffebcd; }
+            QTableWidget { background-color: #4d4d4d; color: #ffebcd; }
+            QHeaderView::section { background-color: grey; color: white; }
+            QLabel { color: #ffebcd; }
+            QPushButton { background-color: #4d4d4d; color: #ffebcd; }
+            QMenuBar { background-color: #4d4d4d; color: #ffebcd; }
+            QMenu { background-color: #4d4d4d; color: #ffebcd; }
+        """ if self.dark_mode else ""
+
         self.setStyleSheet(style)
-        self.text_edit.setStyleSheet(style)
-        self.text_panel.setStyleSheet(style)
-        for i in range(self.buttons.count()):
-            self.buttons.itemAt(i).widget().setStyleSheet(button_style)
 
     def increase_header_size(self):
         header_font = self.data_grid.horizontalHeader().font()
@@ -335,6 +332,7 @@ class STQTool(QMainWindow):
         header_font = self.data_grid.horizontalHeader().font()
         header_font.setPointSize(header_font.pointSize() - 1)
         self.data_grid.horizontalHeader().setFont(header_font)
+
     def store_state(self):
         state = {
             'text_edit': self.text_edit.toPlainText(),
@@ -344,14 +342,14 @@ class STQTool(QMainWindow):
             'file_name': self.loaded_file_name,
             'original_content': self.original_content
         }
-        
+
         for row in range(self.data_grid.rowCount()):
             row_data = []
             for col in range(self.data_grid.columnCount()):
                 item = self.data_grid.item(row, col)
                 row_data.append(item.text() if item else "")
             state['grid_data'].append(row_data)
-        
+
         # Push the current state to the undo stack and clear the redo stack
         self.undo_stack.append(state)
         self.redo_stack.clear()
@@ -365,13 +363,11 @@ class STQTool(QMainWindow):
         for row, row_data in enumerate(state['grid_data']):
             for col, cell_data in enumerate(row_data):
                 self.data_grid.setItem(row, col, QTableWidgetItem(cell_data))
-        
+
         self.pattern_offsets = state['pattern_offsets']
         self.loaded_file_name = state['file_name']
         self.original_content = state['original_content']
         self.setWindowTitle(f"Handburger's STQ Reader Tool - Editing {os.path.basename(self.loaded_file_name)}")
-
-
 
     def show_about_dialog(self):
         dialog = QDialog(self)
@@ -397,7 +393,7 @@ class STQTool(QMainWindow):
     def create_about_text(self):
         return (
             "Handburger's STQ Tool\n"
-            "Version 1.3\n\n"
+            "Version 1.4\n\n"
             "Handburger's STQTool, capable of editing, viewing, and pattern analyzing STQ/STQR files.\n"
         )
 

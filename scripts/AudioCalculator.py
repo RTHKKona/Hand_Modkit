@@ -1,6 +1,6 @@
 import sys
-from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QLineEdit, QRadioButton, QPushButton
-from PyQt5.QtGui import QFont
+from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QLineEdit, QRadioButton, QPushButton, QApplication
+from PyQt5.QtGui import QFont, QColor
 from PyQt5.QtCore import Qt
 from decimal import Decimal, getcontext, InvalidOperation
 
@@ -12,6 +12,7 @@ class AudioCalculator(QWidget):
     def __init__(self):
         super().__init__()
         self.font_size = 12  # Default font size
+        self.dark_mode = True  # Start in dark mode by default
         self.init_ui()
 
     def init_ui(self):
@@ -30,6 +31,10 @@ class AudioCalculator(QWidget):
 
         self.result_label = QLabel("Result will be shown here", self)
         layout.addWidget(self.result_label, 3, 0, 1, 4)
+
+        self.toggle_theme_btn = QPushButton("Toggle Theme", self)
+        self.toggle_theme_btn.clicked.connect(self.toggle_theme)
+        layout.addWidget(self.toggle_theme_btn, 4, 0, 1, 4)
 
         self.setLayout(layout)
         self.update_font_size()
@@ -54,16 +59,28 @@ class AudioCalculator(QWidget):
 
     def update_font_size(self):
         font = QFont()
-        font.setPointSize(self.font_size)  # Correct way to set the point size
-        for widget in [self.display, self.mode_samples_to_duration, self.mode_duration_to_samples, self.calculate_btn, self.result_label]:
+        font.setPointSize(self.font_size)
+        for widget in [self.display, self.mode_samples_to_duration, self.mode_duration_to_samples, self.calculate_btn, self.result_label, self.toggle_theme_btn]:
             widget.setFont(font)
 
     def change_font_size(self, increment):
         self.font_size = max(1, self.font_size + increment)
         self.update_font_size()
 
+    def toggle_theme(self):
+        self.dark_mode = not self.dark_mode
+        if self.dark_mode:
+            self.setStyleSheet("""
+                QWidget { background-color: #2b2b2b; color: #ffebcd; }
+                QLineEdit { background-color: #4d4d4d; color: #ffebcd; }
+                QLabel { color: #ffebcd; }
+                QRadioButton { color: #ffebcd; }
+                QPushButton { background-color: #4d4d4d; color: #ffebcd; }
+            """)
+        else:
+            self.setStyleSheet("")
+
 if __name__ == "__main__":
-    from PyQt5.QtWidgets import QApplication
     app = QApplication(sys.argv)
     calculator = AudioCalculator()
     calculator.show()

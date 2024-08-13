@@ -2,7 +2,7 @@ import sys
 import os
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTabWidget
 from PyQt5.QtGui import QIcon
-from scripts import stq_tool, OpusHeaderInjector, AudioCalculator, FolderMaker
+from scripts import stq_tool, OpusHeaderInjector, AudioCalculator, FolderMaker, HexConverterEncoder
 
 class MHGU_Mod_Platform(QMainWindow):
     def __init__(self):
@@ -15,7 +15,8 @@ class MHGU_Mod_Platform(QMainWindow):
         self.setStyleSheet("QMainWindow { background-color: #f0f0f0; }")
         self.setWindowIcon(QIcon(self.get_resource_path("egg.ico")))
 
-        self.tab_widget = QTabWidget(movable=True, styleSheet="QTabBar::tab { min-width: 150px; font-size: 12px; }")
+        self.tab_widget = QTabWidget(movable=True)
+        self.tab_widget.setStyleSheet("QTabBar::tab { min-width: 150px; font-size: 12px; }")
         self.setCentralWidget(self.tab_widget)
 
         self.add_tabs()
@@ -25,7 +26,8 @@ class MHGU_Mod_Platform(QMainWindow):
             (stq_tool.STQTool(), "STQ Editor Tool"),
             (OpusHeaderInjector.OpusHeaderInjector(), "Opus Header Injector"),
             (AudioCalculator.AudioCalculator(), "Audio Calculator"),
-            (FolderMaker.FolderMaker(), "FolderMaker")
+            (FolderMaker.FolderMaker(), "FolderMaker"),
+            (HexConverterEncoder.HexConverterEncoder(), "Hex Enc/Decoder")  # Corrected module name
         ]
         for tab, name in tabs:
             self.tab_widget.addTab(tab, name)

@@ -1,12 +1,16 @@
 import os
+import sys
 import subprocess
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QFileDialog, QMessageBox
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QFileDialog, QMessageBox, QApplication
+from PyQt5.QtGui import QFont, QColor
+from PyQt5.QtCore import Qt
 
 class FolderMaker(QWidget):
     def __init__(self):
         super().__init__()
+        self.dark_mode = True  # Start in dark mode by default
         self.initUI()
-    
+
     def initUI(self):
         layout = QVBoxLayout()
 
@@ -29,9 +33,16 @@ class FolderMaker(QWidget):
         self.result_label = QLabel("", self)
         layout.addWidget(self.result_label)
 
+        self.toggle_theme_btn = QPushButton("Toggle Theme", self)
+        self.toggle_theme_btn.clicked.connect(self.toggle_theme)
+        layout.addWidget(self.toggle_theme_btn)
+
         self.setLayout(layout)
         self.setWindowTitle('Folder Creation Tool')
-    
+        
+        # Increase font size by 1
+        self.setFont(QFont(self.font().family(), self.font().pointSize() + 1))
+
     def browse_folder(self):
         folder = QFileDialog.getExistingDirectory(self, "Select Directory")
         if folder:
@@ -53,7 +64,7 @@ class FolderMaker(QWidget):
             
             if result_path:
                 self.result_label.setText(f"Created folders leading to: {result_path}")
-                self.result_label.setStyleSheet("color: black;")
+                self.result_label.setStyleSheet("color: #ffebcd;")  # Manilla color in dark mode
                 self.open_directory(result_path)
             else:
                 self.show_error("No matching folders were created.")
@@ -89,3 +100,23 @@ class FolderMaker(QWidget):
     def show_error(self, message):
         self.result_label.setText(message)
         self.result_label.setStyleSheet("color: red;")
+
+    def toggle_theme(self):
+        self.dark_mode = not self.dark_mode
+        if self.dark_mode:
+            self.setStyleSheet("""
+                QWidget { background-color: #2b2b2b; color: #ffebcd; }
+                QLineEdit { background-color: #4d4d4d; color: #ffebcd; }
+                QPushButton { background-color: #4d4d4d; color: #ffebcd; }
+                QLabel { color: #ffebcd; }
+            """)
+            self.result_label.setStyleSheet("color: #ffebcd;")  # Manilla color for result label
+        else:
+            self.setStyleSheet("")
+            self.result_label.setStyleSheet("color: black;")  # Reset to default black color in light mode
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    window = FolderMaker()
+    window.show()
+    sys.exit(app.exec_())
