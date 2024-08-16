@@ -1,0 +1,11 @@
+ffmpeg.exe
+libopus.a
+libopus-0.dll
+NXAEnc.c
+NXAenc.exe
+include/opus.h
+include/opus_custom.h
+include/opus_defines.h
+include/opus_multistream.h
+include/opus_projection.h
+include/opus_types.h

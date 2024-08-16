@@ -1,32 +1,28 @@
 import sys
 import os
-from PyQt5.QtWidgets import QApplication, QMainWindow, QTabWidget, QSplashScreen
+from PyQt5.QtWidgets import QApplication, QMainWindow, QTabWidget, QVBoxLayout, QWidget, QLabel, QDesktopWidget
 from PyQt5.QtGui import QIcon, QPixmap, QKeySequence
 from PyQt5.QtCore import Qt, QTimer
-from scripts import stq_tool, OpusHeaderInjector, AudioCalculator, FolderMaker, HexConverterEncoder  # Ensure this line is included
+from scripts import stq_tool, OpusHeaderInjector, AudioCalculator, FolderMaker, HexConverterEncoder, NSOpusConverter
 
-class MHGU_Modkit_Platform(QMainWindow):
+class HbModkit(QMainWindow):
     def __init__(self):
         super().__init__()
         self.init_ui()
 
     def init_ui(self):
-        try:
-            self.setWindowTitle("Handburger's MHGU Modkit Platform Alpha v0.0.4")  # Updated version
-            self.setGeometry(250, 250, 1400, 800)  # Updated location
-            self.setStyleSheet("QMainWindow { background-color: #f0f0f0; }")
-            self.setWindowIcon(QIcon(self.get_resource_path("egg.ico")))
+        self.setWindowTitle("Handburger Modkit v.0.5")
+        self.setGeometry(100, 100, 1600, 900)
+        self.setWindowIcon(QIcon(self.get_icon_path("egg.ico")))
 
-            self.tab_widget = QTabWidget(movable=True)
-            self.tab_widget.setStyleSheet("""
-                QTabBar::tab { min-width: 150px; font-size: 12px; padding: 10px; }  # Added padding
-            """)
-            self.setCentralWidget(self.tab_widget)
+        central_widget = QWidget(self)
+        layout = QVBoxLayout(central_widget)
+        self.setCentralWidget(central_widget)
 
-            self.add_tabs()
-        except Exception as e:
-            print(f"Error initializing UI: {e}")
-            sys.exit(1)
+        self.tab_widget = QTabWidget(self)
+        layout.addWidget(self.tab_widget)
+
+        self.add_tabs()
 
     def add_tabs(self):
         tools = {
@@ -34,7 +30,8 @@ class MHGU_Modkit_Platform(QMainWindow):
             "Opus Header Injector": OpusHeaderInjector.OpusHeaderInjector,
             "Audio Calculator": AudioCalculator.AudioCalculator,
             "FolderMaker": FolderMaker.FolderMaker,
-            "Hex Enc/Decoder": HexConverterEncoder.HexConverterEncoder
+            "Hex Enc/Decoder": HexConverterEncoder.HexConverterEncoder,
+            "NSOpus Converter": NSOpusConverter.NSOpusConverter,  # Updated the name
         }
 
         for name, tool in tools.items():
@@ -44,53 +41,91 @@ class MHGU_Modkit_Platform(QMainWindow):
             except Exception as e:
                 print(f"Error adding tab '{name}': {e}")
 
-    def keyPressEvent(self, event):
-        try:
-            if event.matches(QKeySequence.ZoomIn):
-                self.findChild(AudioCalculator.AudioCalculator).change_font_size(1)
-            elif event.matches(QKeySequence.ZoomOut):
-                self.findChild(AudioCalculator.AudioCalculator).change_font_size(-1)
-            else:
-                super().keyPressEvent(event)
-        except Exception as e:
-            print(f"Error processing key event: {e}")
+    def get_icon_path(self, icon_name):
+        """
+        Searches for the icon in the /assets/ directory located
+        in the same directory as Hb_Modkit.py.
+        """
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        assets_dir = os.path.join(script_dir, 'assets')
+        icon_path = os.path.join(assets_dir, icon_name)
 
-    def get_resource_path(self, filename):
-        path = os.path.join(os.path.dirname(__file__), 'assets', filename)
-        if not os.path.exists(path):
-            print(f"Resource '{filename}' not found at {path}")
-        return path
+        if not os.path.exists(icon_path):
+            raise FileNotFoundError(f"Icon not found at {icon_path}")
+        
+        return icon_path
 
-def show_splash_screen(app):
-    splash_image_path = os.path.join(os.path.dirname(__file__), 'assets', 'funnycharacta.png')
-    if not os.path.exists(splash_image_path):
-        print(f"Error: Splash image '{splash_image_path}' not found.")
-        return None
 
-    pixmap = QPixmap(splash_image_path).scaled(550, 550, Qt.KeepAspectRatio)  # Splash Scale
-    splash = QSplashScreen(pixmap, Qt.WindowStaysOnTopHint)
-    splash.setMask(pixmap.mask())
+class SplashScreen(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.init_ui()
 
-    splash.show()
+    def init_ui(self):
+        self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
+        self.setAttribute(Qt.WA_TranslucentBackground)
 
-    # Splash screen timer set to 4 seconds (4000 milliseconds)
-    QTimer.singleShot(4000, splash.close)
+        central_widget = QWidget(self)
+        layout = QVBoxLayout(central_widget)
+        self.setCentralWidget(central_widget)
 
-    return splash
+        # Load and display the splash image from the assets directory
+        splash_label = QLabel(self)
+        splash_image_path = self.get_splash_image_path()
+        pixmap = QPixmap(splash_image_path)
+
+        # Scale the image to the desired size
+        scaled_pixmap = pixmap.scaled(200, 200, Qt.KeepAspectRatio, Qt.SmoothTransformation)  # Adjust the size as needed
+        splash_label.setPixmap(scaled_pixmap)
+        splash_label.setAlignment(Qt.AlignCenter)
+
+        layout.addWidget(splash_label)
+
+        # Center the splash screen on the client's window
+        self.center_on_screen()
+
+        # Display the splash screen for 3 seconds
+        self.show_splash_screen()
+
+    def get_splash_image_path(self):
+        """
+        Searches for the splash image in the /assets/ directory located
+        in the same directory as Hb_Modkit.py.
+        """
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        assets_dir = os.path.join(script_dir, 'assets')
+        splash_image_filename = "funnycharacta.png"  # Updated with the correct image name
+        splash_image_path = os.path.join(assets_dir, splash_image_filename)
+
+        if not os.path.exists(splash_image_path):
+            raise FileNotFoundError(f"Splash image not found at {splash_image_path}")
+        
+        return splash_image_path
+
+    def center_on_screen(self):
+        """
+        Centers the splash screen on the client's window.
+        """
+        screen = QDesktopWidget().screenGeometry()
+        window_size = self.geometry()
+        x = (screen.width() - window_size.width()) // 2
+        y = (screen.height() - window_size.height()) // 2
+        self.move(x, y)
+
+    def show_splash_screen(self):
+        # Using QTimer to properly close the splash screen after 3 seconds
+        QTimer.singleShot(3000, self.close)
+        self.show()
 
 if __name__ == '__main__':
-    try:
-        app = QApplication(sys.argv)
-        
-        splash = show_splash_screen(app)
-        
-        main_window = MHGU_Modkit_Platform()
-        main_window.show()
+    app = QApplication(sys.argv)
 
-        if splash:
-            splash.finish(main_window)
+    # Show the splash screen
+    splash = SplashScreen()
+    splash.show()
 
-        sys.exit(app.exec_())
-    except Exception as e:
-        print(f"Application error: {e}")
-        sys.exit(1)
+    # Start the main application
+    main_window = HbModkit()
+    main_window.show()
+
+    sys.exit(app.exec_())
