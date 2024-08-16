@@ -1,6 +1,6 @@
 # Handburger Modkit
 
-![Handburger Modkit](assets/funnycharacta.png)  
+![Handburger Modkit] 
 *A comprehensive modding toolkit for Monster Hunter Generations Ultimate (MHGU).*
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/L3L711AIP8)
@@ -41,18 +41,8 @@ The **Handburger Modkit** is a robust toolkit designed for modders of Monster Hu
 - Python 3.6 or higher
 - PyQt5
 
-### Clone the Repository
 
-```bash
-git clone https://github.com/RTHKKona/Hand_Modkit.git
-cd Hand_Modkit
-Install Dependencies
-Ensure you have all required Python packages:
-
-```bash
-
-pip install -r requirements.txt
-Additional Dependencies
+### Additional Dependencies
 Make sure you have the following files in the scripts/data folder:
 
 ffmpeg.exe
@@ -60,46 +50,45 @@ NXAenc.exe
 NSOpusDirectory.txt
 If any of these files are missing, please download them from the Hand_Modkit GitHub repository.
 
-Usage
+### Usage
 Running the Application
 After installing the dependencies, you can run the Handburger Modkit with:
 
-bash
-COPY CODE
-python Hb_Modkit.py
-Tools Overview
-STQ Editor Tool
+### Tools Overview
+### STQ Editor Tool
 This tool allows you to edit .stq files with a user-friendly interface. It provides hexadecimal editing capabilities and facilitates easy manipulation of file data.
 
-Opus Header Injector
+#### Opus Header Injector
 Inject custom headers into .opus files, making them compatible with MHGU. This is essential for audio modding within the game.
 
-Audio Calculator
+#### Audio Calculator
 A tool designed to calculate various audio metrics quickly, making it easier to manage and convert audio files for your mods.
 
-FolderMaker
+#### FolderMaker
 Create and organize your mod’s folder structure effortlessly with the FolderMaker tool. This tool ensures that your files are organized and ready for deployment.
 
-Hex Encoder/Decoder
+#### Hex Encoder/Decoder
 Convert hexadecimal data into different formats and vice versa with ease. This tool is particularly useful for modders who need to work with hex values.
 
-NSOpus Converter
+#### NSOpus Converter
 The NSOpus Converter allows you to convert audio files in various formats (mp4, mp3, flac, wav, ogg) into .opus format compatible with MHGU. It includes features like drag-and-drop support, batch processing, and an intuitive interface.
 
-Future Features
+#### Future Features
 The following features are planned for future updates of the Handburger Modkit:
 
-SBKR Reader/Editor: A tool for reading and editing SBKR files.
-MCA/ADPCM Header Injector: A tool to inject or modify headers in MCA/ADPCM audio files.
-Opus Metadata Extractor: A tool to extract metadata from .opus files.
-Contributing
+- SBKR Reader/Editor: A tool for reading and editing SBKR files.
+- MCA/ADPCM Header Injector: A tool to inject or modify headers in MCA/ADPCM audio files.
+- Opus Metadata Extractor: A tool to extract metadata from .opus files.
+
+## Contributing
 Contributions are welcome! Please feel free to submit a pull request or open an issue to discuss improvements or report bugs.
 
-How to Contribute
+#### How to Contribute
 Fork the repository.
 Create a new branch (git checkout -b feature-branch).
 Commit your changes (git commit -am 'Add new feature').
 Push to the branch (git push origin feature-branch).
 Create a new Pull Request.
-License
+
+### License
 This project is licensed under the GNU General Public License v3.0. See the LICENSE file for details.
