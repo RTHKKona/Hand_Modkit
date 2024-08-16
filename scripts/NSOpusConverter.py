@@ -72,11 +72,14 @@ class NSOpusConverter(QMainWindow):
         Checks the dependencies listed in NSOpusDirectory.txt and logs the result.
         If all dependencies are valid, enables the browse button; otherwise, shows an error.
         """
-        self.log("Checking dependencies...\n")
+        self.log("Starting dependency check...\n")
+
         if not os.path.exists(self.dependencies_file):
-            self.log(f"Error: {self.dependencies_file} not found.")
+            self.log(f"Error: Dependency list file '{self.dependencies_file}' not found.\n")
             return
 
+        self.log(f"Dependency list file '{self.dependencies_file}' found. Checking each dependency...\n")
+        
         missing_dependencies = []
 
         with open(self.dependencies_file, 'r') as file:
@@ -84,11 +87,16 @@ class NSOpusConverter(QMainWindow):
 
         for dependency in dependencies:
             dependency_path = os.path.join(self.data_folder, dependency)
-            if not os.path.exists(dependency_path):
+            if os.path.exists(dependency_path):
+                self.log(f"[✔] Dependency '{dependency}' found at '{dependency_path}'.")
+            else:
+                self.log(f"[✘] Dependency '{dependency}' is missing.")
                 missing_dependencies.append(dependency)
 
         if missing_dependencies:
-            self.log(f"Missing dependencies: {', '.join(missing_dependencies)}")
+            self.log("\nDependency check failed. The following dependencies are missing:\n")
+            for dep in missing_dependencies:
+                self.log(f" - {dep}")
             self.show_dependency_error(missing_dependencies)
         else:
             self.log("\nAll dependencies found. Dependency check complete.\n")
@@ -100,11 +108,25 @@ class NSOpusConverter(QMainWindow):
         Displays an error message with missing dependencies and a link to the GitHub repository.
         """
         message = (
-            f"The following dependencies are missing: {', '.join(missing_dependencies)}\n\n"
+            f"The following dependencies are missing:\n{', '.join(missing_dependencies)}\n\n"
             f"Please download the missing files from the GitHub repository:\n"
             "https://github.com/RTHKKona/Hand_Modkit/tree/main/scripts"
         )
-        QMessageBox.critical(self, "Missing Dependencies", message)
+        error_box = QMessageBox(self)
+        error_box.setWindowTitle("Missing Dependencies")
+        error_box.setText(message)
+        error_box.setStandardButtons(QMessageBox.Ok)
+
+        # Apply the current theme to the error box
+        if self.dark_mode:
+            error_box.setStyleSheet("""
+                QMessageBox { background-color: #2b2b2b; color: #ffebcd; }
+                QPushButton { background-color: #4d4d4d; color: #ffebcd; }
+            """)
+        else:
+            error_box.setStyleSheet("")
+
+        error_box.exec_()
 
     def show_help(self):
         help_text = (

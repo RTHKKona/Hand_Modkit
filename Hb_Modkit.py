@@ -2,7 +2,7 @@ import sys
 import os
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTabWidget, QVBoxLayout, QWidget, QLabel, QDesktopWidget
 from PyQt5.QtGui import QIcon, QPixmap, QKeySequence
-from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtCore import Qt, QTimer, QEventLoop
 from scripts import stq_tool, OpusHeaderInjector, AudioCalculator, FolderMaker, HexConverterEncoder, NSOpusConverter
 
 class HbModkit(QMainWindow):
@@ -75,17 +75,15 @@ class SplashScreen(QMainWindow):
         pixmap = QPixmap(splash_image_path)
 
         # Scale the image to the desired size
-        scaled_pixmap = pixmap.scaled(200, 200, Qt.KeepAspectRatio, Qt.SmoothTransformation)  # Adjust the size as needed
+        scaled_pixmap = pixmap.scaled(400, 400, Qt.KeepAspectRatio, Qt.SmoothTransformation)  # Adjust the size as needed
         splash_label.setPixmap(scaled_pixmap)
         splash_label.setAlignment(Qt.AlignCenter)
 
         layout.addWidget(splash_label)
 
-        # Center the splash screen on the client's window
-        self.center_on_screen()
-
-        # Display the splash screen for 3 seconds
+        # Display the splash screen for 3 seconds and center it.
         self.show_splash_screen()
+        self.center_on_screen()
 
     def get_splash_image_path(self):
         """
@@ -124,7 +122,12 @@ if __name__ == '__main__':
     splash = SplashScreen()
     splash.show()
 
-    # Start the main application
+    # Event loop to stall the app's launch until the splash screen completes
+    event_loop = QEventLoop()
+    QTimer.singleShot(3000, event_loop.quit)
+    event_loop.exec_()
+
+    # Start the main application after the splash screen has closed
     main_window = HbModkit()
     main_window.show()
 
