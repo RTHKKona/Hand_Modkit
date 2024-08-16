@@ -1,6 +1,4 @@
 # Handburger Modkit
-
-![Handburger Modkit] 
 *A comprehensive modding toolkit for Monster Hunter Generations Ultimate (MHGU).*
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/L3L711AIP8)
@@ -48,6 +46,7 @@ Make sure you have the following files in the scripts/data folder:
 ffmpeg.exe
 NXAenc.exe
 NSOpusDirectory.txt
+
 If any of these files are missing, please download them from the Hand_Modkit GitHub repository.
 
 ### Usage
