@@ -43,9 +43,9 @@ The **Handburger Modkit** is a robust toolkit designed for modders of Monster Hu
 ### Additional Dependencies
 Make sure you have the following files in the scripts/data folder:
 
-ffmpeg.exe
-NXAenc.exe
-NSOpusDirectory.txt
+- ffmpeg.exe
+- NXAenc.exe
+- NSOpusDirectory.txt
 
 If any of these files are missing, please download them from the Hand_Modkit GitHub repository.
 
@@ -83,11 +83,11 @@ The following features are planned for future updates of the Handburger Modkit:
 Contributions are welcome! Please feel free to submit a pull request or open an issue to discuss improvements or report bugs.
 
 #### How to Contribute
-Fork the repository.
-Create a new branch (git checkout -b feature-branch).
-Commit your changes (git commit -am 'Add new feature').
-Push to the branch (git push origin feature-branch).
-Create a new Pull Request.
+- Fork the repository.
+- Create a new branch (git checkout -b feature-branch).
+- Commit your changes (git commit -am 'Add new feature').
+- Push to the branch (git push origin feature-branch).
+- Create a new Pull Request.
 
 ### License
 This project is licensed under the GNU General Public License v3.0. See the LICENSE file for details.
