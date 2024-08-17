@@ -2,17 +2,16 @@ import sys
 import os
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QTabWidget, QVBoxLayout, QWidget, QLabel, 
-    QDesktopWidget, QHBoxLayout, QTextBrowser, QPushButton, QStyle, QAction, QMenu
+    QDesktopWidget, QHBoxLayout, QTextBrowser, QPushButton, QStyle, QMenu
 )
-from PyQt5.QtGui import QIcon, QPixmap, QFont, QDrag
-from PyQt5.QtCore import Qt, QTimer, QEventLoop, QMimeData
+from PyQt5.QtGui import QIcon, QPixmap, QFont
+from PyQt5.QtCore import Qt, QTimer, QEventLoop
 from scripts import stq_tool, OpusHeaderInjector, AudioCalculator, FolderMaker, HexConverterEncoder, NSOpusConverter, OpusMetadataExtractor
 
 class CustomTitleBar(QWidget):
     def __init__(self, parent=None, title=""):
         super().__init__(parent)
         self.title = title
-        self.start_pos = None
         self.init_ui()
 
     def init_ui(self):
@@ -66,17 +65,6 @@ class CustomTitleBar(QWidget):
 
     def close_window(self):
         self.window().close()
-
-    def mousePressEvent(self, event):
-        if event.button() == Qt.LeftButton:
-            self.start_pos = event.pos()
-
-    def mouseMoveEvent(self, event):
-        if self.start_pos:
-            self.window().move(self.window().pos() + event.pos() - self.start_pos)
-
-    def mouseReleaseEvent(self, event):
-        self.start_pos = None
 
 class PoppableTabWidget(QTabWidget):
     def __init__(self, parent=None):
@@ -162,13 +150,23 @@ class AboutTab(QWidget):
         layout = QVBoxLayout(self)
 
         about_text = """
-        <h2>About Handburger Modkit</h2>
+        <h2>About - Handburger Modkit</h2>
         <p>This multi-use tool is developed to help with various modding tasks for Monster Hunter Generations Ultimate.</p>
-        <p>Find more about the developer (me!) and support them here:</p>
+        <p>Find more about the developer (me!) and support them below.</p>
+        <p>Thanks to ffmpeg for the conversion functions, masagrator for the NXAenc variation for MHGU, and the MHGU modding community for their support. </p>
         """
         text_browser = QTextBrowser(self)
         text_browser.setHtml(about_text)
         text_browser.setOpenExternalLinks(True)
+        
+        font = QFont()
+        font.setPointSize(10)
+        text_browser.setFont(font)
+        
+        h2_font = QFont()
+        h2_font.setPointSize(14)
+        text_browser.setFont(h2_font)
+        
         layout.addWidget(text_browser)
 
         # Adding icons to the About box
@@ -200,7 +198,7 @@ class AboutTab(QWidget):
         # Create the QLabel with HTML styling
         link_label = QLabel(f'<a href="{url}" style="color:{link_color};">{text}</a>', self)
         link_label.setOpenExternalLinks(True)
-        link_label.setFont(QFont("Arial", 12))
+        link_label.setFont(QFont("Arial", 14))
 
         layout.addWidget(link_label)
         return layout
@@ -208,21 +206,17 @@ class AboutTab(QWidget):
 class HbModkit(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.version = "v.0.5.2"
+        self.version = "v.0.5.3"
         self.init_ui()
 
     def init_ui(self):
         self.setWindowTitle(f"Handburger Modkit {self.version}")
         self.setGeometry(100, 100, 1600, 900)
-        self.setWindowFlags(Qt.FramelessWindowHint)
         self.setWindowIcon(QIcon(self.get_icon_path("egg.ico")))
 
         central_widget = QWidget(self)
         main_layout = QVBoxLayout(central_widget)
         main_layout.setContentsMargins(0, 0, 0, 0)
-
-        self.title_bar = CustomTitleBar(self, title=f"Handburger Modkit {self.version}")
-        main_layout.addWidget(self.title_bar)
 
         self.tab_widget = PoppableTabWidget(self)
         main_layout.addWidget(self.tab_widget)
@@ -244,7 +238,7 @@ class HbModkit(QMainWindow):
         }
         # Separate the "About" tab and sort the rest alphabetically
         sorted_tools = {k: tools[k] for k in sorted(tools.keys()) if k != "About"}
-    
+
         # Insert the "About" tab at the beginning
         sorted_tools = {"About": tools["About"], **sorted_tools}
 

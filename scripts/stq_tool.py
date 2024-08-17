@@ -212,8 +212,12 @@ class STQTool(QMainWindow):
         for row in range(row_count):
             item = self.data_grid.item(row, title_column_index)
             if item is None or item.text() == "":
+                # Append "sound" to the first title populated
+                if row == 0:
+                    text = "sound" + text
                 self.data_grid.setItem(row, title_column_index, QTableWidgetItem(text))
                 break
+
 
     def pattern_matches(self, match, pattern):
         return all(c == 'X' or c == m for c, m in zip(pattern, match))
