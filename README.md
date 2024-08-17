@@ -1,90 +1,93 @@
-# Handburger's MHGU Mod Platform (Hand_Modkit)
+# Handburger Modkit
+*A comprehensive modding toolkit for Monster Hunter Generations Ultimate (MHGU).*
 
-## Overview
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/L3L711AIP8)
 
-My MHGU Mod Platform, also known as Hand_Modkit, is a comprehensive tool designed for modding Monster Hunter Generations Ultimate (MHGU). This platform integrates multiple tools into a single, user-friendly application, allowing users to easily modify and customize their game files.
+## Table of Contents
 
-### Featured Plugins
+- [Introduction](#introduction)
+- [Features](#features)
+- [Installation](#installation)
+- [Usage](#usage)
+  - [STQ Editor Tool](#stq-editor-tool)
+  - [Opus Header Injector](#opus-header-injector)
+  - [Audio Calculator](#audio-calculator)
+  - [FolderMaker](#foldermaker)
+  - [Hex Encoder/Decoder](#hex-encoderdecoder)
+  - [NSOpus Converter](#nsopus-converter)
+- [Future Features](#future-features)
+- [Contributing](#contributing)
+- [License](#license)
 
-- **STQ Tool**: Edit and manage .opus STQR files with an intuitive hex editor.
-- **Opus Header Injector**: Modify and inject headers into headerless OPUS audio files.
-- **FolderMaker** : Create a directory to the exact name of the file you want to replace.
-- **Hex De/Encoder** : Convert from hexadecimal to little Endian 32-bit signed integer and Windows ANSI.
-- **Audio Calculator**: Convert between audio samples and duration in MM:SS.s format, with support for high-precision calculations. (For Opus Header Injector)
+## Introduction
 
-## Getting Started
+The **Handburger Modkit** is a robust toolkit designed for modders of Monster Hunter Generations Ultimate (MHGU). It brings together a suite of powerful tools for handling various aspects of the game, from audio conversions to hex editing and file management. Whether you're a seasoned modder or just starting out, this toolkit provides everything you need to create and manage mods with ease.
+
+## Features
+
+- **STQ Editor Tool**: Edit STQ files with a user-friendly interface.
+- **Opus Header Injector**: Inject custom headers into `.opus` files for compatibility with MHGU.
+- **Audio Calculator**: Calculate audio-related metrics quickly and efficiently.
+- **FolderMaker**: Easily create and manage folder structures for your mods.
+- **Hex Encoder/Decoder**: Convert between hex and other formats with a few clicks.
+- **NSOpus Converter**: Convert various audio formats (mp4, mp3, flac, wav, ogg) into MHGU-compatible `.opus` files.
+
+## Installation
 
 ### Prerequisites
 
-Ensure you have the following installed on your system:
-
 - Python 3.6 or higher
 - PyQt5
-- Decimal module (included in Python's standard library)
 
-### Installation
 
-1. **Clone the repository**:
-    ```bash
-    git clone https://github.com/your-username/Hand_Modkit.git
-    cd Hand_Modkit
-    ```
+### Additional Dependencies
+Make sure you have the following files in the scripts/data folder:
 
-2. **Install the required Python packages**:
-    ```bash
-    pip install -r requirements.txt
-    ```
+- ffmpeg.exe
+- NXAenc.exe
+- NSOpusDirectory.txt
 
-   **Note**: If a `requirements.txt` file is not available, you can manually install `PyQt5`:
-    ```bash
-    pip install PyQt5
-    ```
-
-3. **Run the application**:
-    ```bash
-    python Hb_Modkit.py
-    ```
+If any of these files are missing, please download them from the Hand_Modkit GitHub repository.
 
 ### Usage
+Running the Application
+After installing the dependencies, you can run the Handburger Modkit with:
 
-- **STQ Tool**: Open, view, and edit STQR files. Use the hex editor to directly modify file contents in the grid.
-- **Opus Header Injector**: Load OPUS files, modify their headers, and save the changes. Preview the header modifications before saving.
-- **Audio Calculator**: Convert audio samples to duration and vice versa. Enter duration in `MM:SS.s` format for accurate sample calculations.
+### Tools Overview
+### STQ Editor Tool
+This tool allows you to edit .stq files with a user-friendly interface. It provides hexadecimal editing capabilities and facilitates easy manipulation of file data.
 
-### Hotkeys
+#### Opus Header Injector
+Inject custom headers into .opus files, making them compatible with MHGU. This is essential for audio modding within the game.
 
-- **Increase Font Size**: `Ctrl +`
-- **Decrease Font Size**: `Ctrl -`
+#### Audio Calculator
+A tool designed to calculate various audio metrics quickly, making it easier to manage and convert audio files for your mods.
 
-## Screenshots
+#### FolderMaker
+Create and organize your mod’s folder structure effortlessly with the FolderMaker tool. This tool ensures that your files are organized and ready for deployment.
 
-![STQ Tool](/assets/Cap1.png) 
-*Caption: A screenshot showing the STQ Tool in action.*
+#### Hex Encoder/Decoder
+Convert hexadecimal data into different formats and vice versa with ease. This tool is particularly useful for modders who need to work with hex values.
 
-![Opus Header Injector](/assets/Cap2.png)
-*Caption: A screenshot of the Opus Header Injector interface.*
+#### NSOpus Converter
+The NSOpus Converter allows you to convert audio files in various formats (mp4, mp3, flac, wav, ogg) into .opus format compatible with MHGU. It includes features like drag-and-drop support, batch processing, and an intuitive interface.
 
-![Audio Calculator](/assets/Cap3.png)
-*Caption: The Audio Calculator performing a conversion.*
+#### Future Features
+The following features are planned for future updates of the Handburger Modkit:
+
+- SBKR Reader/Editor: A tool for reading and editing SBKR files.
+- MCA/ADPCM Header Injector: A tool to inject or modify headers in MCA/ADPCM audio files.
+- Opus Metadata Extractor: A tool to extract metadata from .opus files.
 
 ## Contributing
+Contributions are welcome! Please feel free to submit a pull request or open an issue to discuss improvements or report bugs.
 
-Contributions are welcome! If you'd like to contribute, please follow these steps:
+#### How to Contribute
+- Fork the repository.
+- Create a new branch (git checkout -b feature-branch).
+- Commit your changes (git commit -am 'Add new feature').
+- Push to the branch (git push origin feature-branch).
+- Create a new Pull Request.
 
-1. Fork the repository.
-2. Create a new feature branch (`git checkout -b feature/new-feature`).
-3. Commit your changes (`git commit -m 'Add some new feature'`).
-4. Push to the branch (`git push origin feature/new-feature`).
-5. Open a Pull Request.
-6. [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/L3L711AIP8) ;) 
-
-Please ensure that your code follows the project's style guidelines and includes appropriate tests.
-
-## License
-
-This project is licensed under the GPL 3.0 License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- Special thanks to the MHGU modding community for their ongoing support and contributions.
-- [PyQt5](https://www.riverbankcomputing.com/software/pyqt/intro) for the GUI framework.
+### License
+This project is licensed under the GNU General Public License v3.0. See the LICENSE file for details.
