@@ -48,6 +48,18 @@ python Hb_Modkit.py
 \`\`\`
 This will open the main application window, where you can access the various tools via the tabs.
 
+## Future Features
+
+#### We're constantly working to improve Hand_Modkit and expand its capabilities. Here's a glimpse of what's coming in future updates:
+
+- Audio to MCA Converter: A tool to convert various audio formats directly to MCA, simplifying the audio modding process.
+- MCA Header Injector/Editor: An advanced tool for injecting and editing headers in MCA files, allowing for more detailed control over audio modifications.
+- Kuriimu2 Compatibility: Integration with Kuriimu2, including support for .dll files, opening .arc files, and editing .tex files. This will enhance Hand_Modkit's versatility and allow seamless editing of game assets.
+- Compile into Full Exe: The goal is to compile Hand_Modkit into a standalone executable, making it easier to distribute and use without requiring a Python environment.
+- Better GUI for Easier Use: We're working on refining the graphical user interface to make it more intuitive and user-friendly, ensuring that even new users can navigate and use the tool effectively.
+
+Stay tuned for these updates!
+
 ## Contributing
 
 Contributions are welcome! If you have suggestions for improvements, feel free to fork the repository, make your changes, and submit a pull request.
