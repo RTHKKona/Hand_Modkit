@@ -1,8 +1,9 @@
 import sys
 from PyQt5.QtWidgets import (
-    QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QWidget, QRadioButton, QFrame, QTextEdit, QSizePolicy
+    QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QMessageBox,
+    QPushButton, QWidget, QRadioButton, QFrame, QTextEdit, QAction, QMenuBar
 )
-from PyQt5.QtGui import QFont, QColor
+from PyQt5.QtGui import QFont, QColor, QIcon
 from PyQt5.QtCore import Qt
 
 from decimal import Decimal, getcontext, InvalidOperation
@@ -35,6 +36,14 @@ class AudioCalculator(QMainWindow):
 
         # Increase the font size
         self.update_font_size()
+        
+        # Create a menu bar
+        menubar = QMenuBar(self)
+        self.setMenuBar(menubar)
+        help_menu = menubar.addMenu("Help")
+        help_action = QAction("About", self)
+        help_action.triggered.connect(self.show_about_dialog)
+        help_menu.addAction(help_action)
 
     def create_left_column(self):
         left_frame = QFrame(self)
@@ -87,7 +96,15 @@ class AudioCalculator(QMainWindow):
         right_layout.addWidget(self.result_output)
         
         return right_frame
-
+    
+    def show_about_dialog(self):
+        about_text = (
+            "Audio Calculator\n"
+            "Version 1.0\n\n"
+            "Calculates various properties of audio files."
+        )
+        QMessageBox.about(self, "About", about_text)
+        
     def calculate(self):
         input_text = self.audio_input.toPlainText().strip()
         try:

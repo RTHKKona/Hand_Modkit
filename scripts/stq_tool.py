@@ -4,7 +4,7 @@ import os
 import random
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QTextEdit, QFileDialog, QLabel,
-    QDialog, QSplitter, QMessageBox, QTableWidget, QTableWidgetItem, QHeaderView, QAction, QSizePolicy
+    QDialog, QSplitter, QMessageBox, QTableWidget, QTableWidgetItem, QHeaderView, QAction, QSizePolicy, QMenuBar
 )
 from PyQt5.QtGui import QFont, QPixmap, QIcon
 from PyQt5.QtCore import Qt, QRect

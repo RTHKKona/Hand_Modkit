@@ -1,11 +1,14 @@
 import os
 import sys
 import subprocess
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QPushButton, QFileDialog, QMessageBox, QTextEdit, QApplication
-from PyQt5.QtGui import QFont
+from PyQt5.QtWidgets import (
+    QMainWindow, QVBoxLayout, QHBoxLayout, QLineEdit, QPushButton, QFileDialog, QMessageBox, QTextEdit, QApplication,
+    QAction, QMenuBar, QLabel, QWidget
+)
+from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtCore import Qt
 
-class FolderMaker(QWidget):
+class FolderMaker(QMainWindow):
     def __init__(self):
         super().__init__()
         self.dark_mode = True  # Start in dark mode by default
@@ -13,8 +16,18 @@ class FolderMaker(QWidget):
         self.apply_initial_theme()  # Apply the initial theme
 
     def initUI(self):
-        main_layout = QVBoxLayout()
+        central_widget = QWidget(self)
+        self.setCentralWidget(central_widget)
+
+        main_layout = QVBoxLayout(central_widget)
         bottom_layout = QHBoxLayout()
+
+        # Create a menu bar
+        menubar = self.menuBar()  # Use menuBar() method of QMainWindow
+        help_menu = menubar.addMenu("Help")
+        help_action = QAction("About", self)
+        help_action.triggered.connect(self.show_about_dialog)
+        help_menu.addAction(help_action)
 
         self.cmd_output = QTextEdit(self)
         self.cmd_output.setReadOnly(True)
@@ -42,7 +55,6 @@ class FolderMaker(QWidget):
         bottom_layout.addWidget(self.toggle_theme_btn)
 
         main_layout.addLayout(bottom_layout)
-        self.setLayout(main_layout)
 
         self.setWindowTitle('FolderMaker')
         self.setGeometry(100, 100, 1600, 800)  # Set the window size to 1600x800, positioned at 100,100
@@ -103,6 +115,14 @@ class FolderMaker(QWidget):
             self.log(f"Error creating directory {target_path}: {e}")
             return None
 
+    def show_about_dialog(self):
+        about_text = (
+            "Folder Maker\n"
+            "Version 1.0\n\n"
+            "Creates a set of predefined folders within a selected directory."
+        )
+        QMessageBox.about(self, "About", about_text)
+    
     def open_directory(self, path):
         try:
             if os.name == 'nt':

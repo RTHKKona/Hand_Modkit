@@ -1,6 +1,9 @@
 import sys
 import struct
-from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QTextEdit, QPushButton, QWidget, QApplication, QComboBox, QRadioButton, QButtonGroup, QFrame
+from PyQt5.QtWidgets import (
+    QMainWindow, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QTextEdit, QPushButton, QWidget, 
+    QApplication, QComboBox, QRadioButton, QButtonGroup, QFrame, QAction, QMenuBar,QMessageBox
+)
 from PyQt5.QtGui import QColor, QFont, QTextCursor
 from PyQt5.QtCore import Qt
 
@@ -94,6 +97,14 @@ class HexConverterEncoder(QMainWindow):
         self.setCentralWidget(central_widget)
         self.setWindowTitle("Hex Converter & Encoder")
         self.resize(800, 400)  # Initial size
+        
+        # Create a menu bar
+        menubar = QMenuBar(self)
+        self.setMenuBar(menubar)
+        help_menu = menubar.addMenu("Help")
+        help_action = QAction("About", self)
+        help_action.triggered.connect(self.show_about_dialog)
+        help_menu.addAction(help_action)
 
     def format_hex_input(self):
         """
@@ -106,6 +117,14 @@ class HexConverterEncoder(QMainWindow):
         self.hex_input.moveCursor(QTextCursor.End)
         self.hex_input.blockSignals(False)  # Re-enable signal
 
+    def show_about_dialog(self):
+        about_text = (
+            "Hex Converter Encoder\n"
+            "Version 1.0\n\n"
+            "Converts and encodes data to and from hexadecimal format."
+        )
+        QMessageBox.about(self, "About", about_text)
+    
     def update_labels(self):
         # Update labels based on the selected conversion type
         conversion = self.conversion_type.currentText()

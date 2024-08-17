@@ -2,7 +2,10 @@ import os
 import sys
 import shutil
 import subprocess
-from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QHBoxLayout, QPushButton, QFileDialog, QTextEdit, QApplication, QLabel, QMessageBox
+from PyQt5.QtWidgets import (
+    QMainWindow, QVBoxLayout, QHBoxLayout, QPushButton, QFileDialog, QTextEdit, QApplication, 
+    QLabel, QMessageBox, QAction, QMenuBar
+)
 from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt
 import webbrowser
@@ -36,6 +39,14 @@ class NSOpusConverter(QMainWindow):
         button_font = QFont()
         button_font.setPointSize(11)  # Set the font size for all buttons
 
+        # Create a menu bar
+        menubar = QMenuBar(self)
+        self.setMenuBar(menubar)
+        help_menu = menubar.addMenu("Help")
+        help_action = QAction("About", self)
+        help_action.triggered.connect(self.show_about_dialog)
+        help_menu.addAction(help_action)
+        
         self.browse_button = QPushButton("Browse Audio Files", self)
         self.browse_button.setFont(button_font)
         self.browse_button.setStyleSheet("QPushButton { padding: 10px; }")
@@ -66,7 +77,15 @@ class NSOpusConverter(QMainWindow):
 
         self.setWindowTitle('NSOpus Converter')
         self.setGeometry(100, 100, 1600, 800)  # Set the window size to 1600x800, positioned at 100,100
-
+        
+    def show_about_dialog(self):
+        about_text = (
+            "NS Opus Converter\n"
+            "Version 1.0\n\n"
+            "Converts standard Opus files to the NS Opus format used in certain Nintendo Switch games."
+        )
+        QMessageBox.about(self, "About", about_text)
+        
     def check_dependencies(self):
         """
         Checks the dependencies listed in NSOpusDirectory.txt and logs the result.

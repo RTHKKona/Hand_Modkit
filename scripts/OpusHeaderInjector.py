@@ -3,7 +3,7 @@ import struct
 import os
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QTextEdit, QFileDialog, QSplitter,
-    QTableWidget, QTableWidgetItem, QHeaderView, QAction, QMessageBox, QSizePolicy, QLabel
+    QTableWidget, QTableWidgetItem, QHeaderView, QAction, QMessageBox, QSizePolicy, QLabel, QMenuBar, QAction,
 )
 from PyQt5.QtGui import QFont, QIcon, QColor, QTextCharFormat
 from PyQt5.QtCore import Qt
@@ -43,7 +43,15 @@ class OpusHeaderInjector(QMainWindow):
         self.help_button.clicked.connect(self.show_help)
         top_widget = QWidget()
         top_widget.setLayout(top_layout)
-
+        
+        # Create a menu bar
+        menubar = QMenuBar(self)
+        self.setMenuBar(menubar)
+        help_menu = menubar.addMenu("Help")
+        help_action = QAction("About", self)
+        help_action.triggered.connect(self.show_about_dialog)
+        help_menu.addAction(help_action)
+        
         # Text Box for Hex Data (Displaying the header)
         self.hex_view = QTextEdit(self, readOnly=True, font=QFont("Consolas", 11))  # Increased font size by 1
         self.hex_view.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -100,7 +108,15 @@ class OpusHeaderInjector(QMainWindow):
         save_file_action = QAction("&Save As", self)
         save_file_action.triggered.connect(self.save_file_as)
         file_menu.addAction(save_file_action)
-
+        
+    def show_about_dialog(self):
+        about_text = (
+            "Opus Header Injector\n"
+            "Version 1.0\n\n"
+            "Injects custom headers into Opus audio files."
+        )
+        QMessageBox.about(self, "About", about_text)
+        
     def show_help(self):
         help_text = (
             "1. Import the .opus file you want to replace inside of nativeNX.\n"
