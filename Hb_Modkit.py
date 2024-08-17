@@ -149,12 +149,39 @@ class AboutTab(QWidget):
         super().__init__()
         layout = QVBoxLayout(self)
 
+        # Core information about the tool
         about_text = """
         <h2>About - Handburger Modkit</h2>
         <p>This multi-use tool is developed to help with various modding tasks for Monster Hunter Generations Ultimate.</p>
         <p>Find more about the developer (me!) and support them below.</p>
-        <p>Thanks to ffmpeg for the conversion functions, masagrator for the NXAenc variation for MHGU, and the MHGU modding community for their support. </p>
+        <p>Thanks to ffmpeg for the conversion functions, masagrator for the NXAenc variation for MHGU, and vgmstream for their audio software and dependencies. </p>
+        <p>Note: I do not own the icons for the Ko-fi or Github below. </p>
+        <h3>Tool Descriptions</h3>
+        <ul>
         """
+
+        # Dictionary to store tool names and descriptions
+        self.tools = {
+            "STQ Editor Tool": "A tool for editing and viewing STQ/STQR files, including hex pattern analysis.",
+            "Opus Header Injector": "Allows users to inject or modify Opus headers within audio files.",
+            "Audio Calculator": "A utility for calculating audio properties such as bitrate, file size, and duration.",
+            "FolderMaker": "Helps in organizing and creating folders necessary for modding projects.",
+            "Hex Enc/Decoder": "Encodes or decodes hexadecimal data, useful for file conversions and analysis.",
+            "NSOpus Converter": "Converts audio files to and from the Opus format, with support for NSOpus-specific formats.",
+            "Opus Metadata Extractor": "Extracts metadata from Opus files for easier management and editing."
+        }
+
+        # Sort the dictionary by tool names
+        sorted_tools = dict(sorted(self.tools.items()))
+
+        # Generate HTML for the sorted tools
+        for tool, description in sorted_tools.items():
+            about_text += f"<li><b>{tool}:</b> {description}</li>"
+
+        about_text += """
+        </ul>
+        """
+
         text_browser = QTextBrowser(self)
         text_browser.setHtml(about_text)
         text_browser.setOpenExternalLinks(True)
@@ -174,6 +201,31 @@ class AboutTab(QWidget):
                                                 "GitHub - RTHKKona", "https://github.com/RTHKKona", 64))
         layout.addLayout(self.create_link_layout(self.get_resource_path("ko-fi.png"),
                                                 "Ko-fi - Handburger", "https://ko-fi.com/handburger", 64))
+
+    def add_tool_description(self, tool_name, description):
+        """Method to add new tool descriptions"""
+        self.tools[tool_name] = description
+        self.update_about_text()
+
+    def update_about_text(self):
+        """Updates the about text after adding a new tool"""
+        about_text = """
+        <h2>About - Handburger Modkit</h2>
+        <p>This multi-use tool is developed to help with various modding tasks for Monster Hunter Generations Ultimate.</p>
+        <p>Find more about the developer (me!) and support them below.</p>
+        <p>Thanks to ffmpeg for the conversion functions, masagrator for the NXAenc variation for MHGU, and vgmstream for their audio software and dependencies. </p>
+        <p>Note: I do not own the icons for the Ko-fi or Github below. </p>
+        <h3>Tool Descriptions</h3>
+        <ul>
+        """
+        sorted_tools = dict(sorted(self.tools.items()))
+        for tool, description in sorted_tools.items():
+            about_text += f"<li><b>{tool}:</b> {description}</li>"
+
+        about_text += "</ul>"
+
+        # Update the text in the QTextBrowser
+        self.findChild(QTextBrowser).setHtml(about_text)
 
     def get_resource_path(self, filename):
         script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -202,6 +254,7 @@ class AboutTab(QWidget):
 
         layout.addWidget(link_label)
         return layout
+
 
 class HbModkit(QMainWindow):
     def __init__(self):
