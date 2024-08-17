@@ -50,7 +50,7 @@ This will open the main application window, where you can access the various too
 
 ## Future Features
 
-#### We're constantly working to improve Hand_Modkit and expand its capabilities. Here's a glimpse of what's coming in future updates:
+I'm working to improve Hand_Modkit and expand its capabilities. Here's a glimpse of what's coming in future updates:
 
 - Audio to MCA Converter: A tool to convert various audio formats directly to MCA, simplifying the audio modding process.
 - MCA Header Injector/Editor: An advanced tool for injecting and editing headers in MCA files, allowing for more detailed control over audio modifications.
