@@ -255,7 +255,6 @@ class AboutTab(QWidget):
         layout.addWidget(link_label)
         return layout
 
-
 class HbModkit(QMainWindow):
     def __init__(self):
         super().__init__()
