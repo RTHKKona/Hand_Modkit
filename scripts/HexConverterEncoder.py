@@ -2,7 +2,7 @@ import sys
 import struct
 from PyQt5.QtWidgets import (
     QMainWindow, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QTextEdit, QPushButton, QWidget, 
-    QApplication, QComboBox, QRadioButton, QButtonGroup, QFrame, QAction, QMenuBar,QMessageBox
+    QApplication, QComboBox, QRadioButton, QButtonGroup, QFrame, QAction, QMenuBar, QMessageBox
 )
 from PyQt5.QtGui import QColor, QFont, QTextCursor
 from PyQt5.QtCore import Qt
@@ -44,7 +44,12 @@ class HexConverterEncoder(QMainWindow):
         center_layout.addWidget(self.settings_label)
 
         self.conversion_type = QComboBox(self)
-        self.conversion_type.addItems(["Hex to Little Endian Signed Int32", "Hex to Windows (ANSI)"])
+        self.conversion_type.addItems([
+            "Hex to Little Endian Signed Int32", 
+            "Hex to Windows (ANSI)",
+            "Signed Int32 to Hex",
+            "Windows (ANSI) to Hex"
+        ])
         self.conversion_type.currentIndexChanged.connect(self.update_labels)
         center_layout.addWidget(self.conversion_type)
 
@@ -134,36 +139,61 @@ class HexConverterEncoder(QMainWindow):
             self.byte_order_label.show()
             for button in self.byte_order_group.buttons():
                 button.show()
+            self.hex_input.setPlaceholderText("Enter hexadecimal value (e.g., f0 9f 8f b3 ef b8 8f e2 80 8d)")
         elif conversion == "Hex to Windows (ANSI)":
             self.hex_input_label.setText("Hexadecimal Input")
             self.result_label.setText("Converted ANSI String")
             self.byte_order_label.hide()
             for button in self.byte_order_group.buttons():
                 button.hide()
+            self.hex_input.setPlaceholderText("Enter hexadecimal value (e.g., f0 9f 8f b3 ef b8 8f e2 80 8d)")
+        elif conversion == "Signed Int32 to Hex":
+            self.hex_input_label.setText("Signed Int32 Input")
+            self.result_label.setText("Converted Hexadecimal")
+            self.byte_order_label.show()
+            for button in self.byte_order_group.buttons():
+                button.show()
+            self.hex_input.setPlaceholderText("Enter signed int32 value (e.g., -123456789)")
+        elif conversion == "Windows (ANSI) to Hex":
+            self.hex_input_label.setText("ANSI String Input")
+            self.result_label.setText("Converted Hexadecimal")
+            self.byte_order_label.hide()
+            for button in self.byte_order_group.buttons():
+                button.hide()
+            self.hex_input.setPlaceholderText("Enter ANSI string (e.g., Hello World)")
 
     def convert(self):
         try:
-            hex_value = self.hex_input.toPlainText().strip()
-
-            # Normalize input: remove spaces
-            hex_value = hex_value.replace(" ", "").upper()
+            input_value = self.hex_input.toPlainText().strip()
 
             conversion = self.conversion_type.currentText()
             byte_order = '<' if self.byte_order_group.buttons()[0].isChecked() else '>'
 
             if conversion == "Hex to Little Endian Signed Int32":
                 # Ensure the string is 8 characters long
-                if len(hex_value) != 8:
+                if len(input_value) != 8:
                     raise ValueError("Hexadecimal input must be 8 characters long after normalization.")
                 # Convert to little-endian or big-endian signed 32-bit integer
-                packed = bytes.fromhex(hex_value)
+                packed = bytes.fromhex(input_value)
                 little_endian_int = struct.unpack(f'{byte_order}i', packed)[0]
                 self.result_output.setText(f"{little_endian_int}")
 
             elif conversion == "Hex to Windows (ANSI)":
                 # Convert hex to ANSI string
-                ansi_string = bytes.fromhex(hex_value).decode('cp1252')
+                ansi_string = bytes.fromhex(input_value).decode('cp1252')
                 self.result_output.setText(ansi_string)
+
+            elif conversion == "Signed Int32 to Hex":
+                # Convert signed int32 to hexadecimal
+                int_value = int(input_value)
+                packed = struct.pack(f'{byte_order}i', int_value)
+                hex_value = packed.hex().upper()
+                self.result_output.setText(hex_value)
+
+            elif conversion == "Windows (ANSI) to Hex":
+                # Convert ANSI string to hex
+                hex_value = input_value.encode('cp1252').hex().upper()
+                self.result_output.setText(hex_value)
 
         except (ValueError, struct.error, UnicodeDecodeError) as e:
             self.result_output.setText(f"Error: {str(e)}")
