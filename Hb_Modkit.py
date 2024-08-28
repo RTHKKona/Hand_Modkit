@@ -258,7 +258,7 @@ class AboutTab(QWidget):
 class HbModkit(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.version = "v.0.5.3"
+        self.version = "v.0.5.4"
         self.init_ui()
 
     def init_ui(self):
