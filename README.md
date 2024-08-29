@@ -50,9 +50,14 @@ I'm working to improve Hand_Modkit and expand its capabilities. Here's a glimpse
 
 Stay tuned for these updates!
 
-## Contributing
+# Contributions
 
 Contributions are welcome! If you have suggestions for improvements, feel free to fork the repository, make your changes, and submit a pull request.
+
+## Contributers
+<a href="https://github.com/RTHKKona/Hand_Modkit/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=RTHKKona/Hand_Modkit" />
+</a>
 
 ### Bug Reports & Feature Requests
 
