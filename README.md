@@ -66,7 +66,7 @@ Contributions are welcome! If you have suggestions for improvements, feel free t
 
 ## Contributers
 <a href="https://github.com/RTHKKona/Hand_Modkit/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=RTHKKona/Hand_Modkit" />
+  <img src="https://contrib.rocks/image?repo=RTHKKona/Hand_Modkit"/>
 </a>
 
 ### Bug Reports & Feature Requests
