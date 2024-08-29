@@ -15,6 +15,16 @@ Hand_Modkit, also known as the Handburger Modkit, is a versatile tool designed f
 - **NSOpus Converter**: Convert audio files to and from the Opus format, with support for NSOpus-specific formats.
 - **Opus Metadata Extractor**: Extract metadata from Opus files for easier management and editing.
 
+## Screenshots
+
+<img src="./assets/Screenshot.png" alt="Screenshot" width="600"/>
+<img src="./assets/Screenshot1.png" alt="Screenshot1" width="600"/>
+<img src="./assets/Screenshot2.png" alt="Screenshot2" width="600"/>
+<img src="./assets/Screenshot3.png" alt="Screenshot3" width="600"/>
+<img src="./assets/Screenshot4.png" alt="Screenshot4" width="600"/>
+<img src="./assets/Screenshot5.png" alt="Screenshot5" width="600"/>
+<img src="./assets/Screenshot6.png" alt="Screenshot6" width="600"/>
+
 ## Getting Started
 
 ### Prerequisites
