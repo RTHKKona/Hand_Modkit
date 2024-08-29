@@ -7,12 +7,12 @@ Hand_Modkit, also known as the Handburger Modkit, is a versatile tool designed f
 
 ## Features
 
-- **STQ Editor Tool**: Edit and view STQ/STQR files, including hex pattern analysis.
-- **Opus Header Injector**: Modify Opus headers within audio files.
+- **STQ Editor Tool**: Edit and view STQ/STQR files, including hex pattern analysis and specific hexadecimal editing.
+- **Opus Header Injector**: Modify Opus headers and inject edited ones onto headerless Opus audio files.
 - **Audio Calculator**: Calculate audio properties such as bitrate, file size, and duration.
-- **FolderMaker**: Organize and create folders for your modding projects.
+- **FolderMaker**:  Create folders and directories for your projects.
 - **Hex Enc/Decoder**: Encode or decode hexadecimal data, useful for file conversions and analysis.
-- **NSOpus Converter**: Convert audio files to and from the Opus format, with support for NSOpus-specific formats.
+- **NSOpus Converter**: Convert audio files to and from the Opus format, with support for Nintendo Switch .Opus format for MHGU.
 - **Opus Metadata Extractor**: Extract metadata from Opus files for easier management and editing.
 
 ## Screenshots
