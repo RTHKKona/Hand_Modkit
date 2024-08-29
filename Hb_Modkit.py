@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtGui import QIcon, QPixmap, QFont
 from PyQt5.QtCore import Qt, QTimer, QEventLoop
-from scripts import stq_tool, OpusHeaderInjector, AudioCalculator, FolderMaker, HexConverterEncoder, NSOpusConverter, OpusMetadataExtractor
+from scripts import stq_tool, OpusHeaderInjector, AudioCalculator, FolderMaker, HexConverterEncoder, NSOpusConverter, OpusMetadataExtractor, STQ_Merge
 
 class CustomTitleBar(QWidget):
     def __init__(self, parent=None, title=""):
@@ -286,6 +286,7 @@ class HbModkit(QMainWindow):
             "Hex Enc/Decoder": HexConverterEncoder.HexConverterEncoder,
             "NSOpus Converter": NSOpusConverter.NSOpusConverter,
             "Opus Metadata Extractor": OpusMetadataExtractor.OpusMetadataExtractor,
+            "STQ Merge Tool": STQ_Merge.STQMergeTool,
             "About": AboutTab
         }
         # Separate the "About" tab and sort the rest alphabetically
