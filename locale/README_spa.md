@@ -1,85 +1,76 @@
 
 # Hand_Modkit
 
-Hand_Modkit, tambien conocido como Handburger Modkit, es una herramienta versatíl para modding en Monster Hunter Generations Ultimate (MHGU). Con un conjunto de utilidades
+Hand_Modkit, tambien conocido como Handburger Modkit, es una herramienta versátil para modding en Monster Hunter Generations Ultimate (MHGU). Con un conjunto de utilidades
 especializadas, esta herramienta ayuda a los modders a editar, analizar y manejar varios archivos del juego facilmente. Ya sea que estes incoporando encabezados de audio, calculando propiedades de audio u organizando las carpetas de mods, Hand_Modkit simplifica las complejas tareas involucradas en el MHGU modding.
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/L3L711AIP8)
 
-## Features
+## Características
 
-- **Herramienta de edición STQ**: Edit and view STQ/STQR files, including hex pattern analysis and specific hexadecimal editing.
-- **Opus Header Injector**: Modify Opus headers and inject edited ones onto headerless Opus audio files.
-- **Audio Calculator**: Calculate audio properties such as bitrate, file size, and duration.
-- **FolderMaker**:  Create folders and directories for your projects.
-- **Hex Enc/Decoder**: Encode or decode hexadecimal data, useful for file conversions and analysis.
-- **NSOpus Converter**: Convert audio files to and from the Opus format, with support for Nintendo Switch .Opus format for MHGU.
-- **Opus Metadata Extractor**: Extract metadata from Opus files for easier management and editing.
+- **Herramienta de edición STQ**: Editar y ver archivos STQ/STQR, incluyendo analisis de patrones hex y edición hexadecimal específica.
+- **Insertor de encabezado Opus**: Modificar encabezados Opus e inserta ya editados en archivos Opus audio sin encabezado.
+- **Calculadora de audio**: Calcular las propiedades del audio como el bitrate, tamaño de archivo y duración.
+- **Creador de carpetas**:  Crear carpetas y directorios para tus propios proyectos.
+- **Codificador/Descodificador Hex**: Codificar o descodificar datos hexadecimales, útil para conversiones y análisis de archivos.
+- **Conversor a NSOpus**: Convertir archivos de audio a formato Opus o viceversa, con soporte para el formato .Opus de Nintendo Switch para MHGU.
+- **Extractor de metadatos Opus**: Extraer metadatos de los archivos Opus para un manejo y edicion mas facíl.
 
-## Screenshots
 
-<img src="./assets/Screenshot.png" alt="Screenshot" width="600"/>
-<img src="./assets/Screenshot1.png" alt="Screenshot1" width="600"/>
-<img src="./assets/Screenshot2.png" alt="Screenshot2" width="600"/>
-<img src="./assets/Screenshot3.png" alt="Screenshot3" width="600"/>
-<img src="./assets/Screenshot4.png" alt="Screenshot4" width="600"/>
-<img src="./assets/Screenshot5.png" alt="Screenshot5" width="600"/>
-<img src="./assets/Screenshot6.png" alt="Screenshot6" width="600"/>
+## Primeros pasos
 
-## Getting Started
+### Requisitos previos
 
-### Prerequisites
-
-- **Python 3.x**: Ensure you have Python installed on your machine. You can download it [here](https://www.python.org/downloads/).
-- **PyQt5**: Install PyQt5, the library used for the GUI. You can install it via pip:
+- **Python 3.x**: Asegurese de que esta instalado Python en su dispositivo. Lo puede descargar [aquí](https://www.python.org/downloads/).
+- **PyQt5**: Instalar PyQt5, la libreria utilizada por la GUI. Lo puede instalar via pip:
   \`\`\`bash
   pip install PyQt5
   \`\`\`
 
-### Installation
+### Instalación
 
-1. Clone the repository:
+1. Clona el repositorio:
    \`\`\`bash
    git clone https://github.com/RTHKKona/Hand_Modkit.git
    \`\`\`
-2. Navigate to the project directory:
+2. Navega hacia el directorio del proyecto:
    \`\`\`bash
    cd Hand_Modkit
    \`\`\`
-3. Open up Hb_Modkit.py or any standalone python script in /scripts/
+3. Abre el archivo Hb_Modkit.py o cualquier script de Python independiente en /scripts/
 
-## Future Features
+## Futuras funcionalidades
 
-I'm working to improve Hand_Modkit and expand its capabilities. Here's a glimpse of what's coming in future updates:
+Estoy trabajando para mejorar Hand_Modkit y expandir sus capacidades. Aquí hay un vistazo de lo que va a haber en actualizaciones futuras:
 
-- STQR Conflict Manager: Fixes multi-mod conflicts of the stqr files.
-- Audio to MCA Converter: A tool to convert various audio formats directly to MCA, simplifying the audio modding process.
-- MCA Header Injector/Editor: An advanced tool for injecting and editing headers in MCA files, allowing for more detailed control over audio modifications.
-- Kuriimu2 Compatibility: Integration with Kuriimu2, including support for .dll files, opening .arc files, and editing .tex files. This will enhance Hand_Modkit's versatility and allow seamless editing of game assets.
-- Compile into Full Exe: The goal is to compile Hand_Modkit into a standalone executable, making it easier to distribute and use without requiring a Python environment.
-- Better GUI for Easier Use: We're working on refining the graphical user interface to make it more intuitive and user-friendly, ensuring that even new users can navigate and use the tool effectively.
+- Gestor de conflictos STQR: Arregla conflictos multi-mod de los archivos stqr.
+- Convertidor de Audio a MCA: Una heramienta para convertir varios formatos de audio directamente a MCA, simplificando el proceso de modding del audio.
+- Insertor/Editor de Encabezado MCA:Una herramienta avanzada para insetar y editar encabezados en archivos MCA, permitiendo un control mas detallado sobre las modificaciones de audio.
+- Compatibilidad con Kuriimu2: Integración con Kuriimu2, incluyendo soporte para archivos .dll, abriendo archivos .arc y editando archivos .tex. Esto ayudará a la versatilidad de Hand_Modkit y parmitirá la edición perfecta de los recursos del juego.
+- Compilar en un Exe completo: El objetivo es compilar Hand_Modkit en un ejecutable independiente, haciendolo mas fácil para distribuír y usar sin la necesidad de tener un entorno Python.
+- Mejor GUI para un uso más sencillo: Estamos trabajando en perfeccionar la interfaz gráfica del usuario para hacerlo mas intuitivo y amigable, asegurando que hasta los nuevos usuarios pueden navegar y usar la herramienta efectivamente.
 
-Stay tuned for these updates!
+Esten pendientes de estas actualizaciones!
 
-# Contributions
+# Contribuciones
 
-Contributions are welcome! If you have suggestions for improvements, feel free to fork the repository, make your changes, and submit a pull request.
+Contribuciones son bienvenidas! Si tenes alguna idea sobre mejoras, sientete libre de crear un fork del repositorio, realiza tus cambios y publica una pull request.
 
-## Contributers
+## Contribuidores
 <a href="https://github.com/RTHKKona/Hand_Modkit/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=RTHKKona/Hand_Modkit" />
 </a>
 
-### Bug Reports & Feature Requests
+### Reportes de bugs y solicitud de funciones
 
-Please use the [issue tracker](https://github.com/RTHKKona/Hand_Modkit/issues) to report bugs or request new features.
+Por favor usa [issue tracker](https://github.com/RTHKKona/Hand_Modkit/issues) para reportar bugs o solicitar nuevas funciones.
 
-## Support
+## Ayudas
 
-If you find this tool useful and would like to support its development, consider buying me a coffee!
+Si le pareció útil la herramienta y le gustaría ayudar en el desarollo, considera apoyarme con una pequeña contribución ;D!
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/L3L711AIP8)
 
-## License
+## Licencia
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+Este proyecto esta protegido por una licencia del MIT - revisar el archivo [LICENSE](LICENSE) para más detalles.
