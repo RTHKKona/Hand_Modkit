@@ -6,6 +6,7 @@ Hand_Modkit, also known as the Handburger Modkit, is a versatile tool designed f
 ## Features
 
 - **STQ Editor Tool**: Edit and view STQ/STQR files, including hex pattern analysis and specific hexadecimal editing.
+- **STQ Merge Tool**: Merge modified STQR files for multiple mod usage. Includes hexadecimal editing, conflict management and saving functionality.
 - **Opus Header Injector**: Modify Opus headers and inject edited ones onto headerless Opus audio files.
 - **Audio Calculator**: Calculate audio properties such as bitrate, file size, and duration.
 - **FolderMaker**:  Create folders and directories for your projects.
