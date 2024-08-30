@@ -29,20 +29,20 @@ Hand_Modkit, also known as the Handburger Modkit, is a versatile tool designed f
 
 - **Python 3.x**: Ensure you have Python installed on your machine. You can download it [here](https://www.python.org/downloads/).
 - **PyQt5**: Install PyQt5, the library used for the GUI. You can install it via pip:
-  \`\`\`bash
+  ```
   pip install PyQt5
-  \`\`\`
+  ```
 
 ### Installation
 
 1. Clone the repository:
-   \`\`\`bash
+   ```
    git clone https://github.com/RTHKKona/Hand_Modkit.git
-   \`\`\`
+   ```
 2. Navigate to the project directory:
-   \`\`\`bash
+   ```
    cd Hand_Modkit
-   \`\`\`
+   ```
 3. Open up Hb_Modkit.py or any standalone python script in /scripts/
 
 ## Future Features
