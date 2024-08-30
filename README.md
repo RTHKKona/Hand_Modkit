@@ -3,8 +3,6 @@
 
 Hand_Modkit, also known as the Handburger Modkit, is a versatile tool designed for modding Monster Hunter Generations Ultimate (MHGU). With a suite of specialized utilities, this toolkit empowers modders to easily edit, analyze, and manage various game files. Whether you're injecting audio headers, calculating audio properties, or organizing mod folders, Hand_Modkit simplifies the complex tasks involved in MHGU modding.
 
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/L3L711AIP8)
-
 ## Features
 
 - **STQ Editor Tool**: Edit and view STQ/STQR files, including hex pattern analysis and specific hexadecimal editing.
@@ -31,20 +29,20 @@ Hand_Modkit, also known as the Handburger Modkit, is a versatile tool designed f
 
 - **Python 3.x**: Ensure you have Python installed on your machine. You can download it [here](https://www.python.org/downloads/).
 - **PyQt5**: Install PyQt5, the library used for the GUI. You can install it via pip:
-  \`\`\`bash
+  ```
   pip install PyQt5
-  \`\`\`
+  ```
 
 ### Installation
 
 1. Clone the repository:
-   \`\`\`bash
+   ```
    git clone https://github.com/RTHKKona/Hand_Modkit.git
-   \`\`\`
+   ```
 2. Navigate to the project directory:
-   \`\`\`bash
+   ```
    cd Hand_Modkit
-   \`\`\`
+   ```
 3. Open up Hb_Modkit.py or any standalone python script in /scripts/
 
 ## Future Features
@@ -65,11 +63,22 @@ Stay tuned for these updates!
 Contributions are welcome! If you have suggestions for improvements, feel free to fork the repository, make your changes, and submit a pull request.
 
 ## Contributers
-<a href="https://github.com/RTHKKona/Hand_Modkit/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=RTHKKona/Hand_Modkit"/>
-</a>
+#### Lead Developer
+![Handburger](https://github.com/user-attachments/assets/a927ae22-ae98-4c3d-94ed-63e170ef1daf)
 
-### Bug Reports & Feature Requests
+#### Translators
+![LucioPalmucci](https://github.com/user-attachments/assets/b270bb04-fb07-4ea5-843b-a426a5596af3)
+![nichoconutzy](https://github.com/user-attachments/assets/79dd1a82-94e9-422b-a8dd-5cfac00132ce)
+
+### All Contributors
+
+<a href="https://github.com/RTHKKona/Hand_Modkit/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=RTHKKona/Hand_Modkit" anon=1/>
+</a>
+<br>
+Made with [contrib.rocks](https://contrib.rocks).
+
+## Bug Reports & Feature Requests
 
 Please use the [issue tracker](https://github.com/RTHKKona/Hand_Modkit/issues) to report bugs or request new features.
 
