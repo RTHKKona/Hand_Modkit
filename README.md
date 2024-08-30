@@ -71,14 +71,6 @@ Contributions are welcome! If you have suggestions for improvements, feel free t
 ![LucioPalmucci](https://github.com/user-attachments/assets/b270bb04-fb07-4ea5-843b-a426a5596af3)
 ![nichoconutzy](https://github.com/user-attachments/assets/79dd1a82-94e9-422b-a8dd-5cfac00132ce)
 
-### All Contributors
-
-<a href="https://github.com/RTHKKona/Hand_Modkit/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=RTHKKona/Hand_Modkit" anon=1/>
-</a>
-<br>
-Made with [contrib.rocks](https://contrib.rocks).
-
 ## Bug Reports & Feature Requests
 
 Please use the [issue tracker](https://github.com/RTHKKona/Hand_Modkit/issues) to report bugs or request new features.
