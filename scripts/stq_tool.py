@@ -105,6 +105,7 @@ class STQTool(QMainWindow):
         ])
         grid.horizontalHeader().setFont(QFont("Arial", weight=QFont.Bold))
         grid.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        grid.horizontalHeader().setStyleSheet("QHeaderView::section { color: black; }")
         grid.setEditTriggers(QTableWidget.DoubleClicked)
         return grid
 
@@ -340,7 +341,7 @@ class STQTool(QMainWindow):
             QMainWindow { background-color: #2b2b2b; color: #ffebcd; }
             QTextEdit { background-color: #4d4d4d; color: #ffebcd; }
             QTableWidget { background-color: #4d4d4d; color: #ffebcd; }
-            QHeaderView::section { background-color: grey; color: white; }
+            QHeaderView::section { background-color: white; color: white; }
             QLabel { color: #ffebcd; }
             QPushButton { background-color: #4d4d4d; color: #ffebcd; }
             QMenuBar { background-color: #4d4d4d; color: #ffebcd; }
@@ -397,7 +398,7 @@ class STQTool(QMainWindow):
     def create_about_text(self):
         return (
             "Handburger's STQ Tool\n"
-            "Version 1.4\n\n"
+            "Version 1.5\n\n"
             "Handburger's STQTool, capable of editing, viewing, and pattern analyzing STQ/STQR files.\n"
         )
 

@@ -1,0 +1,21 @@
+{
+    "settings_label": "设置",
+    "language_label": "语言",
+    "handburger_modkit_title": "汉堡模组工具包",
+    "about_content": "这个多功能工具旨在帮助处理《怪物猎人XX》的各种模组任务。",
+    "version": "这是 {version} 版本。",
+    "tutorial": "点击任意标签页使用它。右键点击标签页以弹出或创建新实例。",
+    "plug": "了解更多关于开发者（我！）的信息，并在下方支持他们。",
+    "thanks": "感谢 ffmpeg 提供转换功能，感谢 masagrator 为 MHGU 提供的 NXAenc 变体，以及感谢 vgmstream 提供他们的音频软件和依赖项。",
+    "tool_descriptions_title": "工具描述",
+    "stq_editor_tool_desc": "一个用于编辑和查看 STQ/STQR 文件的工具，包括十六进制模式分析。",
+    "stq_merge_tool_desc": "合并和管理多个模组之间的 STQR 文件冲突。",
+    "opus_header_injector_desc": "允许用户在音频文件中注入或修改 Opus 头信息。",
+    "audio_calculator_desc": "一个用于计算音频属性（如比特率、文件大小和时长）的实用程序。",
+    "foldermaker_desc": "帮助组织和创建模组项目所需的文件夹。",
+    "hex_enc_decoder_desc": "对十六进制数据进行编码或解码，用于文件转换和分析。",
+    "nsopus_converter_desc": "将音频文件与 Nintendo Switch Opus MHGU 特定格式之间进行转换。",
+    "opus_metadata_extractor_desc": "从 Opus 文件中提取元数据，便于管理和编辑。",
+    "github_link": "GitHub - RTHKKona",
+    "kofi_link": "Ko-fi - Handburger"
+}
