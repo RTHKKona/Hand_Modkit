@@ -1,0 +1,21 @@
+{
+    "settings_label": "Ajustes",
+    "language_label": "Idioma",
+    "handburger_modkit_title": "Handburger Modkit",
+    "about_content": "Esta es una herramienta multiuso desarrollada para ayudar en tareas de modding para Monster Hunter Generations Ultimate.",
+    "version": "Esta es la versión {version}.",
+    "tutorial": "Haga clic en cualquier pestaña para usarla. Clic derecho en una ventana para abrirla o crear una nueva instancia.",
+    "plug": "Descubre más sobre el desarrollador (¡yo!) y apóyalo a continuación.",
+    "thanks": "Gracias a ffmpeg por las funciones de conversión, masagrator por la variación NXAenc para MHGU y vgmstream por su software de audio y dependencias.",
+    "tool_descriptions_title": "Descripciones de herramientas",
+    "stq_editor_tool_desc": "Una herramienta para editar y visualizar archivos STQ/STQR, incluido el análisis de patrones hexadecimales.",
+    "stq_merge_tool_desc": "Fusión y manejo de conflictos de archivos STQR entre varios mods.",
+    "opus_header_injector_desc": "Permite a los usuarios insertar o modificar encabezados Opus dentro de archivos de audio.",
+    "audio_calculator_desc": "Una utilidad para calcular propiedades del audio tales como el bitrate, el tamaño de archivos, y la duración.",
+    "foldermaker_desc": "Ayuda en la organización y creación de carpetas necesarias para proyectos de modding.",
+    "hex_enc_decoder_desc": "Codifica o descodifica datos hexadecimales, útil para la conversión y análisis de archivos.",
+    "nsopus_converter_desc": "Convierte archivos de audio a formato Opus o viceversa, con soporte para formatos específicos de Nintendo Switch Opus MHGU.",
+    "opus_metadata_extractor_desc": "Extrae metadatos de los archivos Opus para un manejo y edición más fácil.",
+    "github_link": "GitHub - RTHKKona",
+    "kofi_link": "Ko-fi - Handburger"
+}
