@@ -65,9 +65,20 @@ Stay tuned for these updates!
 Contributions are welcome! If you have suggestions for improvements, feel free to fork the repository, make your changes, and submit a pull request.
 
 ## Contributers
+#### Lead Developer
+![Handburger](https://github.com/user-attachments/assets/a927ae22-ae98-4c3d-94ed-63e170ef1daf)
+
+#### Translators
+![LucioPalmucci](https://github.com/user-attachments/assets/b270bb04-fb07-4ea5-843b-a426a5596af3)
+![nichoconutzy](https://github.com/user-attachments/assets/79dd1a82-94e9-422b-a8dd-5cfac00132ce)
+
+### All Contributors
+
 <a href="https://github.com/RTHKKona/Hand_Modkit/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=RTHKKona/Hand_Modkit"/>
+  <img src="https://contrib.rocks/image?repo=RTHKKona/Hand_Modkit" anon=1/>
 </a>
+<br>
+Made with [contrib.rocks](https://contrib.rocks).
 
 ### Bug Reports & Feature Requests
 
