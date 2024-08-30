@@ -78,7 +78,7 @@ Contributions are welcome! If you have suggestions for improvements, feel free t
 <br>
 Made with [contrib.rocks](https://contrib.rocks).
 
-### Bug Reports & Feature Requests
+## Bug Reports & Feature Requests
 
 Please use the [issue tracker](https://github.com/RTHKKona/Hand_Modkit/issues) to report bugs or request new features.
 
