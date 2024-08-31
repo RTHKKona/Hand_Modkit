@@ -1,0 +1,21 @@
+{
+    "settings_label": "Settings",
+    "language_label": "Bahasa",
+    "handburger_modkit_title": "Handburger Modkit",
+    "about_content": "Alat multi guna ini dikembangkan untuk membantu berbagai tugas modding untuk Monster Hunter Generations Ultimate.",
+    "version": "Versi including {version}.",
+    "tutorial": "Klik tab mana saja untuk menggunakannya. Klik kanan tab untuk memunculkan atau membuat instance baru.",
+    "plug": "Cari tahu lebih lanjut tentang pengembang (saya!) dan dukung mereka di bawah ini.",
+    "thanks": "Terima kasih kepada ffmpeg untuk fungsi konversi, masagrator untuk variasi NXAenc untuk MHGU, dan vgmstream untuk perangkat lunak audio dan dependensinya.",
+    "tool_descriptions_title": "Deskripsti Alat",
+    "stq_editor_tool_desc": "Alat untuk mengedit dan melihat file STQ/STQR, termasuk analisis pola hex.",
+    "stq_merge_tool_desc": "Menggabungkan dan mengatur konflik file STQR antara beberapa mod.",
+    "opus_header_injector_desc": "Memungkinkan pengguna untuk ngeinsert atau memodifikasi header Opus dalam file audio.",
+    "audio_calculator_desc": "Utilitas untuk menghitung properti audio seperti bitrate, ukuran file, dan durasi.",
+    "foldermaker_desc": "Membantu dalam mengatur dan membuat folder yang diperlukan untuk proyek modding.",
+    "hex_enc_decoder_desc": "Encodes or decodes hexadecimal data, useful for file conversions and analysis.",
+    "nsopus_converter_desc": "Converts audio files to and from the Opus format, with support for Nintendo Switch Opus MHGU-specific formats.",
+    "opus_metadata_extractor_desc": "Mengekstrak metadata dari file Opus untuk memudahkan mengatur dan pengeditan.",
+    "github_link": "GitHub - RTHKKona",
+    "kofi_link": "Ko-fi - Handburger"
+}
