@@ -3,6 +3,8 @@
 
 Hand_Modkit, also known as the Handburger Modkit, is a versatile tool designed for modding Monster Hunter Generations Ultimate (MHGU). With a suite of specialized utilities, this toolkit empowers modders to easily edit, analyze, and manage various game files. Whether you're injecting audio headers, calculating audio properties, or organizing mod folders, Hand_Modkit simplifies the complex tasks involved in MHGU modding.
 
+[![]("https://gamebanana.com/tools/embeddables/17846?type=thumbnail")](https://gamebanana.com/tools/17846)
+
 ## Features
 
 - **STQ Editor Tool**: Edit and view STQ/STQR files, including hex pattern analysis and specific hexadecimal editing.
