@@ -13,8 +13,8 @@
     "opus_header_injector_desc": "Memungkinkan pengguna untuk ngeinsert atau memodifikasi header Opus dalam file audio.",
     "audio_calculator_desc": "Utilitas untuk menghitung properti audio seperti bitrate, ukuran file, dan durasi.",
     "foldermaker_desc": "Membantu dalam mengatur dan membuat folder yang diperlukan untuk proyek modding.",
-    "hex_enc_decoder_desc": "Encodes or decodes hexadecimal data, useful for file conversions and analysis.",
-    "nsopus_converter_desc": "Converts audio files to and from the Opus format, with support for Nintendo Switch Opus MHGU-specific formats.",
+    "hex_enc_decoder_desc": "Mengonversi berkas audio ke dan dari format Opus, dengan dukungan untuk format khusus Nintendo Switch Opus MHGU.",
+    "nsopus_converter_desc": "Mengonversi berkas audio ke dan dari format Opus, dengan dukungan untuk format khusus Nintendo Switch Opus MHGU.",
     "opus_metadata_extractor_desc": "Mengekstrak metadata dari file Opus untuk memudahkan mengatur dan pengeditan.",
     "github_link": "GitHub - RTHKKona",
     "kofi_link": "Ko-fi - Handburger"
