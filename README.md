@@ -52,7 +52,6 @@ Hand_Modkit, also known as the Handburger Modkit, is a versatile tool designed f
 
 I'm working to improve Hand_Modkit and expand its capabilities. Here's a glimpse of what's coming in future updates:
 
-- STQR Conflict Manager: Fixes multi-mod conflicts of the stqr files.
 - Audio to MCA Converter: A tool to convert various audio formats directly to MCA, simplifying the audio modding process.
 - MCA Header Injector/Editor: An advanced tool for injecting and editing headers in MCA files, allowing for more detailed control over audio modifications.
 - Kuriimu2 Compatibility: Integration with Kuriimu2, including support for .dll files, opening .arc files, and editing .tex files. This will enhance Hand_Modkit's versatility and allow seamless editing of game assets.
