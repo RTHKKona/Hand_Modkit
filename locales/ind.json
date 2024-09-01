@@ -1,5 +1,5 @@
 {
-    "settings_label": "Settings",
+    "settings_label": "Pengaturan",
     "language_label": "Bahasa",
     "handburger_modkit_title": "Handburger Modkit",
     "about_content": "Alat multi guna ini dikembangkan untuk membantu berbagai tugas modding untuk Monster Hunter Generations Ultimate.",
@@ -13,7 +13,7 @@
     "opus_header_injector_desc": "Memungkinkan pengguna untuk ngeinsert atau memodifikasi header Opus dalam file audio.",
     "audio_calculator_desc": "Utilitas untuk menghitung properti audio seperti bitrate, ukuran file, dan durasi.",
     "foldermaker_desc": "Membantu dalam mengatur dan membuat folder yang diperlukan untuk proyek modding.",
-    "hex_enc_decoder_desc": "Mengonversi berkas audio ke dan dari format Opus, dengan dukungan untuk format khusus Nintendo Switch Opus MHGU.",
+    "hex_enc_decoder_desc": "Mengkodekan atau mendekode data heksadesimal, berguna untuk konversi dan analisis file.",
     "nsopus_converter_desc": "Mengonversi berkas audio ke dan dari format Opus, dengan dukungan untuk format khusus Nintendo Switch Opus MHGU.",
     "opus_metadata_extractor_desc": "Mengekstrak metadata dari file Opus untuk memudahkan mengatur dan pengeditan.",
     "github_link": "GitHub - RTHKKona",
