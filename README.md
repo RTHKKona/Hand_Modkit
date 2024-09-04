@@ -62,9 +62,9 @@ Stay tuned for these updates!
 
 # Contributions
 
-Contributions are welcome! If you have suggestions for improvements, feel free to fork the repository, make your changes, and submit a pull request.
+Contributions are welcome! If you have suggestions for improvements, feel free to fork the repository, make changes, and submit a pull request.
 
-## Contributers
+## Contributors
 #### Lead Developer
 ![Handburger](https://github.com/user-attachments/assets/a927ae22-ae98-4c3d-94ed-63e170ef1daf)
 
@@ -73,9 +73,9 @@ Contributions are welcome! If you have suggestions for improvements, feel free t
 ![nichoconutzy](https://github.com/user-attachments/assets/79dd1a82-94e9-422b-a8dd-5cfac00132ce)
 
 ## Acknowledgements
-masagrator for his MHGU NXAenc from his NX-Scripts. Without this, the opus conversions would not be possible.
-ffmpeg for audio functionality dependencies.
-vgmstream for reading and working with game audio data.
+masagrator for his MHGU NXAenc from his NX-Scripts. Without this, the opus conversions would not be possible. <br>
+ffmpeg for audio functionality dependencies.<br>
+vgmstream for reading and working with game audio data.<br>
 
 ## Bug Reports & Feature Requests
 
@@ -83,7 +83,7 @@ Please use the [issue tracker](https://github.com/RTHKKona/Hand_Modkit/issues) t
 
 ## Support
 
-If you find this tool useful and would like to support its development, consider buying me a coffee!
+If you find this tool useful and want to support its development, consider buying me a coffee!
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/L3L711AIP8)
 
