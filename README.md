@@ -87,6 +87,13 @@ If you find this tool useful and want to support its development, consider buyin
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/L3L711AIP8)
 
+#### Dynamic Contributor List
+
+<a href="https://github.com/RTHKKona/Hand_Modkit/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=RTHKKona/Hand_Modkit" />
+</a>
+
+Made with [contrib.rocks](https://contrib.rocks).
 
 ## License
 
