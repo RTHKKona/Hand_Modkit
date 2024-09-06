@@ -5,8 +5,9 @@ import sys
 import os
 import struct
 from PyQt5.QtWidgets import (
-    QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QPushButton, QFileDialog, QMessageBox, QTextEdit, QAction,
-    QTableWidget, QTableWidgetItem, QHeaderView, QWidget, QSplitter, QScrollArea, QDialog, QDialogButtonBox, QLabel, QGroupBox
+    QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QPushButton, QFileDialog, 
+    QMessageBox, QTextEdit, QAction,QTableWidget, QTableWidgetItem, QHeaderView, 
+    QWidget, QSplitter, QScrollArea, QDialog, QDialogButtonBox, QLabel, QGroupBox
 )
 from PyQt5.QtGui import QFont, QIcon, QColor
 from PyQt5.QtCore import Qt
@@ -57,9 +58,9 @@ class STQMergeTool(QMainWindow):
 
         # File name labels
         self.file_label_1 = QLabel("", self)
-        self.file_label_1.setFont(QFont("Arial", 10, QFont.Bold))
+        self.file_label_1.setFont(QFont("Consolas", 10, QFont.Bold))
         self.file_label_2 = QLabel("", self)
-        self.file_label_2.setFont(QFont("Arial", 10, QFont.Bold))
+        self.file_label_2.setFont(QFont("Consolas", 10, QFont.Bold))
 
         # Horizontal layout for file names
         file_name_layout = QHBoxLayout()
@@ -67,8 +68,8 @@ class STQMergeTool(QMainWindow):
         file_name_layout.addWidget(self.file_label_2)
 
         # Text editors for left and right views
-        self.text_edit_left = QTextEdit(self, readOnly=True, font=QFont("Consolas", 12))
-        self.text_edit_right = QTextEdit(self, readOnly=True, font=QFont("Consolas", 12))
+        self.text_edit_left = QTextEdit(self, readOnly=True, font=QFont("Consolas", 11))
+        self.text_edit_right = QTextEdit(self, readOnly=True, font=QFont("Consolas", 11))
         text_splitter = QSplitter(Qt.Horizontal)
         text_splitter.addWidget(self.text_edit_left)
         text_splitter.addWidget(self.text_edit_right)
@@ -170,7 +171,7 @@ class STQMergeTool(QMainWindow):
         return assets_path
 
     def create_data_grid(self):
-        """Create a data grid with predefined columns for conflict resolution."""
+        #Create a data grid with predefined columns for conflict resolution.
         grid = QTableWidget(self)
         grid.setColumnCount(7)
         grid.setHorizontalHeaderLabels([
@@ -185,7 +186,7 @@ class STQMergeTool(QMainWindow):
         return grid
 
     def load_file(self, index):
-        """Load an STQR file and update the corresponding view."""
+        #Load an STQR file and update the corresponding view.
         file, _ = QFileDialog.getOpenFileName(self, "Open .stqr File", "", "STQ Files (*.stqr);;All Files (*)")
         if file:
             if self.loaded_files[index] is None or os.path.basename(file) == os.path.basename(self.loaded_files[index]):
@@ -206,7 +207,7 @@ class STQMergeTool(QMainWindow):
                 self.show_error_message("Error", "The filenames of both STQR files must match exactly.")
 
     def load_hex_data(self, index):
-        """Load hexadecimal data from the STQR file and display it."""
+       #Load hexadecimal data from the STQR file and display it.
         try:
             with open(self.loaded_files[index], 'rb') as f:
                 content = f.read()
@@ -225,7 +226,7 @@ class STQMergeTool(QMainWindow):
             self.show_error_message("Error", str(e))
 
     def load_template(self, file):
-        """Load the template STQR file into memory."""
+       #Load the template STQR file into memory.
         try:
             with open(file, 'rb') as f:
                 self.template_data = bytearray(f.read())
@@ -234,7 +235,7 @@ class STQMergeTool(QMainWindow):
             self.show_error_message("Template Load Error", str(e))
 
     def search_patterns(self):
-        """Search for specific patterns in the loaded STQR files and populate the data grid."""
+        # Search for specific patterns in the loaded STQR files and populate the data grid.
         # Clear the grids and reset the state
         self.data_grid_1.clearContents()
         self.data_grid_1.setRowCount(0)
@@ -258,7 +259,7 @@ class STQMergeTool(QMainWindow):
             self.extract_directory_data(content_1[start_index + len(start_pattern):])
 
     def populate_patterns(self, grid, content):
-        """Populate the data grid with patterns found in the STQR file."""
+        # Populate the data grid with patterns found in the STQR file.
         pattern1 = "XXXXXXXX XXXXXXXX 02000000 80BB0000 XXXXXXXX XXXXXXXX".replace(' ', '')
         for index in range(0, len(content) - len(pattern1), 2):
             match = content[index:index + len(pattern1)]
@@ -268,7 +269,7 @@ class STQMergeTool(QMainWindow):
                 self.pattern_offsets.append((index // 2, window_data))  # Store offset and data
 
     def extract_directory_data(self, data):
-        """Extract directory information from the hex data and populate the grids."""
+        # Extract directory information from the hex data and populate the grids.
         digit_count = 0
         buffer = ""
         while data:
@@ -293,7 +294,7 @@ class STQMergeTool(QMainWindow):
             self.data_grid_2.setItem(i, 0, QTableWidgetItem(directory))
 
     def populate_grid(self, grid, hex_data):
-        """Populate the grid with decoded values from the hex data."""
+        # Populate the grid with decoded values from the hex data.
         row_position = grid.rowCount()
         grid.insertRow(row_position)
         for i in range(0, len(hex_data), 8):
@@ -311,11 +312,11 @@ class STQMergeTool(QMainWindow):
                 grid.setItem(row_position, i // 8 + 1, QTableWidgetItem("Error"))
 
     def pattern_matches(self, match, pattern):
-        """Check if a hex string matches a specific pattern."""
+        # Check if a hex string matches a specific pattern.
         return all(c == 'X' or c == m for c, m in zip(pattern, match))
 
     def analyze_and_merge(self):
-        """Analyze the loaded STQR files for conflicts and merge them."""
+        # Analyze the loaded STQR files for conflicts and merge them.
         try:
             if len(self.loaded_files) < 2 or None in self.loaded_files:
                 raise ValueError("Please load both .stqr files before merging.")
@@ -358,7 +359,7 @@ class STQMergeTool(QMainWindow):
             self.show_error_message("Merge Error", str(e))
 
     def prompt_conflict_resolution(self, conflict_key, value1, value2):
-        """Prompt the user to resolve conflicts between the two STQR files."""
+        # Prompt the user to resolve conflicts between the two STQR files."""
         dialog = QDialog(self)
         dialog.setWindowTitle("Resolve Conflict")
         dialog_layout = QVBoxLayout(dialog)
@@ -394,7 +395,7 @@ class STQMergeTool(QMainWindow):
         return chosen_value
 
     def update_hex_data(self, row, col, value):
-        """Update the original hex data with the resolved conflict value."""
+        # Update the original hex data with the resolved conflict value."""
         try:
             # Convert the chosen value back to little-endian signed int32 hex
             hex_value = struct.pack('<i', int(value)).hex().upper()
@@ -406,7 +407,7 @@ class STQMergeTool(QMainWindow):
             self.show_error_message("Update Error", str(e))
 
     def filter_conflicting_rows(self, conflicting_rows):
-        """Remove non-conflicting rows from the data grid."""
+        # Remove non-conflicting rows from the data grid."""
         rows_to_keep = set(conflicting_rows)
         for row in range(self.data_grid_1.rowCount() - 1, -1, -1):
             if row not in rows_to_keep:
@@ -414,7 +415,7 @@ class STQMergeTool(QMainWindow):
                 self.data_grid_2.removeRow(row)
 
     def save_merged_file(self):
-        """Save the merged STQR file to disk."""
+        # Save the merged STQR file to disk."""
         try:
             original_filename = os.path.basename(self.loaded_files[0])  # Use the first STQR file's name
             default_filename = f"merged_{os.path.splitext(original_filename)[0]}.stqr"
@@ -427,7 +428,7 @@ class STQMergeTool(QMainWindow):
             QMessageBox.critical(self, "Save Failed", f"An unexpected error occurred: {str(e)}")
 
     def clear_data(self):
-        """Clear all data and reset the tool's state."""
+        # Clear all data and reset the tool's state."""
         self.text_edit_left.clear()
         self.text_edit_right.clear()
         self.data_grid_1.setRowCount(0)
@@ -441,23 +442,23 @@ class STQMergeTool(QMainWindow):
         self.save_btn.setEnabled(False)  # Disable the save button after clearing
 
     def format_hex(self, hex_str):
-        """Format hexadecimal string into a human-readable format for display."""
+        # Format hexadecimal string into a human-readable format for display."""
         return '\n'.join(
             ' '.join(hex_str[i:i + 8] for i in range(start, start + 36 * 2, 8))  # 36 bytes per row
             for start in range(0, len(hex_str), 36 * 2)
         )
 
     def toggle_theme(self):
-        """Toggle between dark mode and light mode."""
+        # Toggle between dark mode and light mode."""
         self.dark_mode = not self.dark_mode
         self.apply_theme()
 
     def apply_initial_theme(self):
-        """Apply the initial theme when the tool is launched."""
+        # Apply the initial theme when the tool is launched."""
         self.apply_theme()
 
     def apply_theme(self):
-        """Apply the current theme based on the dark_mode flag."""
+        # Apply the current theme based on the dark_mode flag."""
         stylesheet = """
             QWidget { background-color: #2b2b2b; color: #ffebcd; }
             QTextEdit { background-color: #4d4d4d; color: #ffebcd; }
@@ -468,7 +469,7 @@ class STQMergeTool(QMainWindow):
         self.setStyleSheet(stylesheet)
 
     def show_error_message(self, title, message):
-        """Display an error message in a message box."""
+        # Display an error message in a message box."""
         QMessageBox.critical(self, title, message)
 
 if __name__ == "__main__":

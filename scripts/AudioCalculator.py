@@ -1,10 +1,12 @@
+#Version
+VERSION = "1.0.1"
+
 import sys
 from PyQt5.QtWidgets import (
-    QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QMessageBox,
+    QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QLabel, QMessageBox,
     QPushButton, QWidget, QRadioButton, QFrame, QTextEdit, QAction, QMenuBar
 )
-from PyQt5.QtGui import QFont, QColor, QIcon
-from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QFont
 
 from decimal import Decimal, getcontext, InvalidOperation
 
@@ -100,7 +102,7 @@ class AudioCalculator(QMainWindow):
     def show_about_dialog(self):
         about_text = (
             "Audio Calculator\n"
-            "Version 1.0\n\n"
+            f"Version {VERSION}\n\n"
             "Calculates various properties of audio files."
         )
         QMessageBox.about(self, "About", about_text)

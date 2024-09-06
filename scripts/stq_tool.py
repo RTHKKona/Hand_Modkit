@@ -1,3 +1,6 @@
+# Version management
+VERSION = "1.5" 
+
 import sys
 import struct
 import os
@@ -8,7 +11,6 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtGui import QFont, QPixmap, QIcon
 from PyQt5.QtCore import Qt, QRect
-
 
 class STQTool(QMainWindow):
     def __init__(self):
@@ -32,7 +34,7 @@ class STQTool(QMainWindow):
         return assets_path
 
     def init_ui(self):
-        self.setWindowTitle("Handburger's STQ Reader Tool")
+        self.setWindowTitle(f"Handburger's STQ Reader Tool v{VERSION}")
         self.setGeometry(100, 100, 1600, 800)  # Extended width to accommodate the new text panel
         self.setWindowIcon(QIcon(self.get_resource_path("egg.png")))
 
@@ -118,9 +120,7 @@ class STQTool(QMainWindow):
             ("Clear", self.clear_data),
             ("Undo", self.undo),
             ("Redo", self.redo),
-            ("Toggle Theme", self.toggle_theme),
-            ("Increase Header Size", self.increase_header_size),
-            ("Decrease Header Size", self.decrease_header_size)
+            ("Toggle Theme", self.toggle_theme)
         ]
         for label, callback in buttons:
             button = QPushButton(label, self)
@@ -140,7 +140,7 @@ class STQTool(QMainWindow):
         file_name, _ = QFileDialog.getOpenFileName(self, "Open .stqr File", "", "STQ Files (*.stqr);;All Files (*)")
         if file_name:
             self.loaded_file_name = file_name
-            self.setWindowTitle(f"Handburger's STQ Reader Tool - Editing {os.path.basename(file_name)}")
+            self.setWindowTitle(f"Handburger's STQ Reader Tool v{VERSION} - Editing {os.path.basename(file_name)}")
             with open(file_name, 'rb') as file:
                 self.original_content = file.read()
                 if self.original_content[:4] != b'STQR':
@@ -219,7 +219,6 @@ class STQTool(QMainWindow):
                 self.data_grid.setItem(row, title_column_index, QTableWidgetItem(text))
                 break
 
-
     def pattern_matches(self, match, pattern):
         return all(c == 'X' or c == m for c, m in zip(pattern, match))
 
@@ -273,7 +272,7 @@ class STQTool(QMainWindow):
             self.data_grid.clearContents()
             self.data_grid.setRowCount(0)
             self.pattern_offsets.clear()
-            self.setWindowTitle("Handburger's STQ Reader Tool")
+            self.setWindowTitle(f"Handburger's STQ Reader Tool v{VERSION}")
             self.pattern_search_button.setEnabled(True)
             self.background_label.hide()
             self.loaded_file_name = ""
@@ -314,7 +313,7 @@ class STQTool(QMainWindow):
         self.pattern_offsets = state['pattern_offsets']
         self.loaded_file_name = state['file_name']
         self.original_content = state['original_content']
-        self.setWindowTitle(f"Handburger's STQ Reader Tool - Editing {os.path.basename(self.loaded_file_name)}")
+        self.setWindowTitle(f"Handburger's STQ Reader Tool v{VERSION} - Editing {os.path.basename(self.loaded_file_name)}")
     def store_state(self):
         state = {
             'text_edit': self.text_edit.toPlainText(),
@@ -348,16 +347,6 @@ class STQTool(QMainWindow):
             QMenu { background-color: #4d4d4d; color: #ffebcd; }
         """ if self.dark_mode else ""
         self.setStyleSheet(style)
-
-    def increase_header_size(self):
-        header_font = self.data_grid.horizontalHeader().font()
-        header_font.setPointSize(header_font.pointSize() + 1)
-        self.data_grid.horizontalHeader().setFont(header_font)
-
-    def decrease_header_size(self):
-        header_font = self.data_grid.horizontalHeader().font()
-        header_font.setPointSize(header_font.pointSize() - 1)
-        self.data_grid.horizontalHeader().setFont(header_font)
 
     def show_about_dialog(self):
         dialog = QDialog(self)
@@ -397,8 +386,8 @@ class STQTool(QMainWindow):
 
     def create_about_text(self):
         return (
-            "Handburger's STQ Tool\n"
-            "Version 1.5\n\n"
+            f"Handburger's STQ Tool\n"
+            f"Version {VERSION}\n\n"
             "Handburger's STQTool, capable of editing, viewing, and pattern analyzing STQ/STQR files.\n"
         )
 

@@ -1,14 +1,12 @@
-import os
-import sys
-import shutil
-import subprocess
+# Version
+VERSION = "1.7.0"
+
+import os,sys,shutil,subprocess, webbrowser
 from PyQt5.QtWidgets import (
     QMainWindow, QVBoxLayout, QHBoxLayout, QPushButton, QFileDialog, QTextEdit, QApplication, 
     QLabel, QMessageBox, QAction, QMenuBar
 )
 from PyQt5.QtGui import QFont
-from PyQt5.QtCore import Qt
-import webbrowser
 
 class NSOpusConverter(QMainWindow):
     def __init__(self):
@@ -19,12 +17,13 @@ class NSOpusConverter(QMainWindow):
         self.temp_folder = os.path.join(self.data_folder, "temp_conversion")
         self.output_folder = os.path.abspath(os.path.join(self.base_directory, "..", "ConvertedOpus"))
         self.dependencies_file = os.path.join(self.data_folder, "NSOpusDirectory.txt")
+        self.license_file = os.path.join(self.data_folder, "COPYING.GPLv2.txt")
         self.ffmpeg_path = os.path.join(self.data_folder, "ffmpeg.exe")
         self.nxaenc_path = os.path.join(self.data_folder, "NXAenc.exe")
         self.dependencies_valid = False
+        self.first_launch = True
         self.init_ui()
         self.apply_initial_theme()  # Apply the initial theme
-        self.check_dependencies()
 
     def init_ui(self):
         main_layout = QVBoxLayout()
@@ -32,7 +31,7 @@ class NSOpusConverter(QMainWindow):
 
         self.log_output = QTextEdit(self)
         self.log_output.setReadOnly(True)
-        self.log_output.setFont(QFont("Courier", 10))  # Set monospaced font for CMD style
+        self.log_output.setFont(QFont("Consolas", 11))  # Set monospaced font for CMD style
         main_layout.addWidget(self.log_output)
 
         # Create buttons with consistent font size and buffer
@@ -53,9 +52,6 @@ class NSOpusConverter(QMainWindow):
         self.browse_button.clicked.connect(self.open_file)
         self.browse_button.setAcceptDrops(True)
         self.browse_button.setEnabled(False)  # Initially disabled until dependency check passes
-        self.browse_button.dragEnterEvent = self.dragEnterEvent
-        self.browse_button.dragLeaveEvent = self.dragLeaveEvent
-        self.browse_button.dropEvent = self.dropEvent
         bottom_layout.addWidget(self.browse_button)
 
         help_button = QPushButton("Help", self)
@@ -77,21 +73,39 @@ class NSOpusConverter(QMainWindow):
 
         self.setWindowTitle('NSOpus Converter')
         self.setGeometry(100, 100, 1600, 800)  # Set the window size to 1600x800, positioned at 100,100
-        
+
+        # Ensure the window is visible before proceeding
+        self.show()
+        QApplication.processEvents()  # Ensure all events are processed so the window is fully visible
+        self.start_print_sequence()
+
     def show_about_dialog(self):
         about_text = (
             "NS Opus Converter\n"
-            "Version 1.0\n\n"
-            "Converts standard Opus files to the NS Opus format used in certain Nintendo Switch games."
+            f"Version {VERSION}\n\n"
+            "Converts various audio files (mp3, wav, flac) into valid .Opus audio format used by MHGU."
         )
         QMessageBox.about(self, "About", about_text)
-        
+
+    def start_print_sequence(self):
+        if self.first_launch:
+            self.show_license_and_dependencies()
+            self.first_launch = False
+
+    def show_license_and_dependencies(self):
+        # Show LICENSE first, then check dependencies
+        if os.path.exists(self.license_file):
+            with open(self.license_file, 'r') as file:
+                license_text = file.read()
+            self.log("[INFO] Displaying License:\n" + license_text)
+        else:
+            self.log("[ERROR] COPYING.GPLv2.txt License file not found.")
+
+        # Now check dependencies
+        self.check_dependencies()
+
     def check_dependencies(self):
-        """
-        Checks the dependencies listed in NSOpusDirectory.txt and logs the result.
-        If all dependencies are valid, enables the browse button; otherwise, shows an error.
-        """
-        self.log("Starting dependency check...\n")
+        self.log("\n[INFO] Listing dependencies:\n")
 
         if not os.path.exists(self.dependencies_file):
             self.log(f"Error: Dependency list file '{self.dependencies_file}' not found.\n")
@@ -122,10 +136,9 @@ class NSOpusConverter(QMainWindow):
             self.dependencies_valid = True
             self.browse_button.setEnabled(True)
 
+        self.log("\nBrowse audio files to convert various audio files (mp3, wav, flac) into a valid .Opus audio format used by MHGU.\n")
+
     def show_dependency_error(self, missing_dependencies):
-        """
-        Displays an error message with missing dependencies and a link to the GitHub repository.
-        """
         message = (
             f"The following dependencies are missing:\n{', '.join(missing_dependencies)}\n\n"
             f"Please download the missing files from the GitHub repository:\n"
@@ -136,7 +149,6 @@ class NSOpusConverter(QMainWindow):
         error_box.setText(message)
         error_box.setStandardButtons(QMessageBox.Ok)
 
-        # Apply the current theme to the error box
         if self.dark_mode:
             error_box.setStyleSheet("""
                 QMessageBox { background-color: #2b2b2b; color: #ffebcd; }

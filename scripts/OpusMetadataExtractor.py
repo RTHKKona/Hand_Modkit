@@ -1,3 +1,6 @@
+#Version
+VERSION = "1.1.0"
+
 import os
 import sys
 import subprocess
@@ -8,10 +11,10 @@ import json
 import xml.etree.ElementTree as ET
 from PyQt5.QtWidgets import (
     QMainWindow, QVBoxLayout, QHBoxLayout, QPushButton, QFileDialog, QTextEdit, 
-    QApplication, QLabel, QMessageBox, QAction, QLineEdit, QMenu, QMenuBar
+    QApplication, QLabel, QMessageBox, QAction, QMenu, QMenuBar
 )
 from PyQt5.QtGui import QFont
-from PyQt5.QtCore import Qt, QPoint
+from PyQt5.QtCore import QPoint
 from tabulate import tabulate
 
 class OpusMetadataExtractor(QMainWindow):
@@ -20,6 +23,8 @@ class OpusMetadataExtractor(QMainWindow):
         self.dark_mode = True  # Start in dark mode by default
         self.base_directory = os.path.dirname(os.path.abspath(__file__))
         self.meta_dep_data_folder = os.path.join(self.base_directory, "MetaDepData")
+        self.license_file = os.path.join(self.meta_dep_data_folder, "vgm_COPYING.txt")
+        self.first_launch = True
         self.dependencies_file = os.path.join(self.meta_dep_data_folder, "OpusMetaDependencies.txt")
         self.vgmstream_cli = os.path.join(self.meta_dep_data_folder, "vgmstream-cli.exe")
         self.dependencies_valid = False
@@ -34,7 +39,7 @@ class OpusMetadataExtractor(QMainWindow):
 
         self.log_output = QTextEdit(self)
         self.log_output.setReadOnly(True)
-        self.log_output.setFont(QFont("Courier", 10))  # Set monospaced font for CMD style
+        self.log_output.setFont(QFont("Consolas", 11))  # Set monospaced font for CMD style
         main_layout.addWidget(self.log_output)
 
         # Create buttons with consistent font size and buffer
@@ -92,7 +97,7 @@ class OpusMetadataExtractor(QMainWindow):
     def show_about_dialog(self):
         about_text = (
             "Opus Metadata Extractor\n"
-            "Version 1.0\n\n"
+            f"Version {VERSION}\n\n"
             "Extracts metadata from Opus audio files."
         )
         QMessageBox.about(self, "About", about_text)
@@ -132,6 +137,20 @@ class OpusMetadataExtractor(QMainWindow):
             self.log("\nAll dependencies found. Dependency check complete.\n")
             self.dependencies_valid = True
             self.browse_button.setEnabled(True)
+        
+        if self.first_launch:
+            self.show_license()
+            self.first_launch = False
+            
+    def show_license(self):
+        ### Show LICENSE on first launch
+        if os.path.exists(self.license_file):
+            with open(self.license_file, 'r') as file:
+                license_text = file.read()
+            self.log("[INFO] Displaying License:\n" + license_text)
+        else:
+            self.log("[ERROR] vgm_COPYING.txt License file not found.")
+    
 
     def show_dependency_error(self, missing_dependencies):
         """

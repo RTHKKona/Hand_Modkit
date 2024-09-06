@@ -1,7 +1,10 @@
+#Version
+VERSION = "1.0"
+
 import sys
 import struct
 from PyQt5.QtWidgets import (
-    QMainWindow, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QTextEdit, QPushButton, QWidget, 
+    QMainWindow, QVBoxLayout, QHBoxLayout, QLabel, QTextEdit, QPushButton, QWidget, 
     QApplication, QComboBox, QRadioButton, QButtonGroup, QFrame, QAction, QMenuBar, QMessageBox
 )
 from PyQt5.QtGui import QColor, QFont, QTextCursor
@@ -125,7 +128,7 @@ class HexConverterEncoder(QMainWindow):
     def show_about_dialog(self):
         about_text = (
             "Hex Converter Encoder\n"
-            "Version 1.0\n\n"
+            f"Version {VERSION}\n\n"
             "Converts and encodes data to and from hexadecimal format."
         )
         QMessageBox.about(self, "About", about_text)

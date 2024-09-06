@@ -1,3 +1,6 @@
+#Version
+VERSION = "1.0"
+
 import sys
 import struct
 import os
@@ -112,7 +115,7 @@ class OpusHeaderInjector(QMainWindow):
     def show_about_dialog(self):
         about_text = (
             "Opus Header Injector\n"
-            "Version 1.0\n\n"
+            f"Version {VERSION}\n\n"
             "Injects custom headers into Opus audio files."
         )
         QMessageBox.about(self, "About", about_text)

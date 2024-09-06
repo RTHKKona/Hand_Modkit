@@ -1,12 +1,16 @@
+#Version
+VERSION = "1.1.1"
+
 import os
 import sys
 import subprocess
 from PyQt5.QtWidgets import (
-    QMainWindow, QVBoxLayout, QHBoxLayout, QLineEdit, QPushButton, QFileDialog, QMessageBox, QTextEdit, QApplication,
-    QAction, QMenuBar, QLabel, QWidget
+    QMainWindow, QVBoxLayout, QHBoxLayout, QLineEdit, QPushButton, QFileDialog, 
+    QMessageBox, QTextEdit, QApplication,
+    QAction, QWidget
 )
-from PyQt5.QtGui import QFont, QIcon
-from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QFont
+
 
 class FolderMaker(QMainWindow):
     def __init__(self):
@@ -14,6 +18,7 @@ class FolderMaker(QMainWindow):
         self.dark_mode = True  # Start in dark mode by default
         self.initUI()
         self.apply_initial_theme()  # Apply the initial theme
+        self.display_welcome_message()  # Display the welcome message and ASCII art on launch
 
     def initUI(self):
         central_widget = QWidget(self)
@@ -31,7 +36,7 @@ class FolderMaker(QMainWindow):
 
         self.cmd_output = QTextEdit(self)
         self.cmd_output.setReadOnly(True)
-        self.cmd_output.setFont(QFont("Courier", 10))  # Set monospaced font for CMD style
+        self.cmd_output.setFont(QFont("Consolas", 11))  # Set monospaced font for CMD style
         main_layout.addWidget(self.cmd_output)
 
         self.folder_input = QLineEdit(self)
@@ -57,7 +62,7 @@ class FolderMaker(QMainWindow):
         main_layout.addLayout(bottom_layout)
 
         self.setWindowTitle('FolderMaker')
-        self.setGeometry(100, 100, 1600, 800)  # Set the window size to 1600x800, positioned at 100,100
+        self.setGeometry(100, 100, 1600, 900)  # Set the window size to 1600x800, positioned at 100,100
 
         self.update_font_size()  # Increase the font size
 
@@ -117,8 +122,8 @@ class FolderMaker(QMainWindow):
 
     def show_about_dialog(self):
         about_text = (
-            "Folder Maker\n"
-            "Version 1.0\n\n"
+            "FolderMaker\n"
+            f"Version {VERSION}\n\n"
             "Creates a set of predefined folders within a selected directory."
         )
         QMessageBox.about(self, "About", about_text)
@@ -132,8 +137,11 @@ class FolderMaker(QMainWindow):
         except Exception as e:
             self.log(f"Error opening directory: {e}")
 
-    def log(self, message):
-        self.cmd_output.append(message)
+    def log(self, message, is_preformatted=False):
+        if is_preformatted:
+            self.cmd_output.append(f"<pre>{message}</pre>")
+        else:
+            self.cmd_output.append(message)
 
     def toggle_theme(self):
         self.dark_mode = not self.dark_mode
@@ -153,6 +161,60 @@ class FolderMaker(QMainWindow):
             QPushButton { background-color: #4d4d4d; color: #ffebcd; }
         """ if self.dark_mode else ""
         self.setStyleSheet(stylesheet)
+
+    def display_welcome_message(self):
+        #Display ASCII art and welcome message when the app launches.
+        art = r"""                                                                                                                                         
+                                                                       
+                  {Æ›zÆü                                                                   
+                    6  íÅ                   ÏígÇÇÇÇGü                                      
+               ÆÇ  ÅÏÇ› —Þ              zÆÆ—›        ÞÆÇ                                   
+              üÇ›—Æ— ÏÆ› Å            ÇÆ›              ›gÆü                                
+               GÆg››› {Å››zÆÅÅÅÆ    ÇÆ›                   GG                               
+                  íÆ—›         ›Æ  Æ{                      ›Æí                             
+                   Æ›  › ›Æ—››››  g›                         ÅÅ                            
+                    ÅÅ —Æü      —Æ›                           ÇÆ                           
+                     Ç›g       —Ï                              zÆ                          
+                     6—Æ      —Ç     › ›    ›    ››  ›   ›      zÆÇ                        
+                     íÞÆ     zÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆÆ6                       
+                      ÆÅ6    Æ gÆÆÆÆÆÆÆÆ—ÅÆ  ÆÆÆÆÆÆÆÆÆ ÆÆí        Æg                       
+                      Å{g6  g  GÆÆÆÆÆÆÆÆÅÆ›  ÞÆÆÆÆÆÆÆgÆÆg          Æz                      
+                       gÞ—ÆÆz   ÆÆÆÆÆÆÆÆÆÞ    ÆÆÆÆÆÆÆÆÆÆ›           gÇ                     
+                        zÆ—Æ     ÆÆÆÆÆÆÆÆ      ÆÆÆÆÆÆÆÆ               gÏ                   
+                          ÆÏ       ÅÆÆg{         ——›               {Æ  ›Æ                  
+                         íÆ                 ›Ç                       ÆG  ÆÏ                
+                         íg              ÏÅÅ       g6                ÞÆÆ› ÅÏ               
+                         g—        Þ›            gÅÏ                 ›ÆÆgÇ Æz              
+                         Æ          ÅÅÅg6666ÇÅÆÅzÅ›                   ÆÆ  6 Æ              
+                         Æ           G—        Çg                     ÆÆ› üí›g             
+                         Æ            6Ç›    ÞG                       ÆÆ  Å{ Æ             
+                         Æ              ›gÅg› ›                       ÆÆÅ—zÆÞ              
+                         g—                                      ›ÅÆg{›ÞÞGÆ{Æ              
+                         íÆ                                     Æ—  ›íÆÆ—í—{g              
+                          Æ›                                    Æ› › ››ÆÆ›{Åg              
+                          íÆ                                    ÅÆ›      —Æz               
+                           zÏ                                   {ÆÆgGíGíÆg                 
+                            ÏÇ                                   ›ÆÆÆÏ                     
+                             zÆ                                   ÅÆ                       
+                               Çü                               {ÆÏ                        
+                                 gü                           ›ÆÇ                          
+                                  íGÆ›                      ÏÆÇ                            
+                                     íÆÆ6›              zÆÆÆz                              
+                                     íG—Å ›{GGÆÆÆÆÆgGí— ›Æ 6í                              
+                                      Å{í                Þ——í                              
+                                       íÆ—6            ÏÆígz                               
+                                         ÆüÆ         {Å—Æí                                 
+                                          gÅÅü     ›Å Å6                                   
+                                züü6ü6666üÏÆÞ›Å{  gü Æz   zÏüÅÆÆÆÆÆÆGGÏ                    
+                            zGÆÆ6í—› › › ›››—› ›GÆ{ íÆÆÆÆÅ{››        ›{g                   
+                          zÆÆ›                › ›Æ›› › ››   ››› ››››››{6ü                  
+                          ÇÆÆÆÆÆÆÆÆÆÆÆÆÆÆÞÞgí{{zzíííííízzzzzzzzzzzzzzzz                    
+        """
+        self.log(art, is_preformatted=True)
+        self.log(
+            f"\nYou see that? That funny little characta?<br><br>"
+            f"\nThis FolderMaker tool helps you create nested directories easy. No more right-clicking and New Folder.<br>"
+        )
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

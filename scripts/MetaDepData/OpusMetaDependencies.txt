@@ -9,3 +9,4 @@ avcodec-vgmstream-59.dll
 avformat-vgmstream-59.dll
 avutil-vgmstream-57.dll
 vgmstream-cli.exe
+vgm_COPYING.txt
