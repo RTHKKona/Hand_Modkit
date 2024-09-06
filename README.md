@@ -33,7 +33,20 @@ Hand_Modkit, also known as the Handburger Modkit or H.Modkit, is a versatile mul
 
 ### Prerequisites
 
-- **Python 3.x**: Ensure you have Python installed on your machine. You can download it [here](https://www.python.org/downloads/).
+<img src="https://github.com/user-attachments/assets/44e40e8e-ad9e-49cf-a8c8-92df5df7b30e" width="600"/>
+<img src="https://github.com/user-attachments/assets/b32a0314-f5bf-4209-96cf-2e1042790375" width="600"/>
+<img src="https://github.com/user-attachments/assets/06566296-670e-492a-a76d-be939289d9cb" width="600"/>
+<img src="https://github.com/user-attachments/assets/22013a7c-3078-453c-bc78-7b0663bedb3c" width="600"/>
+<img src="https://github.com/user-attachments/assets/a7426d8a-9706-4726-a80f-636c44d64ecd" width="600"/>
+<img src="https://github.com/user-attachments/assets/09f3797f-07bf-401c-9831-6cf80aafe834" width="600"/>
+<img src="https://github.com/user-attachments/assets/afd99a17-71cb-4675-b150-dac72a40af06" width="600"/>
+<img src="https://github.com/user-attachments/assets/ea23c11c-3ce2-4f0a-9a8a-56f3a37e21ba" width="600"/>
+<img src="https://github.com/user-attachments/assets/bdee5ccb-38f9-4ea0-9144-817953280dd1" width="600"/>
+<img src="https://github.com/user-attachments/assets/7732d5d8-bf7c-47f7-874e-f1f5a1da5e7b" width="600"/>
+<img src="https://github.com/user-attachments/assets/dd68c5b7-c6aa-46bf-99e9-fb95d4db55cf" width="600"/>
+<img src="https://github.com/user-attachments/assets/c6759a0c-5c11-46fc-9e3d-99a6b9b625e4" width="600"/>
+
+- **Python 3.12.x**: Ensure you have Python installed on your machine. You can download it [here](https://www.python.org/downloads/).
 - **PyQt5**: Install PyQt5, the library used for the GUI. You can install it via pip:
   \`\`\`bash
   pip install PyQt5
@@ -64,7 +77,7 @@ Stay tuned for these updates!
 
 ## Contributions
 
-Contributions are welcome! If you have suggestions for improvements, feel free to fork the repository, make changes, and submit a pull request.
+Contributions are welcome! Feel free to fork the repository, make changes, and submit a pull request if you have suggestions for improvements.
 
 ## Contributors
 
