@@ -1,4 +1,5 @@
-# Version
+# MCA Forge
+# Version management
 VERSION = "0.5.5"
 
 import os, sys, subprocess, binascii, shutil

@@ -1,4 +1,5 @@
-#Version
+# Opus Header Injector
+# Version management
 VERSION = "1.0"
 
 import sys

@@ -1,3 +1,4 @@
+# STQR Editor Tool
 # Version management
 VERSION = "1.5" 
 

@@ -1,4 +1,5 @@
-#Version
+# FolderMaker module
+# Version management
 VERSION = "1.1.1"
 
 import os

@@ -1,4 +1,5 @@
-# Current version
+# STQ Merge
+# Version management
 VERSION = "0.5"
 
 import sys

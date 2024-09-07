@@ -1,4 +1,5 @@
-#Version
+# Hex Converter Enc/Decoder module
+# Version management
 VERSION = "1.0"
 
 import sys

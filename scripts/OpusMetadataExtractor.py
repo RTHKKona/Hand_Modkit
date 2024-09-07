@@ -1,4 +1,5 @@
-#Version
+# Opus Metadata Extractor
+# Version management
 VERSION = "1.1.0"
 
 import os

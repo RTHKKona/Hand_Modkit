@@ -1,4 +1,5 @@
-#Version
+# MCA Converter
+# Version management
 VERSION = "1.0.6"
 
 import os, sys,subprocess

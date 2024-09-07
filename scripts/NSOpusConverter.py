@@ -1,7 +1,8 @@
-# Version
-VERSION = "1.7.0"
+# NS Opus Converter
+# Version management
+VERSION = "1.7.4"
 
-import os,sys,shutil,subprocess, webbrowser
+import os, sys, shutil, subprocess, webbrowser, random
 from PyQt5.QtWidgets import (
     QMainWindow, QVBoxLayout, QHBoxLayout, QPushButton, QFileDialog, QTextEdit, QApplication, 
     QLabel, QMessageBox, QAction, QMenuBar
@@ -24,6 +25,11 @@ class NSOpusConverter(QMainWindow):
         self.first_launch = True
         self.init_ui()
         self.apply_initial_theme()  # Apply the initial theme
+        
+        
+    def log(self, message):  # Moved this method above where it's first used
+        self.log_output.append(message)
+        
 
     def init_ui(self):
         main_layout = QVBoxLayout()
@@ -36,7 +42,7 @@ class NSOpusConverter(QMainWindow):
 
         # Create buttons with consistent font size and buffer
         button_font = QFont()
-        button_font.setPointSize(11)  # Set the font size for all buttons
+        button_font.setPointSize(12)  # Set the font size for all buttons
 
         # Create a menu bar
         menubar = QMenuBar(self)
@@ -71,7 +77,7 @@ class NSOpusConverter(QMainWindow):
         central_widget.setLayout(main_layout)
         self.setCentralWidget(central_widget)
 
-        self.setWindowTitle('NSOpus Converter')
+        self.setWindowTitle('NS Opus Converter')
         self.setGeometry(100, 100, 1600, 800)  # Set the window size to 1600x800, positioned at 100,100
 
         # Ensure the window is visible before proceeding
@@ -83,7 +89,7 @@ class NSOpusConverter(QMainWindow):
         about_text = (
             "NS Opus Converter\n"
             f"Version {VERSION}\n\n"
-            "Converts various audio files (mp3, wav, flac) into valid .Opus audio format used by MHGU."
+            "Converts various audio files (.mp3, .wav, .flac, .ogg) into valid .Opus audio format used by MHGU."
         )
         QMessageBox.about(self, "About", about_text)
 
@@ -192,34 +198,6 @@ class NSOpusConverter(QMainWindow):
             self.log(f"Selected Files: {', '.join(files)}")
             self.convert_to_opus(files)
 
-    def dragEnterEvent(self, event):
-        if not self.dependencies_valid:
-            return  # Don't allow dragging if dependencies aren't valid
-
-        if event.mimeData().hasUrls():
-            event.acceptProposedAction()
-            self.browse_button.setText(f"Import {event.mimeData().urls()[0].fileName()}")
-            self.browse_button.setStyleSheet("""
-                QPushButton {
-                    border: 2px solid #FFD700;
-                    padding: 30px 10px;  /* Increase padding when dragging */
-                }
-            """)
-
-    def dragLeaveEvent(self, event):
-        self.browse_button.setText("Browse Audio Files")
-        self.browse_button.setStyleSheet("QPushButton { padding: 10px; }")
-
-    def dropEvent(self, event):
-        if not self.dependencies_valid:
-            return  # Don't allow dropping if dependencies aren't valid
-
-        files = [url.toLocalFile() for url in event.mimeData().urls()]
-        self.log(f"Selected Files: {', '.join(files)}")
-        self.browse_button.setText("Browse Audio Files")
-        self.browse_button.setStyleSheet("QPushButton { padding: 10px; }")
-        self.convert_to_opus(files)
-
     def convert_to_opus(self, files):
         if not files:
             self.log("No files selected for conversion.")
@@ -234,6 +212,8 @@ class NSOpusConverter(QMainWindow):
         try:
             for file in files:
                 self.log(f"Processing: {file}")
+                self.update_progress(0, f"Starting Conversion...", file)
+
                 temp_wav = os.path.join(self.temp_folder, f"{os.path.basename(file)}_temp.wav")
                 resampled_wav = os.path.join(self.temp_folder, f"{os.path.basename(file)}_resampled.wav")
                 raw_file = os.path.join(self.temp_folder, f"{os.path.basename(file)}.raw")
@@ -241,20 +221,24 @@ class NSOpusConverter(QMainWindow):
 
                 if not file.lower().endswith('.wav'):
                     command_convert_wav = f"\"{self.ffmpeg_path}\" -i \"{file}\" \"{temp_wav}\""
-                    self.run_command(command_convert_wav, "Convert to WAV", temp_wav)
+                    self.run_command(command_convert_wav, "Detected non .wav, converting to WAV", temp_wav)
+                    self.update_progress(int(random.randint(1,10)), "Detected non .wav, converting to WAV", file)
                 else:
                     temp_wav = file
 
                 command_resample = f"\"{self.ffmpeg_path}\" -i \"{temp_wav}\" -ar 48000 -ac 2 -hide_banner -loglevel error \"{resampled_wav}\""
-                self.run_command(command_resample, "Resample WAV", resampled_wav)
+                self.run_command(command_resample, "Resampling WAV", resampled_wav)
+                self.update_progress(int(random.randint(14,40)), "Resampled .wav into 48kHz", file)
 
                 command_pcm = f"\"{self.ffmpeg_path}\" -i \"{resampled_wav}\" -f s16le -acodec pcm_s16le -hide_banner -loglevel error \"{raw_file}\""
                 self.run_command(command_pcm, "Convert to PCM", raw_file)
+                self.update_progress(int(random.randint(41,93)), "PCM Conversion Done", file)
 
                 command_opus = f"\"{self.nxaenc_path}\" -i \"{raw_file}\" -o \"{output_file}\""
                 self.run_command(command_opus, "Convert to Opus", output_file)
+                self.update_progress(100, f"Conversion Completed.", file)
 
-            self.log("Conversion completed successfully.")
+            self.log("All conversions completed successfully.")
             webbrowser.open(self.output_folder)
 
         except Exception as e:
@@ -263,23 +247,28 @@ class NSOpusConverter(QMainWindow):
             self.cleanup_temp_files()
 
     def run_command(self, command, step_description, output_file):
-        self.log(f"Running: {step_description}")
         result = subprocess.run(command, capture_output=True, text=True, shell=True)
         if result.returncode != 0 or not os.path.exists(output_file):
             self.log(f"Error during {step_description}: {result.stderr}")
             raise Exception(f"{step_description} failed.")
-        self.log(f"{step_description} completed successfully.")
 
     def cleanup_temp_files(self):
         try:
             if os.path.exists(self.temp_folder):
                 shutil.rmtree(self.temp_folder)
-                self.log(f"Deleted temporary folder: {self.temp_folder}")
         except Exception as e:
             self.log(f"Error deleting temporary folder: {e}")
 
-    def log(self, message):
-        self.log_output.append(message)
+
+    def update_progress(self, progress, status, file):
+        progress_bar_length = 50  # Length of the progress bar
+        progress_blocks = int(progress / 100 * progress_bar_length)
+        progress_bar = "[" + "#" * progress_blocks + "." * (progress_bar_length - progress_blocks) + "]"
+        
+        # Clear the QTextEdit and rewrite the progress line
+        self.log_output.append(f"Processing {file} - {status} - {progress_bar} {progress}%")
+        QApplication.processEvents()  # Ensure the UI updates immediately
+
 
     def toggle_theme(self):
         self.dark_mode = not self.dark_mode
@@ -289,13 +278,22 @@ class NSOpusConverter(QMainWindow):
         self.apply_theme()
 
     def apply_theme(self):
-        stylesheet = """
-            QMainWindow { background-color: #2b2b2b; color: #ffebcd; }
-            QTextEdit { background-color: #4d4d4d; color: #ffebcd; }
-            QLabel { color: #ffebcd; }
-            QPushButton { background-color: #4d4d4d; color: #ffebcd; }
-        """ if self.dark_mode else ""
+        if self.dark_mode:
+            stylesheet = """
+                QMainWindow { background-color: #2b2b2b; color: #ffebcd; }
+                QTextEdit { background-color: #4d4d4d; color: #ffebcd; }
+                QLabel { color: #ffebcd; }
+                QPushButton { background-color: #4d4d4d; color: #ffebcd; }
+            """
+        else:
+            stylesheet = """
+                QMainWindow { background-color: white; color: black; }
+                QTextEdit { background-color: white; color: black; }
+                QLabel { color: black; }
+                QPushButton { background-color: white; color: black; }
+            """
         self.setStyleSheet(stylesheet)
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

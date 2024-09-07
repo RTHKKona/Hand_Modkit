@@ -1,4 +1,5 @@
-# Version Define
+# Handburger's Hb_Modkit alpha release 
+# Version management
 VERSION = "0.6.1"
 
 
