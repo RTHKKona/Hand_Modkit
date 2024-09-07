@@ -1,7 +1,7 @@
 
-# Hand_Modkit
+# Handburger's Modkit
 
-Hand_Modkit, also known as the Handburger Modkit or H.Modkit, is a versatile multi-use tool designed for modding *Monster Hunter Generations Ultimate* (MHGU). With a suite of specialized utilities, this toolkit gives modders tools to easily edit, analyze, and manage various game files. Whether you're injecting audio headers, calculating audio properties, or organizing mod folders, Hand_Modkit simplifies the complex tasks involved in MHGU modding.
+Hand_Modkit, also known as Handburger's Modkit or H.Modkit, is a versatile multi-use tool designed for modding *Monster Hunter Generations Ultimate* (MHGU). With a suite of specialized utilities, this toolkit gives modders tools to easily edit, analyze, and manage various game files. Whether you're injecting audio headers, calculating audio properties, or organizing mod folders, Hand_Modkit simplifies the complex tasks involved in MHGU modding.
 
 <img src="https://github.com/user-attachments/assets/4e2a52b4-4f95-4e16-a44b-e4119e82e46e" width="800" />
 
@@ -61,7 +61,6 @@ Hand_Modkit, also known as the Handburger Modkit or H.Modkit, is a versatile mul
 
 I'm working to improve Hand_Modkit and expand its capabilities. Here's a glimpse of what's coming in future updates:
 
-- **MCA Header Injector/Editor**: A tool for injecting and editing headers in MCA files, allowing for more detailed control over audio modifications.
 - **Kuriimu2 Compatibility**: Integration with Kuriimu2, including support for \`.dll\` files, opening \`.arc\` files, and editing \`.tex\` files. This will enhance Hand_Modkit's versatility and allow seamless editing of game assets.
 - **Compile into Full Exe**: The goal is to compile Hand_Modkit into a standalone executable, making it easier to distribute and use without requiring a Python environment.
 - **Better GUI for Easier Use**: We're working on refining the graphical user interface to make it more intuitive and user-friendly, ensuring that even new users can navigate and use the tool effectively.
