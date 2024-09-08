@@ -1,6 +1,6 @@
 # Hex Converter Enc/Decoder module
 # Version management
-VERSION = "1.0"
+VERSION = "1.0.2"
 
 import sys
 import struct
@@ -8,21 +8,25 @@ from PyQt5.QtWidgets import (
     QMainWindow, QVBoxLayout, QHBoxLayout, QLabel, QTextEdit, QPushButton, QWidget, 
     QApplication, QComboBox, QRadioButton, QButtonGroup, QFrame, QAction, QMenuBar, QMessageBox
 )
-from PyQt5.QtGui import QColor, QFont, QTextCursor
-from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QTextCursor
 
 class HexConverterEncoder(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.dark_mode = True # Dark Mode Initialized
         self.init_ui()
-        self.toggle_dark_mode()  # Start in dark mode by default
 
-    def init_ui(self):
-        # Increase default font size
-        font = QFont()
-        font.setPointSize(font.pointSize() + 1)
-        self.setFont(font)
-
+    def init_ui(self):        
+        if self.dark_mode:
+            self.setStyleSheet("""
+                QMainWindow { background-color: #2b2b2b; color: #ffebcd; font-family: Consolas; font-size: 11pt;}
+                QTextEdit { background-color: #4d4d4d; color: #ffebcd; font-family: Consolas; font-size: 11pt;}
+                QLabel { color: #ffebcd; font-family: Consolas; font-size: 11pt; }
+                QPushButton { background-color: #4d4d4d; color: #ffebcd; font-family: Consolas; font-size: 11pt;}
+                QComboBox { background-color: #4d4d4d; color: #ffebcd; font-family: Consolas; font-size: 11pt;}
+                QRadioButton { color: #ffebcd; font-family: Consolas; font-size: 11pt;}
+            """)
+            
         # Main widget and layout
         central_widget = QWidget(self)
         main_layout = QHBoxLayout(central_widget)
@@ -34,7 +38,9 @@ class HexConverterEncoder(QMainWindow):
         
         self.hex_input_label = QLabel("Hexadecimal Input", self)
         self.hex_input = QTextEdit(self)
-        self.hex_input.setPlaceholderText("Enter hexadecimal value (e.g., f0 9f 8f b3 ef b8 8f e2 80 8d)")
+        self.hex_input.setPlaceholderText(
+            "Enter hexadecimal value (e.g., f09f8fb3 efb88fe2). Note: This app doesn't like it if the data isn't in 4byte format."
+            )
         self.hex_input.textChanged.connect(self.format_hex_input)  # Auto format input
         left_layout.addWidget(self.hex_input_label)
         left_layout.addWidget(self.hex_input)
@@ -49,7 +55,7 @@ class HexConverterEncoder(QMainWindow):
 
         self.conversion_type = QComboBox(self)
         self.conversion_type.addItems([
-            "Hex to Little Endian Signed Int32", 
+            "Hex to Signed Int32", 
             "Hex to Windows (ANSI)",
             "Signed Int32 to Hex",
             "Windows (ANSI) to Hex"
@@ -75,13 +81,17 @@ class HexConverterEncoder(QMainWindow):
         convert_button.clicked.connect(self.convert)
         center_layout.addWidget(convert_button)
 
-        dark_mode_button = QPushButton("Toggle Dark Mode", self)
-        dark_mode_button.clicked.connect(self.toggle_dark_mode)
-        center_layout.addWidget(dark_mode_button)
+        theme_button = QPushButton("Toggle Theme", self)
+        theme_button.clicked.connect(self.toggle_dark_mode)
+        center_layout.addWidget(theme_button)
 
         clipboard_button = QPushButton("Copy to Clipboard", self)
         clipboard_button.clicked.connect(self.copy_to_clipboard)
         center_layout.addWidget(clipboard_button)
+
+        paste_button = QPushButton("Paste from Clipboard", self)
+        paste_button.clicked.connect(self.paste_from_clipboard)
+        center_layout.addWidget(paste_button)
 
         clear_button = QPushButton("Clear", self)
         clear_button.clicked.connect(self.clear_fields)
@@ -114,11 +124,37 @@ class HexConverterEncoder(QMainWindow):
         help_action = QAction("About", self)
         help_action.triggered.connect(self.show_about_dialog)
         help_menu.addAction(help_action)
+        
 
+    def toggle_dark_mode(self):
+        self.dark_mode = not self.dark_mode
+        if self.dark_mode:
+            # Switch to dark mode
+            self.setStyleSheet("""
+                QMainWindow { background-color: #2b2b2b; color: #ffebcd; font-family: Consolas; font-size: 11pt; }
+                QTextEdit { background-color: #4d4d4d; color: #ffebcd;  font-family: Consolas; font-size: 11pt;}
+                QLabel { color: #ffebcd;  font-family: Consolas; font-size: 11pt;}
+                QPushButton { background-color: #4d4d4d; color: #ffebcd;  font-family: Consolas; font-size: 11pt;}
+                QComboBox { background-color: #4d4d4d; color: #ffebcd;  font-family: Consolas; font-size: 11pt;}
+                QRadioButton { color: #ffebcd;  font-family: Consolas; font-size: 11pt;}
+            """)
+        else:
+            # Switch to light mode
+            self.setStyleSheet("""
+                QMainWindow { background-color: #ffffff; color: #000000;  font-family: Consolas; font-size: 11pt;}
+                QTextEdit { background-color: #ffffff; color: #000000;  font-family: Consolas; font-size: 11pt;}
+                QLabel { color: #000000;  font-family: Consolas; font-size: 11pt;}
+                QPushButton { background-color: #ffffff; color: #000000;  font-family: Consolas; font-size: 11pt;}
+                QComboBox { background-color: #ffffff; color: #000000;  font-family: Consolas; font-size: 11pt;}
+                QRadioButton { color: #000000;  font-family: Consolas; font-size: 11pt;}
+            """)
+    def paste_from_clipboard(self):
+        clipboard = QApplication.clipboard()
+        self.hex_input.setText(clipboard.text())
+    
+            
     def format_hex_input(self):
-        """
-        Auto-format the hex input by grouping into 4 bytes (8 characters).
-        """
+       # Auto-format the hex input by grouping into 4 bytes (8 characters).
         text = self.hex_input.toPlainText().replace(" ", "").upper()
         formatted_text = " ".join(text[i:i+8] for i in range(0, len(text), 8))
         self.hex_input.blockSignals(True)  # Prevent recursive signal
@@ -143,14 +179,14 @@ class HexConverterEncoder(QMainWindow):
             self.byte_order_label.show()
             for button in self.byte_order_group.buttons():
                 button.show()
-            self.hex_input.setPlaceholderText("Enter hexadecimal value (e.g., f0 9f 8f b3 ef b8 8f e2 80 8d)")
+            self.hex_input.setPlaceholderText("Enter hexadecimal value (e.g.,  (e.g., f09f8fb3 efb88fe2).")
         elif conversion == "Hex to Windows (ANSI)":
             self.hex_input_label.setText("Hexadecimal Input")
             self.result_label.setText("Converted ANSI String")
             self.byte_order_label.hide()
             for button in self.byte_order_group.buttons():
                 button.hide()
-            self.hex_input.setPlaceholderText("Enter hexadecimal value (e.g., f0 9f 8f b3 ef b8 8f e2 80 8d)")
+            self.hex_input.setPlaceholderText("Enter hexadecimal value (e.g.,  (e.g., f09f8fb3 efb88fe2).")
         elif conversion == "Signed Int32 to Hex":
             self.hex_input_label.setText("Signed Int32 Input")
             self.result_label.setText("Converted Hexadecimal")
@@ -209,22 +245,6 @@ class HexConverterEncoder(QMainWindow):
     def clear_fields(self):
         self.hex_input.clear()
         self.result_output.clear()
-
-    def toggle_dark_mode(self):
-        dark_mode = self.palette().color(self.backgroundRole()) == QColor(Qt.black)
-        if dark_mode:
-            # Switch to light mode
-            self.setStyleSheet("")
-        else:
-            # Switch to dark mode
-            self.setStyleSheet("""
-                QMainWindow { background-color: #2b2b2b; color: #ffebcd; }
-                QTextEdit { background-color: #4d4d4d; color: #ffebcd; }
-                QLabel { color: #ffebcd; }
-                QPushButton { background-color: #4d4d4d; color: #ffebcd; }
-                QComboBox { background-color: #4d4d4d; color: #ffebcd; }
-                QRadioButton { color: #ffebcd; }
-            """)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

@@ -136,6 +136,7 @@ class PoppableTabWidget(QTabWidget):
             "MCA Converter" : MCAConverter.WavToMcaConverter,
             "MCA Forge" : MCA_Forge.MCA_Forge
         }
+        self.tabBar().setFont(QFont("Consolas", 11))
 
     def show_tab_context_menu(self, position):
         ## Show context menu for tab options like popping out.
@@ -223,7 +224,7 @@ class HbModkit(QMainWindow):
     def init_ui(self):
         ## Initialize the main UI.
         self.setWindowTitle(f"Handburger Modkit v{VERSION}")
-        self.setGeometry(100, 100, 1600, 900)
+        self.setGeometry(100, 70, 1650, 1000)
         self.setWindowIcon(QIcon(self.get_icon_path("egg.ico")))
 
         central_widget = QWidget(self)
@@ -299,6 +300,7 @@ class HbModkit(QMainWindow):
             except Exception as e:
                 print(f"error adding tab '{name}' : {e}")
 
+
     def apply_dark_mode_theme(self):
         ## Apply dark mode styling to the main window.
         self.setStyleSheet("""
@@ -357,7 +359,7 @@ class SplashScreen(QMainWindow):
 
         ## Funny Splash Image
         splash_label = QLabel(self)
-        pixmap = QPixmap(self.get_splash_image_path()).scaled(400, 400, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        pixmap = QPixmap(self.get_splash_image_path()).scaled(1000, 800, Qt.KeepAspectRatio, Qt.SmoothTransformation)
         splash_label.setPixmap(pixmap)
         splash_label.setAlignment(Qt.AlignCenter)
 
@@ -367,14 +369,17 @@ class SplashScreen(QMainWindow):
         self.progress_bar.setStyleSheet("""
             QProgressBar {
                 background-color: #3c3c3c;
-                color: #fff;
-                border-style: none;
-                border-radius: 5px;
+                border-style: outset;
+                border-radius: 6px;
+                border: 2px solid; 
                 text-align: center;
+                font: bold 14px;
+                padding: 2px;
+                color: #000000;
             }                      
             QProgressBar::chunk {
-                background-color: #555;
-                width: 20px;
+                background-color: #30d5c8;
+                width: 10px;
             }          
         """)
         self.progress_bar.setMaximum(100)
@@ -389,7 +394,7 @@ class SplashScreen(QMainWindow):
     def get_splash_image_path(self):
         ## Get the path to the splash image in the assets directory.
         assets_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets')
-        splash_image_path = os.path.join(assets_dir, "funnycharacta.png")
+        splash_image_path = os.path.join(assets_dir, "funnycharacta2.png")
         if not os.path.exists(splash_image_path):
             raise FileNotFoundError(f"Splash image not found at {splash_image_path}")
         return splash_image_path
