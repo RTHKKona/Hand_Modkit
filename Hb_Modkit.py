@@ -64,7 +64,7 @@ class CustomTitleBar(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)  ## Remove margins around the layout
 
         self.title_label = QLabel(self.title, self)
-        self.title_label.setFont(QFont("", 11))  ## Increased font size by 1
+        self.title_label.setFont(QFont("Times New Roman", 11))  ## Increased font size by 1
         self.title_label.setAlignment(Qt.AlignCenter)
 
         layout.addStretch(1)
@@ -130,13 +130,13 @@ class PoppableTabWidget(QTabWidget):
             "Audio Calculator": AudioCalculator.AudioCalculator,
             "FolderMaker": FolderMaker.FolderMaker,
             "Hex Enc/Decoder": HexConverterEncoder.HexConverterEncoder,
-            "NSOpus Converter": NSOpusConverter.NSOpusConverter,
+            "NS Opus Converter": NSOpusConverter.NSOpusConverter,
             "Opus Metadata Extractor": OpusMetadataExtractor.OpusMetadataExtractor,
             "STQ Merge Tool": STQ_Merge.STQMergeTool,
             "MCA Converter" : MCAConverter.WavToMcaConverter,
             "MCA Forge" : MCA_Forge.MCA_Forge
         }
-        self.tabBar().setFont(QFont("Consolas", 11))
+        self.tabBar().setFont(QFont("Proggy", 11))
 
     def show_tab_context_menu(self, position):
         ## Show context menu for tab options like popping out.
@@ -249,7 +249,7 @@ class HbModkit(QMainWindow):
         QMenuBar {
             background-color: #2b2b2b;  /* Background color of the menu bar */
             color: #ffebcd;  /* Default text color */
-            font-size: 11px;
+            font-size: 12px;
         }
         QMenuBar::item {
             background-color: #2b2b2b;  /* Background color of items */
@@ -569,7 +569,7 @@ class AboutTab(QWidget):
         self.text_browser.setOpenExternalLinks(True)
 
         # Set font size
-        font = QFont()
+        font = QFont("JetBrains Mono", 12)
         font.setPointSize(11)
         self.text_browser.setFont(font)
 

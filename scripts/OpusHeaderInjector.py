@@ -1,6 +1,6 @@
 # Opus Header Injector
 # Version management
-VERSION = "1.0"
+VERSION = "1.0.0"
 
 import sys
 import struct
