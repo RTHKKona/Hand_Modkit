@@ -82,7 +82,7 @@ Contributions are welcome! Feel free to fork the repository, make changes, and s
 
 ## Acknowledgements
 
-- **masagrator** for his MHGU NXAenc from his NX-Scripts. Without this, the Opus conversions would not be possible.
+- **masagrator** for his MHGU NXAenc from his NX-Scripts.
 - **ffmpeg** for audio functionality dependencies.
 - **vgmstream** for reading and working with game audio data.
 - **Dasding** for his MH4/MHX modding conversion tools.
