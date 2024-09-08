@@ -276,7 +276,7 @@ class HbModkit(QMainWindow):
 
     def add_tabs(self):
         ## Add tool tabs to the main window.
-        tools = {  ## Add Tools here when created, remember to add commas
+        tools = {  ## Remember to add commas
             "About": AboutTab,  ## Initialize AboutTab with locale_manager
             "STQ Editor Tool": stq_tool.STQTool,
             "Opus Header Injector": OpusHeaderInjector.OpusHeaderInjector,
