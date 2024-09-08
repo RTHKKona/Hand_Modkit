@@ -41,27 +41,27 @@ Hand_Modkit, also known as Handburger's Modkit or H.Modkit, is a versatile multi
 
 - **Python 3.12.x**: Ensure you have Python installed on your machine. You can download it [here](https://www.python.org/downloads/).
 - **PyQt5**: Install PyQt5, the library used for the GUI. You can install it via pip:
-  \`\`\`bash
+  ```
   pip install PyQt5
-  \`\`\`
+  ```
 
 ### Installation
 
 1. Clone the repository:
-   \`\`\`bash
+   ```
    git clone https://github.com/RTHKKona/Hand_Modkit.git
-   \`\`\`
+   ```
 2. Navigate to the project directory:
-   \`\`\`bash
+   ```
    cd Hand_Modkit
-   \`\`\`
-3. Open up \`Hb_Modkit.py\` or any standalone Python script in \`/scripts/\`.
+   ```
+3. Open up `Hb_Modkit.py` or any standalone Python script in `/scripts/`.
 
 ## Future Features
 
 I'm working to improve Hand_Modkit and expand its capabilities. Here's a glimpse of what's coming in future updates:
 
-- **Kuriimu2 Compatibility**: Integration with Kuriimu2, including support for \`.dll\` files, opening \`.arc\` files, and editing \`.tex\` files. This will enhance Hand_Modkit's versatility and allow seamless editing of game assets.
+- **Kuriimu2 Compatibility**: Integration with Kuriimu2, including support for `.dll` files, opening `.arc` files, and editing `.tex` files. This will enhance Hand_Modkit's versatility and allow seamless editing of game assets.
 - **Compile into Full Exe**: The goal is to compile Hand_Modkit into a standalone executable, making it easier to distribute and use without requiring a Python environment.
 - **Better GUI for Easier Use**: We're working on refining the graphical user interface to make it more intuitive and user-friendly, ensuring that even new users can navigate and use the tool effectively.
 
