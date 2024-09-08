@@ -1,6 +1,6 @@
 # STQ Merge
 # Version management
-VERSION = "0.5"
+VERSION = "0.5.0"
 
 import sys
 import os
@@ -180,7 +180,7 @@ class STQMergeTool(QMainWindow):
             "Number of Channels", "Sample Rate Hz", "Loop Start (samples)",
             "Loop End (samples)"
         ])
-        grid.horizontalHeader().setFont(QFont("Arial", weight=QFont.Bold))
+        grid.horizontalHeader().setFont(QFont("Consolas", weight=QFont.Bold))
         grid.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
         grid.horizontalHeader().setStyleSheet("QHeaderView::section { color: black; }")  # Set header text color to black
         grid.setEditTriggers(QTableWidget.DoubleClicked)
@@ -459,15 +459,54 @@ class STQMergeTool(QMainWindow):
         self.apply_theme()
 
     def apply_theme(self):
-        # Apply the current theme based on the dark_mode flag."""
-        stylesheet = """
+        # Common styles for both dark and light modes
+        common_styles = """
+            QPushButton {
+                font-family: Consolas;
+                font-size: 12pt;
+                padding: 5px;
+            }
+            QTextEdit {
+                font-family: Consolas;
+                font-size: 10pt;
+            }
+            QLabel {
+                font-family: Consolas;
+                font-size: 12pt;
+            }
+        """
+
+        # Dark mode-specific styles
+        dark_mode_styles = """
             QWidget { background-color: #2b2b2b; color: #ffebcd; }
             QTextEdit { background-color: #4d4d4d; color: #ffebcd; }
             QLabel { color: #ffebcd; }
             QLineEdit { background-color: #4d4d4d; color: #ffebcd; border: 1px solid #ffebcd; }
             QPushButton { background-color: #4d4d4d; color: #ffebcd; }
-        """ if self.dark_mode else ""
-        self.setStyleSheet(stylesheet)
+            QTableWidget { background-color: #4d4d4d; color: #ffebcd; gridline-color: white; }
+            QHeaderView::section { background-color: grey; color: white; }
+        """
+
+        # Light mode-specific styles
+        light_mode_styles = """
+            QWidget { background-color: white; color: black; }
+            QTextEdit { background-color: white; color: black; }
+            QLabel { color: black; }
+            QLineEdit { background-color: white; color: black; border: 1px solid black; }
+            QPushButton { background-color: #f0f0f0; color: black; }
+            QTableWidget { background-color: white; color: black; gridline-color: black; }
+            QHeaderView::section { background-color: lightgrey; color: black; }
+        """
+
+        # Combine the common styles with theme-specific styles
+        if self.dark_mode:
+            full_stylesheet = common_styles + dark_mode_styles
+        else:
+            full_stylesheet = common_styles + light_mode_styles
+
+        # Apply the combined stylesheet
+        self.setStyleSheet(full_stylesheet)
+
 
     def show_error_message(self, title, message):
         # Display an error message in a message box."""

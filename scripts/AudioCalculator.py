@@ -1,6 +1,6 @@
 # Audio Calculator module 
 # Version management
-VERSION = "1.0.1"
+VERSION = "1.0.2"
 
 import sys
 from PyQt5.QtWidgets import (
@@ -8,7 +8,6 @@ from PyQt5.QtWidgets import (
     QPushButton, QWidget, QRadioButton, QFrame, QTextEdit, QAction, QMenuBar
 )
 from PyQt5.QtGui import QFont
-
 from decimal import Decimal, getcontext, InvalidOperation
 
 # Set precision high enough to handle all operations accurately
@@ -134,8 +133,7 @@ class AudioCalculator(QMainWindow):
         self.result_output.clear()
 
     def update_font_size(self):
-        font = QFont()
-        font.setPointSize(11)  # Increased font size by 1 point
+        font = QFont("Consolas", 11)
         widgets = [
             self.input_label, self.audio_input, self.settings_label,
             self.mode_samples_to_duration, self.mode_duration_to_samples,
@@ -154,15 +152,40 @@ class AudioCalculator(QMainWindow):
 
     def apply_theme(self):
         """Apply the appropriate stylesheet based on the current theme."""
-        stylesheet = """
+        common_styles = """
+            QPushButton {
+                font-family: Consolas;
+                font-size: 12pt;
+                padding: 6px;
+            }
+        """
+
+        dark_mode_styles = """
             QMainWindow { background-color: #2b2b2b; color: #ffebcd; }
             QTextEdit { background-color: #4d4d4d; color: #ffebcd; }
             QLabel { color: #ffebcd; }
             QRadioButton { color: #ffebcd; }
             QPushButton { background-color: #4d4d4d; color: #ffebcd; }
             QFrame { background-color: #2b2b2b; color: #ffebcd; }
-        """ if self.dark_mode else ""
-        self.setStyleSheet(stylesheet)
+        """
+
+        light_mode_styles = """
+            QMainWindow { background-color: white; color: black; }
+            QTextEdit { background-color: white; color: black; }
+            QLabel { color: black; }
+            QRadioButton { color: black; }
+            QPushButton { background-color: #f0f0f0; color: black; }
+            QFrame { background-color: white; color: black; }
+        """
+
+        # Apply common styles plus mode-specific styles
+        if self.dark_mode:
+            full_stylesheet = common_styles + dark_mode_styles
+        else:
+            full_stylesheet = common_styles + light_mode_styles
+
+        # Apply the combined stylesheet
+        self.setStyleSheet(full_stylesheet)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

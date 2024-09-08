@@ -1,6 +1,6 @@
 # NS Opus Converter
 # Version management
-VERSION = "1.7.4"
+VERSION = "1.7.5"
 
 import os, sys, shutil, subprocess, webbrowser, random
 from PyQt5.QtWidgets import (
@@ -278,21 +278,41 @@ class NSOpusConverter(QMainWindow):
         self.apply_theme()
 
     def apply_theme(self):
+        common_styles = """
+            QPushButton {
+                font-family: Consolas;
+                font-size: 12pt;
+                padding: 6px;
+            }
+        """
+
+        dark_mode_styles = """
+            QMainWindow { background-color: #2b2b2b; color: #ffebcd; }
+            QTextEdit { background-color: #4d4d4d; color: #ffebcd; }
+            QPushButton { background-color: #4d4d4d; color: #ffebcd; }
+            QMessageBox QLabel { color: #ffebcd; }  
+            QMessageBox QPushButton { background-color: #4d4d4d; color: #ffebcd; }  
+            QMessageBox { background-color: #4d4d4d; } 
+        """
+
+        light_mode_styles = """
+            QMainWindow { background-color: #f0f0f0; color: #000000; }
+            QTextEdit { background-color: #ffffff; color: #000000; }
+            QPushButton { background-color: #ffffff; color: #000000; }
+            QMessageBox QLabel { color: #000000; }  
+            QMessageBox QPushButton { background-color: #ffffff; color: #000000; }  
+            QMessageBox { background-color: #ffffff; }  
+        """
+
+        # Apply common styles plus mode-specific styles
         if self.dark_mode:
-            stylesheet = """
-                QMainWindow { background-color: #2b2b2b; color: #ffebcd; }
-                QTextEdit { background-color: #4d4d4d; color: #ffebcd; }
-                QLabel { color: #ffebcd; }
-                QPushButton { background-color: #4d4d4d; color: #ffebcd; }
-            """
+            full_stylesheet = common_styles + dark_mode_styles
         else:
-            stylesheet = """
-                QMainWindow { background-color: white; color: black; }
-                QTextEdit { background-color: white; color: black; }
-                QLabel { color: black; }
-                QPushButton { background-color: white; color: black; }
-            """
-        self.setStyleSheet(stylesheet)
+            full_stylesheet = common_styles + light_mode_styles
+
+        # Apply the combined stylesheet
+        self.setStyleSheet(full_stylesheet)
+
 
 
 if __name__ == '__main__':

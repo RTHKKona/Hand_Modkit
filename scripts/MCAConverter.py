@@ -1,6 +1,6 @@
 # MCA Converter
 # Version management
-VERSION = "1.0.6"
+VERSION = "1.0.7"
 
 import os, sys,subprocess
 from concurrent.futures import ThreadPoolExecutor
@@ -153,19 +153,50 @@ class WavToMcaConverter(QMainWindow):
         self.apply_theme()
 
     def apply_theme(self):
-        stylesheet = (
-            "QMainWindow { background-color: #2b2b2b; color: #ffebcd; }"
-            "QTextEdit { background-color: #4d4d4d; color: #ffebcd; }"
-            "QPushButton { background-color: #4d4d4d; color: #ffebcd; }"
-        ) if self.dark_mode else (
-            "QMainWindow { background-color: #f0f0f0; color: #000000; }"
-            "QTextEdit { background-color: #ffffff; color: #000000; }"
-            "QPushButton { background-color: #ffffff; color: #000000; }"
-        )
-        self.setStyleSheet(stylesheet)
+        common_styles = """
+            QPushButton {
+                font-family: Consolas;
+                font-size: 12pt;
+                padding: 6px;
+            }
+            QMessageBox QLabel{
+                font-weight: bold;
+                font-size: 12pt;
+                font-family: Consolas;
+                padding: 10px;
+            }
+        """
+
+        dark_mode_styles = """
+            QMainWindow { background-color: #2b2b2b; color: #ffebcd; }
+            QTextEdit { background-color: #4d4d4d; color: #ffebcd; }
+            QPushButton { background-color: #4d4d4d; color: #ffebcd; }
+            QMessageBox QLabel { color: #ffebcd; }  /* Ensure QLabel inside QMessageBox is styled */
+            QMessageBox QPushButton { background-color: #4d4d4d; color: #ffebcd; }  /* Button styling inside QMessageBox */
+            QMessageBox { background-color: #4d4d4d; }  /* Background styling for QMessageBox */
+        """
+
+        light_mode_styles = """
+            QMainWindow { background-color: #f0f0f0; color: #000000; }
+            QTextEdit { background-color: #ffffff; color: #000000; }
+            QPushButton { background-color: #ffffff; color: #000000; }
+            QMessageBox QLabel { color: #000000; }  /* Ensure QLabel inside QMessageBox is styled */
+            QMessageBox QPushButton { background-color: #ffffff; color: #000000; }  /* Button styling inside QMessageBox */
+            QMessageBox { background-color: #ffffff; }  /* Background styling for QMessageBox */
+        """
+
+        # Apply common styles plus mode-specific styles
+        if self.dark_mode:
+            full_stylesheet = common_styles + dark_mode_styles
+        else:
+            full_stylesheet = common_styles + light_mode_styles
+
+        # Apply the combined stylesheet
+        self.setStyleSheet(full_stylesheet)
+
 
     def show_about_dialog(self):
-        about_text = f"Audio to MCA Converter\nVersion {VERSION}\nConverts supported audio files to MCA format."
+        about_text = f"Audio to MCA Converter Version {VERSION}\nConverts supported audio files to MCA format."
         QMessageBox.about(self, "About", about_text)
 
     def show_help(self):

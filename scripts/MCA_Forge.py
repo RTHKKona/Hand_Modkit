@@ -1,6 +1,6 @@
 # MCA Forge
 # Version management
-VERSION = "0.5.5"
+VERSION = "0.5.6"
 
 import os, sys, subprocess, binascii, shutil
 from PyQt5.QtWidgets import (
@@ -29,8 +29,7 @@ class MCA_Forge(QMainWindow):
         self.log_output.setFont(QFont("Consolas", 11))
         main_layout.addWidget(self.log_output)
 
-        button_font = QFont()
-        button_font.setPointSize(11)
+        button_font = QFont("Consolas", 11)
         
         menubar = QMenuBar(self)
         self.setMenuBar(menubar)
@@ -309,16 +308,41 @@ class MCA_Forge(QMainWindow):
         self.apply_theme()
 
     def apply_theme(self):
-        stylesheet = """
+        common_styles = """
+            QPushButton {
+                font-family: Consolas;
+                font-size: 12pt;
+                padding: 6px;
+            }
+        """
+
+        dark_mode_styles = """
             QMainWindow { background-color: #2b2b2b; color: #ffebcd; }
             QTextEdit { background-color: #4d4d4d; color: #ffebcd; }
             QPushButton { background-color: #4d4d4d; color: #ffebcd; }
-        """ if self.dark_mode else """
+            QMessageBox { background-color: #2b2b2b}
+            QMessageBox QLabel { color: #ffebcd; }
+            QMessageBox QPushButton { background-color: #4d4d4d; color: #ffebcd; }
+        """
+
+        light_mode_styles = """
             QMainWindow { background-color: #f0f0f0; color: #000000; }
             QTextEdit { background-color: #ffffff; color: #000000; }
             QPushButton { background-color: #ffffff; color: #000000; }
+            QMessageBox { background-color: #ffffff; color: #000000; }
+            QMessageBox QLabel { color: #000000; } 
+            QMessageBox QPushButton { background-color: #ffffff; color: #000000; }  
+            QMessageBox { background-color: #ffffff; }
         """
-        self.setStyleSheet(stylesheet)
+
+        # Apply common styles plus mode-specific styles
+        if self.dark_mode:
+            full_stylesheet = common_styles + dark_mode_styles
+        else:
+            full_stylesheet = common_styles + light_mode_styles
+
+        # Apply the combined stylesheet
+        self.setStyleSheet(full_stylesheet)
         
     def toggle_theme(self):
         self.dark_mode = not self.dark_mode

@@ -1,6 +1,6 @@
 # Opus Metadata Extractor
 # Version management
-VERSION = "1.1.0"
+VERSION = "1.1.1"
 
 import os
 import sys
@@ -432,13 +432,40 @@ class OpusMetadataExtractor(QMainWindow):
         self.apply_theme()
 
     def apply_theme(self):
-        stylesheet = """
+        common_styles = """
+            QPushButton {
+                font-family: Consolas;
+                font-size: 12pt;
+                padding: 6px;
+            }
+        """
+
+        dark_mode_styles = """
             QMainWindow { background-color: #2b2b2b; color: #ffebcd; }
             QTextEdit { background-color: #4d4d4d; color: #ffebcd; }
-            QLabel { color: #ffebcd; }
             QPushButton { background-color: #4d4d4d; color: #ffebcd; }
-        """ if self.dark_mode else ""
-        self.setStyleSheet(stylesheet)
+            QMessageBox QLabel { color: #ffebcd; }  
+            QMessageBox QPushButton { background-color: #4d4d4d; color: #ffebcd; }  
+            QMessageBox { background-color: #4d4d4d; } 
+        """
+
+        light_mode_styles = """
+            QMainWindow { background-color: #f0f0f0; color: #000000; }
+            QTextEdit { background-color: #ffffff; color: #000000; }
+            QPushButton { background-color: #ffffff; color: #000000; }
+            QMessageBox QLabel { color: #000000; }  
+            QMessageBox QPushButton { background-color: #ffffff; color: #000000; }  
+            QMessageBox { background-color: #ffffff; }  
+        """
+
+        # Apply common styles plus mode-specific styles
+        if self.dark_mode:
+            full_stylesheet = common_styles + dark_mode_styles
+        else:
+            full_stylesheet = common_styles + light_mode_styles
+
+        # Apply the combined stylesheet
+        self.setStyleSheet(full_stylesheet)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

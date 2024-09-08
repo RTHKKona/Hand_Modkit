@@ -283,7 +283,7 @@ class HbModkit(QMainWindow):
             "Audio Calculator": AudioCalculator.AudioCalculator,
             "FolderMaker": FolderMaker.FolderMaker,
             "Hex Enc/Decoder": HexConverterEncoder.HexConverterEncoder,
-            "NSOpus Converter": NSOpusConverter.NSOpusConverter,
+            "NS Opus Converter": NSOpusConverter.NSOpusConverter,
             "Opus Metadata Extractor": OpusMetadataExtractor.OpusMetadataExtractor,
             "STQ Merge Tool": STQ_Merge.STQMergeTool,
             "MCA Converter" : MCAConverter.WavToMcaConverter,
@@ -555,7 +555,7 @@ class AboutTab(QWidget):
             "MCA Converter": translations.get('mcaconvert_desc', "Converts audio files into .MCA format. For use with the MCA Header Injector for modding."),
             "MCA Forger": translations.get('mcaforge_desc', "Allows users to import two .MCA files—an original and a replacement—and merge key elements to create a new custom header with a preset structure."),
             "Hex Enc/Decoder": translations.get('hex_enc_decoder_desc', "Encodes or decodes hexadecimal data, useful for file conversions and analysis."),
-            "NSOpus Converter": translations.get('nsopus_converter_desc',"Converts audio files to and from the Opus format, with support for Nintendo Switch Opus MHGU-specific formats."),
+            "NS Opus Converter": translations.get('nsopus_converter_desc',"Converts audio files to and from the Opus format, with support for Nintendo Switch Opus MHGU-specific formats."),
             "Opus Metadata Extractor": translations.get('opus_metadata_extractor_desc', "Extracts metadata from Opus files for easier management and editing.")
         }
 

@@ -41,7 +41,7 @@ class FolderMaker(QMainWindow):
         main_layout.addWidget(self.cmd_output)
 
         self.folder_input = QLineEdit(self)
-        self.folder_input.setPlaceholderText("Click 'Browse' to select a directory you'd like to analyze... (likely nativeNX)")
+        self.folder_input.setPlaceholderText("Click 'Browse' to select a directory you'd like to analyse. (likely nativeNX)")
         bottom_layout.addWidget(self.folder_input)
 
         browse_button = QPushButton("Browse", self)
@@ -49,7 +49,7 @@ class FolderMaker(QMainWindow):
         bottom_layout.addWidget(browse_button)
 
         self.file_input = QLineEdit(self)
-        self.file_input.setPlaceholderText("Input exact name of file that you want to replace (i.e bgm_v03.opus)")
+        self.file_input.setPlaceholderText("Input exact file you want to replace. (i.e bgm_v03.opus)")
         bottom_layout.addWidget(self.file_input)
 
         create_button = QPushButton("Create Directory/Folders", self)
@@ -63,13 +63,12 @@ class FolderMaker(QMainWindow):
         main_layout.addLayout(bottom_layout)
 
         self.setWindowTitle('FolderMaker')
-        self.setGeometry(100, 100, 1600, 900)  # Set the window size to 1600x800, positioned at 100,100
+        self.setGeometry(100, 70, 1600, 1000)  # Set the window size to 1600x800, positioned at 100,100
 
         self.update_font_size()  # Increase the font size
 
     def update_font_size(self):
-        font = QFont()
-        font.setPointSize(11)  # Increased font size by 1 point
+        font = QFont("Consolas", 11)  # Increased font size by 1 point
         widgets = [
             self.folder_input, self.file_input, self.cmd_output,
             self.toggle_theme_btn
@@ -149,19 +148,44 @@ class FolderMaker(QMainWindow):
         self.apply_theme()
 
     def apply_initial_theme(self):
-        """Apply the theme once during initialization."""
+        # Apply the theme once during initialization.
         self.apply_theme()
 
     def apply_theme(self):
-        """Apply the appropriate stylesheet based on the current theme."""
-        stylesheet = """
+        # Apply the appropriate stylesheet based on the current theme.
+        common_styles = """
+            QPushButton {
+                font-family: Consolas;
+                font-size: 12pt;
+                padding: 6px;
+            }
+        """
+        
+        dark_mode_styles = """
             QWidget { background-color: #2b2b2b; color: #ffebcd; }
             QTextEdit { background-color: #4d4d4d; color: #ffebcd; }
             QLabel { color: #ffebcd; }
             QLineEdit { background-color: #4d4d4d; color: #ffebcd; border: 1px solid #ffebcd; }
             QPushButton { background-color: #4d4d4d; color: #ffebcd; }
-        """ if self.dark_mode else ""
-        self.setStyleSheet(stylesheet)
+        """
+        
+        light_mode_styles = """
+            QWidget { background-color: white; color: black; }
+            QTextEdit { background-color: white; color: black; }
+            QLabel { color: black; }
+            QLineEdit { background-color: white; color: black; border: 1px solid black; }
+            QPushButton { background-color: #f0f0f0; color: black; }
+        """
+        
+        # Combine common styles with the mode-specific styles
+        if self.dark_mode:
+            full_stylesheet = common_styles + dark_mode_styles
+        else:
+            full_stylesheet = common_styles + light_mode_styles
+
+        # Apply the combined stylesheet
+        self.setStyleSheet(full_stylesheet)
+
 
     def display_welcome_message(self):
         #Display ASCII art and welcome message when the app launches.

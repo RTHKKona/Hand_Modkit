@@ -1,6 +1,6 @@
 # STQR Editor Tool
 # Version management
-VERSION = "1.5" 
+VERSION = "1.5.0" 
 
 import sys
 import struct
