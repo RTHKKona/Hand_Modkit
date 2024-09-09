@@ -2,9 +2,7 @@
 # Version management
 VERSION = "1.0.3"
 
-import sys
-import struct
-import os
+import sys,struct,os
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QTextEdit, QFileDialog, QSplitter,
     QTableWidget, QTableWidgetItem, QHeaderView, QAction, QMessageBox, QSizePolicy, QLabel, QMenuBar
