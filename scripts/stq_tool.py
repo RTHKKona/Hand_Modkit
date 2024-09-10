@@ -150,6 +150,7 @@ class STQTool(QMainWindow):
             "Loop End (samples)"
         ])
         grid.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        grid.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
         grid.horizontalHeader().setStyleSheet("""
             QHeaderView::section { color: black; }
             QHeaderView {font-family: Consolas; font: 11pt; }
@@ -541,7 +542,7 @@ class STQTool(QMainWindow):
         link_label = QLabel(self)
         link_label.setText(f'<a href="{url}" style="color:{link_color};">{text}</a>')
         link_label.setOpenExternalLinks(True)
-        link_label.setFont(QFont("Arial", 12))
+        link_label.setFont(QFont("Consolas", 12))
         layout.addWidget(link_label)
         
         return layout
