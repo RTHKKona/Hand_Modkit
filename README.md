@@ -82,7 +82,7 @@ Contributions are welcome! Feel free to fork the repository, make changes, and s
 
 - **masagrator** for his MHGU NXAenc from his NX-Scripts.
 - **ffmpeg** for audio functionality dependencies.
-- **vgmstream** for reading and working with game audio data.
+- **vgmstream** for dependencies for reading/working with game audio data.
 - **Dasding** for his MH4/MHX modding conversion tools.
 
 ## Bug Reports & Feature Requests
