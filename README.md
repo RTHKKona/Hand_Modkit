@@ -103,7 +103,7 @@ If you find this tool useful and want to support its development, consider buyin
   <img src="https://contrib.rocks/image?repo=RTHKKona/Hand_Modkit" />
 </a>
 
-Made with [contrib.rocks](https://contrib.rocks).
+##### Made with [contrib.rocks](https://contrib.rocks).
 
 ## License
 
