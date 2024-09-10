@@ -3,8 +3,7 @@
 
 Hand_Modkit, also known as Handburger's Modkit or H.Modkit, is a versatile multi-use tool designed for modding *Monster Hunter Generations Ultimate* (MHGU). With a suite of specialized utilities, this toolkit gives modders tools to easily edit, analyze, and manage various game files. Whether you're injecting audio headers, calculating audio properties, or organizing mod folders, Hand_Modkit simplifies the complex tasks involved in MHGU modding.
 
-<img src="https://github.com/user-attachments/assets/4e2a52b4-4f95-4e16-a44b-e4119e82e46e" width="800" />
-
+![HBModkit_v061](https://github.com/user-attachments/assets/8e9d13d7-72bc-40c4-bcd9-487441f752a8)
 
 ## Features
 
@@ -22,7 +21,6 @@ Hand_Modkit, also known as Handburger's Modkit or H.Modkit, is a versatile multi
 ## Screenshots
 
 <img src="https://github.com/user-attachments/assets/44e40e8e-ad9e-49cf-a8c8-92df5df7b30e" width="600"/>
-<img src="https://github.com/user-attachments/assets/b32a0314-f5bf-4209-96cf-2e1042790375" width="600"/>
 <img src="https://github.com/user-attachments/assets/06566296-670e-492a-a76d-be939289d9cb" width="600"/>
 <img src="https://github.com/user-attachments/assets/22013a7c-3078-453c-bc78-7b0663bedb3c" width="600"/>
 <img src="https://github.com/user-attachments/assets/a7426d8a-9706-4726-a80f-636c44d64ecd" width="600"/>
