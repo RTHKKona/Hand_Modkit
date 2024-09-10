@@ -394,7 +394,7 @@ class SplashScreen(QMainWindow):
     def get_splash_image_path(self):
         ## Get the path to the splash image in the assets directory.
         assets_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets')
-        splash_image_path = os.path.join(assets_dir, "funnycharacta2.png")
+        splash_image_path = os.path.join(assets_dir, "HBModkit_v061.png")
         if not os.path.exists(splash_image_path):
             raise FileNotFoundError(f"Splash image not found at {splash_image_path}")
         return splash_image_path
