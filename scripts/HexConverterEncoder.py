@@ -30,6 +30,7 @@ class HexConverterEncoder(QMainWindow):
                     color: #ffebcd;  
                     font-family: Consolas; 
                     font-size: 11pt;
+                    margin: 2px;
                     }
                 QLabel { 
                     color: #ffebcd;  
@@ -176,6 +177,9 @@ class HexConverterEncoder(QMainWindow):
                     color: #ffebcd;  
                     font-family: Consolas; 
                     font-size: 11pt;
+                    margin: 2px;
+                    border: 2px solid;
+                    border-color: #ffebcd;
                     }
                 QLabel { 
                     color: #ffebcd;  
@@ -220,6 +224,9 @@ class HexConverterEncoder(QMainWindow):
                     color: #000000;  
                     font-family: Consolas; 
                     font-size: 11pt;
+                    margin: 2px;
+                    border-color:  #000000;
+                    border: 2px solid;
                     }
                 QLabel { 
                     color: #000000;  
@@ -234,7 +241,6 @@ class HexConverterEncoder(QMainWindow):
                     padding-bottom:  3px;
                     padding-left: 10px;
                     padding-right: 10px;
-
                     }
                 QComboBox { 
                     background-color: #d9d9d9; 
