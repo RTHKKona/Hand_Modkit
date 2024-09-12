@@ -19,12 +19,46 @@ class HexConverterEncoder(QMainWindow):
     def init_ui(self):        
         if self.dark_mode:
             self.setStyleSheet("""
-                QMainWindow { background-color: #2b2b2b; color: #ffebcd; font-family: Consolas; font-size: 11pt;}
-                QTextEdit { background-color: #4d4d4d; color: #ffebcd; font-family: Consolas; font-size: 11pt;}
-                QLabel { color: #ffebcd; font-family: Consolas; font-size: 11pt; }
-                QPushButton { background-color: #4d4d4d; color: #ffebcd; font-family: Consolas; font-size: 11pt;}
-                QComboBox { background-color: #4d4d4d; color: #ffebcd; font-family: Consolas; font-size: 11pt;}
-                QRadioButton { color: #ffebcd; font-family: Consolas; font-size: 11pt;}
+                QMainWindow {
+                    background-color: #2b2b2b; 
+                    color: #ffebcd; 
+                    font-family: Consolas; 
+                    font-size: 11pt; 
+                    }
+                QTextEdit {
+                    background-color: #4d4d4d;
+                    color: #ffebcd;  
+                    font-family: Consolas; 
+                    font-size: 11pt;
+                    }
+                QLabel { 
+                    color: #ffebcd;  
+                    font-family: Consolas; 
+                    font-size: 11pt;
+                    margin: 1px;
+                    }
+                QPushButton {
+                    background-color: #4d4d4d; 
+                    color: #ffebcd;  
+                    font-family: Consolas; 
+                    font-size: 11pt; 
+                    margin: 2px;
+                    padding-bottom:  3px;
+                    padding-left: 10px;
+                    padding-right: 10px;
+                    }
+                QComboBox {
+                    background-color: #4d4d4d; 
+                    color: #ffebcd;  
+                    font-family: Consolas; 
+                    font-size: 11pt;
+                    margin: 1px;
+                    }
+                QRadioButton { 
+                    color: #ffebcd;  
+                    font-family: Consolas; 
+                    font-size: 11pt;
+                    }
             """)
             
         # Main widget and layout
@@ -39,7 +73,7 @@ class HexConverterEncoder(QMainWindow):
         self.hex_input_label = QLabel("Hexadecimal Input", self)
         self.hex_input = QTextEdit(self)
         self.hex_input.setPlaceholderText(
-            "Enter hexadecimal value (e.g., f09f8fb3 efb88fe2). Note: This app doesn't like it if the data isn't in 4byte format."
+            "Enter hexadecimal value (e.g., f09f8fb3 efb88fe2). Note: This app doesn't like it if the data isn't in 4 byte format."
             )
         self.hex_input.textChanged.connect(self.format_hex_input)  # Auto format input
         left_layout.addWidget(self.hex_input_label)
@@ -131,22 +165,89 @@ class HexConverterEncoder(QMainWindow):
         if self.dark_mode:
             # Switch to dark mode
             self.setStyleSheet("""
-                QMainWindow { background-color: #2b2b2b; color: #ffebcd; font-family: Consolas; font-size: 11pt; }
-                QTextEdit { background-color: #4d4d4d; color: #ffebcd;  font-family: Consolas; font-size: 11pt;}
-                QLabel { color: #ffebcd;  font-family: Consolas; font-size: 11pt;}
-                QPushButton { background-color: #4d4d4d; color: #ffebcd;  font-family: Consolas; font-size: 11pt;}
-                QComboBox { background-color: #4d4d4d; color: #ffebcd;  font-family: Consolas; font-size: 11pt;}
-                QRadioButton { color: #ffebcd;  font-family: Consolas; font-size: 11pt;}
+                QMainWindow {
+                    background-color: #2b2b2b; 
+                    color: #ffebcd; 
+                    font-family: Consolas; 
+                    font-size: 11pt; 
+                    }
+                QTextEdit {
+                    background-color: #4d4d4d;
+                    color: #ffebcd;  
+                    font-family: Consolas; 
+                    font-size: 11pt;
+                    }
+                QLabel { 
+                    color: #ffebcd;  
+                    font-family: Consolas; 
+                    font-size: 11pt;
+                    margin: 1px;
+                    }
+                QPushButton {
+                    background-color: #4d4d4d; 
+                    color: #ffebcd;  
+                    font-family: Consolas; 
+                    font-size: 11pt; 
+                    margin: 2px;
+                    padding-bottom:  3px;
+                    padding-left: 10px;
+                    padding-right: 10px;
+                    }
+                QComboBox {
+                    background-color: #4d4d4d; 
+                    color: #ffebcd;  
+                    font-family: Consolas; 
+                    font-size: 11pt;
+                    margin: 1px;
+                    }
+                QRadioButton { 
+                    color: #ffebcd;  
+                    font-family: Consolas; 
+                    font-size: 11pt;
+                    }
             """)
         else:
             # Switch to light mode
             self.setStyleSheet("""
-                QMainWindow { background-color: #ffffff; color: #000000;  font-family: Consolas; font-size: 11pt;}
-                QTextEdit { background-color: #ffffff; color: #000000;  font-family: Consolas; font-size: 11pt;}
-                QLabel { color: #000000;  font-family: Consolas; font-size: 11pt;}
-                QPushButton { background-color: #ffffff; color: #000000;  font-family: Consolas; font-size: 11pt;}
-                QComboBox { background-color: #ffffff; color: #000000;  font-family: Consolas; font-size: 11pt;}
-                QRadioButton { color: #000000;  font-family: Consolas; font-size: 11pt;}
+                QMainWindow { 
+                    background-color: #ffffff; 
+                    color: #000000;  
+                    font-family: Consolas; 
+                    font-size: 11pt;
+                    }
+                QTextEdit { 
+                    background-color: #d9d9d9; 
+                    color: #000000;  
+                    font-family: Consolas; 
+                    font-size: 11pt;
+                    }
+                QLabel { 
+                    color: #000000;  
+                    font-family: Consolas; 
+                    font-size: 11pt;}
+                QPushButton { 
+                    background-color: #d9d9d9;
+                    color: #000000;  
+                    font-family: Consolas; 
+                    font-size: 11pt; 
+                    margin: 2px;
+                    padding-bottom:  3px;
+                    padding-left: 10px;
+                    padding-right: 10px;
+
+                    }
+                QComboBox { 
+                    background-color: #d9d9d9; 
+                    color: #000000;  
+                    font-family: Consolas; 
+                    font-size: 11pt;
+                    margin: 2px;
+                    }
+                QRadioButton { 
+                    color: #000000; 
+                    font-family: Consolas; 
+                    font-size: 11pt;
+                    }
             """)
     def paste_from_clipboard(self):
         clipboard = QApplication.clipboard()

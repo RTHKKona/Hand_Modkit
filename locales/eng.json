@@ -1,6 +1,6 @@
 {
     "handburger_modkit_title": "Handburger Modkit",
-    "version": "This is version {version}.",
+    "version": "This is version v{version}.",
     "about_content": "This multi-use tool was developed to assist with and automate various modding tasks for Monster Hunter Generations Ultimate.",
     "tutorial": "Click on any tab to use it. Right-click a tab to pop-out or create a new instance of a particular tab.",
     "plug": "Find more about the developer (me!) and support them below.",

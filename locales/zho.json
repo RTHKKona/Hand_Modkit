@@ -1,6 +1,6 @@
 {
     "handburger_modkit_title": "汉堡包工具包",
-    "version": "这是版本 {version}。",
+    "version": "版本 v{version}。",
     "about_content": "此多功能工具旨在协助和自动化《怪物猎人XX》中的各种modding任务。",
     "tutorial": "点击任何标签页即可使用它。右键单击标签页可弹出或创建该工具的新实例。",
     "plug": "了解更多关于开发者（我！）的信息，并在下方支持他们。",

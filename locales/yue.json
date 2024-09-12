@@ -1,6 +1,6 @@
 {
     "handburger_modkit_title": "漢堡包工具包",
-    "version": "呢個係版本 {version}。",
+    "version": "呢個係版本 v{version}。",
     "about_content": "呢個多功能工具係專門用嚟協助同自動化《怪物獵人XX》嘅各種modding任務。",
     "tutorial": "點擊任意標籤頁使用，右擊標籤頁彈出或創建新實例。",
     "plug": "了解更多開發者嘅資訊（我！）同埋支持佢哋。",

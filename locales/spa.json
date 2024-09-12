@@ -3,7 +3,7 @@
     "language_label": "Idioma",
     "handburger_modkit_title": "Handburger Modkit",
     "about_content": "Esta es una herramienta multiuso desarrollada para ayudar en tareas de modding para Monster Hunter Generations Ultimate.",
-    "version": "Esta es la versión {version}.",
+    "version": "Esta es la versión v{version}.",
     "tutorial": "Haga clic en cualquier pestaña para usarla. Clic derecho en una ventana para abrirla o crear una nueva instancia.",
     "plug": "Descubre más sobre el desarrollador (¡yo!) y apóyalo a continuación.",
     "thanks": "Gracias a ffmpeg por las funciones de conversión, masagrator por la variación NXAenc para MHGU y vgmstream por su software de audio y dependencias.",
