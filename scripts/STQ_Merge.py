@@ -182,7 +182,6 @@ class STQMergeTool(QMainWindow):
         ])
         grid.horizontalHeader().setFont(QFont("Consolas", weight=QFont.Bold))
         grid.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
-        grid.horizontalHeader().setStyleSheet("QHeaderView::section { color: black; }")  # Set header text color to black
         grid.setEditTriggers(QTableWidget.DoubleClicked)
         return grid
 
@@ -483,7 +482,7 @@ class STQMergeTool(QMainWindow):
             QLabel { color: #ffebcd; }
             QLineEdit { background-color: #4d4d4d; color: #ffebcd; border: 1px solid #ffebcd; }
             QPushButton { background-color: #4d4d4d; color: #ffebcd; }
-            QTableWidget { background-color: #4d4d4d; color: #ffebcd; gridline-color: white; }
+            QTableWidget { background-color: #464646; color: #ffebcd; gridline-color: white; }
             QHeaderView::section { background-color: grey; color: white; }
         """
 

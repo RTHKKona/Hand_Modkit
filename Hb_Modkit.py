@@ -224,7 +224,7 @@ class HbModkit(QMainWindow):
     def init_ui(self):
         ## Initialize the main UI.
         self.setWindowTitle(f"Handburger Modkit v{VERSION}")
-        self.setGeometry(100, 70, 1650, 1000)
+        self.setGeometry(100, 50, 1650, 1000)
         self.setWindowIcon(QIcon(self.get_icon_path("egg.ico")))
 
         central_widget = QWidget(self)
@@ -536,11 +536,11 @@ class AboutTab(QWidget):
         #Update the About tab content with the current translations.
         about_text = f"""
         <h2>{translations.get('handburger_modkit_title', 'Handburger Modkit')}</h2>
-        <p>{translations.get('version', f'This is version {VERSION}.').replace('{version}', VERSION)}<br><br></p>
+        <p>{translations.get('version', f'This is version v{VERSION}.').replace('{version}', VERSION)}<br><br></p>
         <p>{translations.get('about_content', 'This multi-use tool was developed to assist with and automate various modding tasks for Monster Hunter Generations Ultimate.')}</p>
         <p>{translations.get('tutorial', 'Click on any tab to use it. Right-click a tab to pop-out or create a new instance of a particular tab.')}</p>
         <p>{translations.get('plug', 'Find more about the developer (me!) and support them below.')}</p>
-        <p>{translations.get('thanks', 'Massive thanks to my translators, ffmpeg & Dasding for their conversion functions, masagrator for the NXAenc variation for MHGU, and vgmstream for their audio software and dependencies.')}</p>
+        <p>{translations.get('thanks', 'Massive thanks to my translators, ffmpeg & Dasding for their conversion functions and dependencies, masagrator for his NXAenc variation for MHGU, and vgmstream for their audio software and dependencies.')}</p>
         <br>
         <h3>{translations.get('tool_descriptions_title', 'Tool Descriptions')}</h3>
         <ul>
