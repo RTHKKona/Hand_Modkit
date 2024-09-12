@@ -152,8 +152,14 @@ class STQTool(QMainWindow):
         grid.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
         grid.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
         grid.horizontalHeader().setStyleSheet("""
-            QHeaderView::section { color: black; }
-            QHeaderView {font-family: Consolas; font: 11pt; }
+            QHeaderView::section { 
+                background-color:  #ffebcd;
+                color: #000000; 
+                }
+            QHeaderView {
+                font-family: Consolas; 
+                font: 11pt; 
+                }
             """)
         grid.setEditTriggers(QTableWidget.DoubleClicked)
         return grid
@@ -426,10 +432,17 @@ class STQTool(QMainWindow):
     def apply_styles(self):
         # Define the style for dark mode
         dark_mode_style = """
-            QMainWindow, QDialog { background-color: #2b2b2b; color: #ffebcd; }
-            QTextEdit, QTableWidget { background-color: #4d4d4d; color: #ffebcd; }
-            QHeaderView::section { background-color: white; color: black; }
-            QLabel { color: #ffebcd; }
+            QMainWindow, QDialog { 
+                background-color: #2b2b2b; 
+                color: #ffebcd;
+                }
+            QTextEdit, QTableWidget { 
+                background-color: #4d4d4d; 
+                color: #ffebcd; 
+                }
+            QLabel { 
+                color: #ffebcd; 
+                }
             QPushButton {
                 background-color: #4c4c4c; 
                 color: #ffebcd; 
