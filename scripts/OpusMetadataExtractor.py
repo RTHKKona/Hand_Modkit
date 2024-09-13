@@ -145,7 +145,7 @@ class OpusMetadataExtractor(QMainWindow):
             with open(self.license_file, 'r') as file:
                 license_text = file.read()
             self.log("[INFO] Displaying License:\n" + license_text)
-            self.log(f"\n\n[INITIALISATION SUCCESS] Welcome to Opus Metadata Extractor v{VERSION}, a script within Handburger's Modkit. This tool helps you gather the metadata from Opus files for further modifications.\n\n")
+            self.log(f"\n\n[INITIALISATION SUCCESS] Welcome to Opus Metadata Extractor v{VERSION}, a module within Handburger's Modkit. This tool helps you gather the metadata from Opus files for further modifications.\n\n")
         else:
             self.log("[ERROR] vgm_COPYING.txt License file not found.")
     
@@ -431,7 +431,6 @@ class OpusMetadataExtractor(QMainWindow):
                 font-family: Consolas;
                 font-size: 12pt;
                 padding: 5px;
-                border: 3px;
                 border-style: outset;
             }
             QPushButton::hover, QPushButton::pressed {
@@ -442,9 +441,10 @@ class OpusMetadataExtractor(QMainWindow):
         dark_mode_styles = """
             QMainWindow { background-color: #2b2b2b; color: #ffebcd;}
             QTextEdit { background-color: #4d4d4d; color: #ffebcd; margin: 3px; padding-bottom: 5px;}
-            QPushButton { background-color: #4d4d4d; color: #ffebcd; border: 3px solid #ffebcd; }
+            QPushButton { background-color: #4d4d4d; color: #ffebcd; border: 2px solid #ffebcd; }
             QPushButton::hover{
-                background-color: #3b3b3b;
+                background-color: #ffebcd;
+                color: #000000
             }
             QMessageBox::QLabel { color: #ffebcd; }  
             QMessageBox::QPushButton { background-color: #4d4d4d; color: #ffebcd; }  
@@ -454,9 +454,10 @@ class OpusMetadataExtractor(QMainWindow):
         light_mode_styles = """
             QMainWindow { background-color: #f0f0f0; color: #000000; }
             QTextEdit { background-color: #ffffff; color: #000000; margin: 3px; padding-bottom: 5px;}
-            QPushButton { background-color: #ffffff; color: #000000; border: 3px solid #4c4c4c; }
+            QPushButton { background-color: #ffffff; color: #000000; border: 2px solid #4c4c4c; }
             QPushButton::hover{
-                background-color: #d2d2d2;
+                background-color: #4c4c4c;
+                color:  #ffffff
             }
             QMessageBox QLabel { color: #000000; }  
             QMessageBox QPushButton { background-color: #ffffff; color: #000000; }  

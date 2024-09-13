@@ -176,7 +176,7 @@ class FolderMaker(QMainWindow):
             QLabel { color: #ffebcd; }
             QLineEdit { background-color: #4d4d4d; color: #ffebcd; border: 1px solid #ffebcd; }
             QPushButton { background-color: #4d4d4d; color: #ffebcd; border:  2px solid #ffebcd; }
-            QPushButton::hover, QPushButton::pressed { background-color: #ffebcd;  color: #4d4d4d;}
+            QPushButton::hover, QPushButton::pressed { background-color: #ffebcd;  color: #000000;}
         """
         
         light_mode_styles = """

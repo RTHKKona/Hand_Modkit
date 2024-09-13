@@ -1,13 +1,12 @@
 # Handburger's Hb_Modkit alpha release 
 # Version management
-VERSION = "0.6.1"
+VERSION = "0.6.2a"
 
-
-import sys, os, random, json
+import sys, os, random, json, logging
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QTabWidget, QVBoxLayout, QWidget, QLabel, 
     QDesktopWidget, QHBoxLayout, QTextBrowser, QPushButton, QStyle, QMenu,
-    QProgressBar, QSpacerItem, QSizePolicy, 
+    QProgressBar, QSpacerItem, QSizePolicy, QMessageBox
 )
 from PyQt5.QtGui import QIcon, QPixmap, QFont
 from PyQt5.QtCore import Qt, QTimer, QEventLoop
@@ -16,6 +15,21 @@ from scripts import (
     NSOpusConverter, OpusMetadataExtractor, STQ_Merge, MCAConverter, MCA_Forge
 )
 
+logging.basicConfig(level=logging.ERROR, format='%(asctime)s - %(levelname)s - %(message)s')
+
+# Global exception handler
+def handle_exception(exc_type, exc_value, exc_traceback):
+    if issubclass(exc_type, KeyboardInterrupt):
+        # Allow KeyboardInterrupt to close the application gracefully
+        sys.__excepthook__(exc_type, exc_value, exc_traceback)
+        return
+    # Log the error
+    logging.error("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))
+    # Show a user-friendly error message
+    QMessageBox.critical(None, "Application Error", "An unexpected error occurred. Please check the logs.", QMessageBox.Ok)
+
+# Set the global exception handler
+sys.excepthook = handle_exception
 
 class LocaleManager:
     ## Handles loading and managing translations for multiple locales.
@@ -33,22 +47,25 @@ class LocaleManager:
                 self.load_translations(locale)
 
     def load_translations(self, locale):
-        ## Loads the translations from the JSON file for the given locale.
         locale_file = os.path.join(os.path.dirname(__file__), 'locales', f'{locale}.json')
         try:
             with open(locale_file, 'r', encoding='utf-8') as f:
                 self.translations = json.load(f)
         except FileNotFoundError:
-            pass  ## Locale file not found, proceed without translations
+            logging.error(f"Locale file not found: {locale_file}")
+            self.translations = {}  # Use empty translations
         except json.JSONDecodeError:
-            pass  ## JSON decoding error, proceed without translations
-        except Exception:
-            pass  ## General exception, proceed without translations
+            logging.error(f"Error decoding JSON file: {locale_file}")
+            self.translations = {}  # Proceed with empty translations
+        except Exception as e:
+            logging.error(f"Unexpected error while loading translations: {str(e)}")
+            self.translations = {}  # Fallback to empty translations
 
     def get_translation(self, key, default_value=None):
         ## Retrieve a translation for the given key.
         return self.translations.get(key, default_value)
-
+    
+    
 
 class CustomTitleBar(QWidget):
     ## Custom title bar with minimize, maximize/restore, and close buttons.
@@ -113,7 +130,6 @@ class CustomTitleBar(QWidget):
         ## Close the application window.
         self.window().close()
 
-
 class PoppableTabWidget(QTabWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -122,6 +138,21 @@ class PoppableTabWidget(QTabWidget):
         self.customContextMenuRequested.connect(self.show_tab_context_menu)
         self.tab_windows = {}
         self.tab_data_store = {}
+
+        self.setStyleSheet("""
+            QTabBar::tab { 
+                background: #4d4d4d; 
+                color: #00ced1; 
+                padding: 12px; 
+            }
+            QTabBar::tab:selected { 
+                background: #555; 
+                color:  #1ffcff; 
+            }
+            QTabWidget::pane { 
+                border: 1px solid #444; 
+            }
+        """)
 
         ## Dictionary of tools for easy access
         self.tools = {
@@ -142,8 +173,8 @@ class PoppableTabWidget(QTabWidget):
         ## Show context menu for tab options like popping out.
         index = self.tabBar().tabAt(position)
         tab_name = self.tabText(index)
-        if tab_name == "About":
-            return  ## Skip the About tab
+        if tab_name == "Main Hub":
+            return  ## Skip the Main Hub tab
 
         menu = QMenu()
 
@@ -156,10 +187,20 @@ class PoppableTabWidget(QTabWidget):
         menu.exec_(self.mapToGlobal(position))
 
     def create_tool_instance(self, tool_name):
-        ## Create a new instance of the selected tool.
         tool_class = self.tools.get(tool_name)
         if tool_class:
-            self.create_new_window(tool_class(), f"{tool_name} - New Instance", {})
+            try:
+                self.create_new_window(tool_class(), f"{tool_name} - New Instance", {})
+            except Exception as e:
+                logging.error(f"Failed to create tool instance '{tool_name}': {str(e)}")
+                self.show_error_message(f"Failed to create tool instance '{tool_name}'. Please try again.")
+    def show_error_message(self, message):
+        from PyQt5.QtWidgets import QMessageBox
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Critical)
+        msg.setWindowTitle("Error")
+        msg.setText(message)
+        msg.exec_()
     
     def serialize_tab_state(self, widget):
         ## Serialize the state of the tab for potential restoration.
@@ -210,7 +251,6 @@ class PoppableTabWidget(QTabWidget):
         menu.addAction("Re-merge Tab", lambda: self.remerge_tab(widget, title))
         menu.exec_(window.mapToGlobal(position))
 
-
 class HbModkit(QMainWindow):
     ## Main application class for the Handburger Modkit.
     def __init__(self):
@@ -223,7 +263,7 @@ class HbModkit(QMainWindow):
 
     def init_ui(self):
         ## Initialize the main UI.
-        self.setWindowTitle(f"Handburger Modkit v{VERSION}")
+        self.setWindowTitle(f"Handburger's Modkit v{VERSION}")
         self.setGeometry(100, 50, 1650, 1000)
         self.setWindowIcon(QIcon(self.get_icon_path("egg.ico")))
 
@@ -236,9 +276,11 @@ class HbModkit(QMainWindow):
 
         self.setCentralWidget(central_widget)
         self.add_tabs()
-        self.apply_dark_mode_theme()
         self.create_menu_bar()  ## Create the menu bar with the settings
-
+        self.tab_widget.currentChanged.connect(self.toggle_stylesheet_based_on_tab)
+        
+        self.toggle_stylesheet_based_on_tab(0)
+    
     def create_menu_bar(self):
         ## Create the settings menu and apply translations.
         menu_bar = self.menuBar()
@@ -247,24 +289,24 @@ class HbModkit(QMainWindow):
         settings_menu = menu_bar.addMenu(self.locale_manager.get_translation("settings_label", "Settings"))
         menu_bar.setStyleSheet("""
         QMenuBar {
-            background-color: #2b2b2b;  /* Background color of the menu bar */
-            color: #ffebcd;  /* Default text color */
+            background-color: #2b2b2b;
+            color: #ffebcd;
             font-size: 12px;
         }
         QMenuBar::item {
-            background-color: #2b2b2b;  /* Background color of items */
-            color: #ffebcd;  /* Default text color of items */
-            padding: 5px 10px; /* Padding top&bottom, leftright */
-            margin: 2px; /* buffer */
+            background-color: #2b2b2b;
+            color: #ffebcd; 
+            padding: 5px 10px; 
+            margin: 2px;
             min-width: 100px; 
         }
-        QMenuBar::item:selected {  /* Hover effect */
-            background-color: #555555;  /* Background color on hover */
-            color: #ffebcd;  /* Text color on hover */
+        QMenuBar::item:selected {  
+            background-color: #555555; 
+            color: #ffebcd;
         }
         QMenuBar::item:pressed {
-            background-color: #333333;  /* Background color when pressed */
-            color: #ffebcd;  /* Text color when pressed */
+            background-color: #333333; 
+            color: #ffebcd;
         }
     """)
 
@@ -275,64 +317,61 @@ class HbModkit(QMainWindow):
         settings_menu.addMenu(language_menu)
 
     def add_tabs(self):
-        ## Add tool tabs to the main window.
-        tools = {  ## Remember to add commas
-            "About": AboutTab,  ## Initialize AboutTab with locale_manager
+        ## Add the "Main Hub" tab first
+        self.tab_widget.addTab(MainHubTab(self.locale_manager), "Main Hub")
+        
+        ## Dictionary of the other tools
+        tools = {
             "STQ Editor Tool": stq_tool.STQTool,
             "Opus Header Injector": OpusHeaderInjector.OpusHeaderInjector,
             "Audio Calculator": AudioCalculator.AudioCalculator,
             "FolderMaker": FolderMaker.FolderMaker,
             "Hex Enc/Decoder": HexConverterEncoder.HexConverterEncoder,
-            "NS Opus Converter": NSOpusConverter.NSOpusConverter,
+            "NS Opus Converter": NSOpusConverter.ns_OpusConverter,
             "Opus Metadata Extractor": OpusMetadataExtractor.OpusMetadataExtractor,
             "STQ Merge Tool": STQ_Merge.STQMergeTool,
-            "MCA Converter" : MCAConverter.WavToMcaConverter,
-            "MCA Forge" : MCA_Forge.MCA_Forge,
+            "MCA Converter": MCAConverter.WavToMcaConverter,
+            "MCA Forge": MCA_Forge.MCA_Forge
         }
+
+        ## Sort the remaining tools alphabetically
         sorted_tools = {k: tools[k] for k in sorted(tools.keys())}
         
+        ## Add the sorted tools as tabs
         for name, tool in sorted_tools.items():
             try:
-                if name == "About":
-                    self.tab_widget.addTab(tool(self.locale_manager),name)
-                else:
-                    self.tab_widget.addTab(tool(), name)
+                self.tab_widget.addTab(tool(), name)
             except Exception as e:
-                print(f"error adding tab '{name}' : {e}")
+                print(f"Error adding tab '{name}': {e}")
 
-
-    def apply_dark_mode_theme(self):
-        ## Apply dark mode styling to the main window.
-        self.setStyleSheet("""
-            QMainWindow { background-color: #2b2b2b; color: #ffebcd; }
-            QTabWidget::pane { border: 1px solid #444; }
-            QWidget { background-color: #3c3c3c; color: #ffffff; }
-            QTabBar::tab { background: #4d4d4d; color: #ffffff; padding: 10px; }
-            QTabBar::tab:selected { background: #555; }
-        """)
 
     def get_icon_path(self, icon_name):
-        ## Get the path to an icon file in the assets directory.
-        assets_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets')
-        icon_path = os.path.join(assets_dir, icon_name)
-        if not os.path.exists(icon_path):
-            raise FileNotFoundError(f"Icon not found at {icon_path}")
-        return icon_path
+        try:
+            assets_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets')
+            icon_path = os.path.join(assets_dir, icon_name)
+            if not os.path.exists(icon_path):
+                raise FileNotFoundError(f"Icon not found at {icon_path}")
+            return icon_path
+        except FileNotFoundError as e:
+            logging.error(str(e))
+            self.show_error_message(f"Icon '{icon_name}' not found. Please check your assets directory.")
+            return None
+
     
     def set_locale(self, locale):
         ## Set the application locale and reload translations.
         self.locale_manager.set_locale(locale)
         self.create_menu_bar()  ## Recreate menu bar to apply translations
-        self.update_about_tab()  ## Update the About tab with new translations
+        self.update_main_hub_tab()  ## Update the Main Hub tab with new translations
         self.update_tool_translations()  ## Update all tool translations
     
-    def update_about_tab(self):
-        ## Updates the About tab with the current translations.
+    def update_main_hub_tab(self):
+        ## Updates the Main Hub tab with the current translations.
         for i in range(self.tab_widget.count()):
-            if self.tab_widget.tabText(i) == "About":
-                about_tab = self.tab_widget.widget(i)
-                if isinstance(about_tab, AboutTab):
-                    about_tab.update_translations(self.locale_manager.translations)
+            if self.tab_widget.tabText(i) == "Main Hub":
+                main_hub_tab = self.tab_widget.widget(i)
+                if isinstance(main_hub_tab, MainHubTab):
+                    main_hub_tab.update_translations(self.locale_manager.translations)
 
     def update_tool_translations(self):
         ## Updates all tools with the current translations.
@@ -340,7 +379,26 @@ class HbModkit(QMainWindow):
             widget = self.tab_widget.widget(i)
             if hasattr(widget, 'update_translations'):
                 widget.update_translations(self.locale_manager.translations)
-
+    
+    def toggle_stylesheet_based_on_tab(self, index):
+        ## Toggle the stylesheet based on the selected tab
+        tab_name = self.tab_widget.tabText(index)
+        if tab_name == "Main Hub":
+            # Apply the stylesheet when the "Main Hub" tab is selected
+            self.setStyleSheet("""
+                QMainWindow {
+                    font-family: Consolas;
+                    background-color: #2c2c2c;
+                    color: #ffebcd;
+                }
+                QTextBrowser {
+                    background-color: #2c2c2c;
+                    color: #ffebcd;
+                }
+            """)
+        else:
+            # Remove the stylesheet when other tabs are selected
+            self.setStyleSheet("")
 
 class SplashScreen(QMainWindow):
     ## Splash screen displayed during application startup.
@@ -371,7 +429,7 @@ class SplashScreen(QMainWindow):
                 background-color: #3c3c3c;
                 border-style: outset;
                 border-radius: 6px;
-                border: 2px solid; 
+                border: 2px solid #ffebcd; 
                 text-align: center;
                 font: bold 14px;
                 padding: 2px;
@@ -380,6 +438,7 @@ class SplashScreen(QMainWindow):
             QProgressBar::chunk {
                 background-color: #30d5c8;
                 width: 10px;
+
             }          
         """)
         self.progress_bar.setMaximum(100)
@@ -392,12 +451,17 @@ class SplashScreen(QMainWindow):
         self.center_on_screen()
 
     def get_splash_image_path(self):
-        ## Get the path to the splash image in the assets directory.
-        assets_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets')
-        splash_image_path = os.path.join(assets_dir, "HBModkit_v061.png")
-        if not os.path.exists(splash_image_path):
-            raise FileNotFoundError(f"Splash image not found at {splash_image_path}")
-        return splash_image_path
+        try:
+            assets_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets')
+            for file_name in os.listdir(assets_dir):
+                if file_name.lower().startswith("hbmodkit") and file_name.lower().endswith(('.png', '.jpg', '.jpeg')):
+                    return os.path.join(assets_dir, file_name)
+            raise FileNotFoundError("No splash image found matching 'HBModkit*'.")
+        except FileNotFoundError as e:
+            logging.error(str(e))
+            self.show_error_message("Splash image not found. Please make sure the assets directory contains a valid splash image.")
+            return None
+
 
     def center_on_screen(self):
         ## Center the splash screen on the user's display.
@@ -412,40 +476,68 @@ class SplashScreen(QMainWindow):
         QTimer.singleShot(3000, self.close)
         self.show()
 
-class AboutTab(QWidget):
+class MainHubTab(QWidget):
     def __init__(self, locale_manager):
         super().__init__()
         self.locale_manager = locale_manager
-        self.scale_factor = 0.70  # Scale to 60% of window height
+        self.scale_factor = 0.70  # 70% Scaling
         self.portrait_label = QLabel(self)
-        
+
         # Timer to throttle resizing events
         self.resize_timer = QTimer(self)
         self.resize_timer.setSingleShot(True)
         self.resize_timer.timeout.connect(self.set_character_portrait)
-        
+
         self.init_ui()
 
     def init_ui(self):
+        # Set background color for the entire MainHubTab widget using QStyleSheet
+        self.setStyleSheet("""
+            QWidget {
+                color: #ffebcd;             /* Text color */
+                font-family: "JetBrains Mono";  /* Font style */
+                font-size: 13px;  /* Font size for consistency */
+            }
+        """)
         # Create the main layout (horizontal: text on the left, portrait on the right)
         self.layout = QHBoxLayout()
 
-        # Left column for text and links
-        right_layout = QVBoxLayout()
-        self.text_browser = QTextBrowser(self)
-        right_layout.addWidget(self.text_browser)
-
-        # Create a layout for the links (GitHub, Ko-fi)
-        self.link_layout = QVBoxLayout()
-        right_layout.addLayout(self.link_layout)
-
-        # Right column for the portrait
+        # Left column for the portrait image
         left_layout = QVBoxLayout()
         self.set_character_portrait()  # Set the portrait dynamically
         left_layout.addWidget(self.portrait_label)
 
         # Add a spacer to push the image to the bottom
         left_layout.addSpacerItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
+
+        # Right column for text and links
+        right_layout = QVBoxLayout()
+
+        # Set style for the QTextBrowser to remove white background and use dark theme
+        self.text_browser = QTextBrowser(self)
+        self.text_browser.setStyleSheet("""
+            QTextBrowser {
+                background-color: #2c2c2c;
+                color: #ffebcd;
+                border: 2px solid #ffebcd;
+            }
+            QScrollBar:vertical {
+                background-color: #2b2b2b;
+                width: 16px;
+                margin: 16px 0 16px 0;
+                border: 1px solid #444;
+            }
+            QScrollBar::handle:vertical {
+                background-color: #555;
+                min-height: 20px;
+                border-radius: 4px;
+            }
+        """)
+        right_layout.addWidget(self.text_browser)
+
+        # Layout for external links (GitHub, Ko-fi)
+        self.link_layout = QVBoxLayout()
+        right_layout.addLayout(self.link_layout)
 
         # Add both the left and right layouts to the main horizontal layout
         self.layout.addLayout(left_layout)
@@ -460,11 +552,6 @@ class AboutTab(QWidget):
         # Initially set up the translations (this won't add links again)
         self.update_translations({})
 
-    def resizeEvent(self, event):
-        # Handle window resizing and throttle the portrait resizing
-        # Start a timer when the window is resized; delay execution by 100ms
-        self.resize_timer.start(100)
-
     def set_character_portrait(self):
         # Set and scale the character portrait based on window size.
         try:
@@ -472,7 +559,7 @@ class AboutTab(QWidget):
             pixmap = QPixmap(portrait_path)
 
             # Calculate the scaled height as 60% of the window's height
-            scaled_height = int(self.height() * self.scale_factor)
+            scaled_height = int(self.height())
             scaled_pixmap = pixmap.scaledToHeight(
                 scaled_height,
                 Qt.SmoothTransformation
@@ -482,17 +569,16 @@ class AboutTab(QWidget):
             self.portrait_label.setAlignment(Qt.AlignCenter)
             self.portrait_label.setStyleSheet("""
                 QLabel {
-                    border: 2px solid black; /* Thickness and Colour*/
-                    border-radius: 5px; /*Rounded*/
+                    border: 2px solid black; /* Thickness and Colour */
+                    border-radius: 5px; /*Rounded */
                 }
-                
             """)
         except FileNotFoundError:
             self.portrait_label.setText("Portrait not found.")
             self.portrait_label.setAlignment(Qt.AlignCenter)
 
     def get_resource_path(self, filename):
-        #Get the path to a resource file in the assets directory
+        # Get the path to a resource file in the assets directory
         script_dir = os.path.dirname(os.path.abspath(__file__))
         assets_path = os.path.join(script_dir, 'assets', filename)
         if not os.path.exists(assets_path):
@@ -500,7 +586,7 @@ class AboutTab(QWidget):
         return assets_path
 
     def add_links(self):
-        #Add the GitHub and Ko-fi links to the layout
+        # Add the GitHub and Ko-fi links to the layout
         try:
             self.link_layout.addLayout(self.create_link_layout(
                 self.get_resource_path("github.png"),
@@ -513,11 +599,11 @@ class AboutTab(QWidget):
                 self.locale_manager.get_translation('kofi_link', "Ko-fi - Handburger"),
                 "https://ko-fi.com/handburger", 64
             ))
-        except FileNotFoundError as e:
-            print(f"Error loading link images: {e}")
+        except FileNotFoundError:
+            pass
 
     def create_link_layout(self, icon_path, text, url, icon_size):
-        #Create a layout for a hyperlink with an icon.
+        # Create a layout for a hyperlink with an icon.
         layout = QHBoxLayout()
 
         icon_label = QLabel(self)
@@ -533,11 +619,13 @@ class AboutTab(QWidget):
         return layout
 
     def update_translations(self, translations):
-        #Update the About tab content with the current translations.
+        # Method to update translations
         about_text = f"""
-        <h2>{translations.get('handburger_modkit_title', 'Handburger Modkit')}</h2>
+        <html>
+        <body>
+        <h2>{translations.get('handburger_modkit_title', "Handburger's Modkit")}</h2>
         <p>{translations.get('version', f'This is version v{VERSION}.').replace('{version}', VERSION)}<br><br></p>
-        <p>{translations.get('about_content', 'This multi-use tool was developed to assist with and automate various modding tasks for Monster Hunter Generations Ultimate.')}</p>
+        <p>{translations.get('about_content', 'This multi-use modkit was developed to assist with and automate various modding tasks for Monster Hunter Generations Ultimate.')}</p>
         <p>{translations.get('tutorial', 'Click on any tab to use it. Right-click a tab to pop-out or create a new instance of a particular tab.')}</p>
         <p>{translations.get('plug', 'Find more about the developer (me!) and support them below.')}</p>
         <p>{translations.get('thanks', 'Massive thanks to my translators, ffmpeg & Dasding for their conversion functions and dependencies, masagrator for his NXAenc variation for MHGU, and vgmstream for their audio software and dependencies.')}</p>
@@ -547,38 +635,31 @@ class AboutTab(QWidget):
         """
 
         tools = {
-            "STQ Editor Tool": translations.get('stq_editor_tool_desc', "A tool for editing and viewing STQ/STQR files, including hex pattern analysis."),
-            "STQ Merge Tool": translations.get('stq_merge_tool_desc', "Merging and managing STQR file conflicts between multiple mods."),
-            "Opus Header Injector": translations.get('opus_header_injector_desc', "Allows users to inject or modify .Opus headers within .Opus files."),
-            "Audio Calculator": translations.get('audio_calculator_desc', "A utility for calculating audio properties such as bitrate, file size, and duration."),
-            "FolderMaker": translations.get('foldermaker_desc', "Helps in organizing and creating folders necessary for modding projects."),
-            "MCA Converter": translations.get('mcaconvert_desc', "Converts audio files into .MCA format. For use with the MCA Header Injector for modding."),
-            "MCA Forger": translations.get('mcaforge_desc', "Allows users to import two .MCA files—an original and a replacement—and merge key elements to create a new custom header with a preset structure."),
-            "Hex Enc/Decoder": translations.get('hex_enc_decoder_desc', "Encodes or decodes hexadecimal data, useful for file conversions and analysis."),
-            "NS Opus Converter": translations.get('nsopus_converter_desc',"Converts audio files to and from the Opus format, with support for Nintendo Switch Opus MHGU-specific formats."),
-            "Opus Metadata Extractor": translations.get('opus_metadata_extractor_desc', "Extracts metadata from Opus files for easier management and editing.")
+            "STQ Editor Tool": (stq_tool.VERSION, translations.get('stq_editor_tool_desc', "A tool for editing and viewing STQ/STQR files, including hex pattern analysis.<br>")),
+            "STQ Merge Tool": (STQ_Merge.VERSION, translations.get('stq_merge_tool_desc', "Merging and managing STQR file conflicts between multiple mods.<br>")),
+            "Opus Header Injector": (OpusHeaderInjector.VERSION, translations.get('opus_header_injector_desc', "Allows users to inject or modify .Opus headers within .Opus files.<br>")),
+            "Audio Calculator": (AudioCalculator.VERSION, translations.get('audio_calculator_desc', "A utility for calculating audio properties such as bitrate, file size, and duration.<br>")),
+            "FolderMaker": (FolderMaker.VERSION, translations.get('foldermaker_desc', "Helps in organizing and creating folders necessary for modding projects.<br>")),
+            "MCA Converter": (MCAConverter.VERSION, translations.get('mcaconvert_desc', "Converts audio files into .MCA format. For use with the MCA Header Injector for modding.<br>")),
+            "MCA Forge": (MCA_Forge.VERSION, translations.get('mcaforge_desc', "Allows users to import two .MCA files—an original and a replacement—and merge key elements to create a new custom header with a preset structure.<br>")),
+            "Hex Enc/Decoder": (HexConverterEncoder.VERSION, translations.get('hex_enc_decoder_desc', "Encodes or decodes hexadecimal data, useful for file conversions and analysis.<br>")),
+            "NS Opus Converter": (NSOpusConverter.VERSION, translations.get('nsopus_converter_desc', "Converts audio files to Opus format, with support for Nintendo Switch Opus MHGU-specific formats.<br>")),
+            "Opus Metadata Extractor": (OpusMetadataExtractor.VERSION, translations.get('opus_metadata_extractor_desc', "Extracts metadata from Opus files for easier management and editing.<br>"))
         }
 
         sorted_tools = dict(sorted(tools.items()))
-        for tool, description in sorted_tools.items():
-            about_text += f"<li><b>{tool}:</b> {description}</li>"
+        for tool, (version, description) in sorted_tools.items():
+            about_text += f"<li><b>{tool} (v{version}):</b> {description}</li>"
 
-        about_text += "</ul>"
+        about_text += "</ul></body></html>"
 
         self.text_browser.setHtml(about_text)
-        self.text_browser.setOpenExternalLinks(True)
-
-        # Set font size
-        font = QFont("JetBrains Mono", 12)
-        font.setPointSize(11)
-        self.text_browser.setFont(font)
 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     
     main_window = HbModkit()
-    main_window.setWindowState(Qt.WindowMinimized)
     
     splash = SplashScreen()
     splash.show()

@@ -425,7 +425,6 @@ class STQTool(QMainWindow):
             QPushButton {
                 padding:  5px;
                 border-style: outset; 
-                border-width: 3px; 
                 font-family: Consolas; 
                 font-size: 12pt;
             }
@@ -464,13 +463,11 @@ class STQTool(QMainWindow):
             QPushButton {
                 background-color: #4c4c4c; 
                 color: #ffebcd;
+                border:  2px solid #ffebcd;
             }
-            QPushButton::pressed {
-                background-color: #333333;
-            }
-            QPushButton::hover {
-                background-color: #3f3f3f;
-                color: #ffffff;
+            QPushButton::pressed, QPushButton::hover {
+                background-color: #ffebcd;
+                color: #000000;
             }
             QHeaderView::section { 
                 background-color: #ffebcd;
@@ -487,13 +484,11 @@ class STQTool(QMainWindow):
             QPushButton {
                 background-color: white;
                 color: black;
+                border:   2px solid #d3d3d3;
             }
-            QPushButton::hover {
+            QPushButton::hover, QPushButton::pressed  {
                 background-color: #d3d3d3;
                 color: black;
-            }
-            QPushButton::pressed {
-                background-color: #d9d9d9
             }
             QHeaderView::section { 
                 background-color: #ebebeb;

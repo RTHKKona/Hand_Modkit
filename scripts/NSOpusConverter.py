@@ -1,6 +1,6 @@
 # NS Opus Converter
 # Version management
-VERSION = "1.7.6"
+VERSION = "1.7.7"
 
 import os, sys, shutil, subprocess, webbrowser, random
 from PyQt5.QtWidgets import (
@@ -141,8 +141,8 @@ class ns_OpusConverter(QMainWindow):
             self.log("\nAll dependencies found. Dependency check complete.\n")
             self.dependencies_valid = True
             self.browse_button.setEnabled(True)
-
-        self.log("\nBrowse audio files to convert various audio files (mp3, wav, flac) into a valid .Opus audio format used by MHGU.\n\n\n\n\n")
+        self.log(f"[INITIALISATION SUCCESS] NS Opus Converter v{VERSION} is an audio conversion module within Handburger's Modkit.\n")
+        self.log("\n[REQUEST] Browse audio files to convert various audio files (mp3, wav, flac) into a valid .Opus audio format used by MHGU.\n\n\n\n\n")
 
     def show_dependency_error(self, missing_dependencies):
         message = (

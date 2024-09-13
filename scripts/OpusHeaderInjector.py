@@ -1,8 +1,8 @@
 # Opus Header Injector
 # Version management
-VERSION = "1.1.0"
+VERSION = "1.1.2"
 
-import sys,struct,os
+import sys, struct, os
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QTextEdit, QFileDialog, QSplitter,
     QTableWidget, QTableWidgetItem, QHeaderView, QAction, QMessageBox, QSizePolicy, QLabel, QMenuBar
@@ -19,7 +19,7 @@ class OpusHeaderInjector(QMainWindow):
         self.is_second_file_loaded = False  # Clearer naming
         self.headers = [
             "Stream Total Samples", "Number of Channels", "Loop Start (samples)", "Loop End (samples)"
-        ]  # Removed 'Buffer' and 'Unknown' headers
+        ]
         self.full_headers = [
             "Stream Total Samples", "Number of Channels", "Loop Start (samples)", "Loop End (samples)",
             "Buffer 1", "Buffer 2", "Buffer 3", "Buffer 4", "Unknown 1", "Unknown 2", "Unknown 3", "Unknown 4"
@@ -68,21 +68,12 @@ class OpusHeaderInjector(QMainWindow):
         self.header_table.setColumnCount(4)  # Show only 4 headers
         self.header_table.setHorizontalHeaderLabels(self.headers)
         self.header_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        self.header_table.horizontalHeader().setStyleSheet("""
-            QHeaderView::section{
-                background-color: #ffebcd;
-                color: #000000;
-                font-family: Consolas; font: 11pt;
-                margin: 2px;
-            }
-        """)
         self.header_table.setEditTriggers(QTableWidget.AllEditTriggers)
 
         splitter.addWidget(self.hex_view)
         splitter.addWidget(self.header_table)
 
         button_layout = QHBoxLayout()
-
 
         self.load_button = QPushButton("Load .Opus File", self)
         self.load_button.clicked.connect(self.load_file)
@@ -116,6 +107,82 @@ class OpusHeaderInjector(QMainWindow):
         self.init_menu()
         self.apply_styles()  # Apply the initial styles
         self.show()
+
+    def apply_styles(self):
+        # Common styles (applies to both dark and light modes)
+        common_styles = """
+            QPushButton {
+                font-family: Consolas;
+                font-size: 12pt;
+                padding: 6px;
+                border-style: outset;
+                min-width: 120px;
+            }
+            QPushButton::hover {
+                border-style: inset;
+            }
+        """
+
+        # Dark mode-specific styles
+        dark_mode_styles = """
+            QMainWindow { background-color: #2b2b2b; color: #ffebcd; }
+            QTextEdit { background-color: #4d4d4d; color: #ffebcd; }
+            QLabel { color: #ffebcd; }
+            QPushButton { background-color: #4d4d4d; color: #ffebcd; border: 3px solid #ffebcd; }
+            QPushButton::hover {background-color: #ffebcd; color: #000000;}
+            QTableWidget { background-color: #4d4d4d; color: #ffebcd; gridline-color: white; }
+            QHeaderView::section { background-color: grey; color: white; }
+        """
+
+        # Light mode-specific styles
+        light_mode_styles = """
+            QMainWindow { background-color: white; color: black; }
+            QTextEdit { background-color: white; color: black; }
+            QLabel { color: black; }
+            QPushButton { background-color: #f0f0f0; color: black; border: 3px solid #cacaca; }
+            QPushButton::hover { background-color: #cacaca; }
+            QTableWidget { background-color: #f0f0f0; color: black; gridline-color: black; }
+            QHeaderView::section { background-color: lightgrey; color: black; }
+        """
+
+            # Header stylesheet depending on the mode
+        if self.dark_mode:
+            header_stylesheet = """
+                QHeaderView::section{
+                    background-color: #ffebcd;
+                    color: #000000;
+                    font-family: Consolas;
+                    font-size: 11pt;
+                    margin: 2px;
+                    font-weight: bold;
+                }
+            """
+        else:
+            header_stylesheet = """
+                QHeaderView::section{
+                    background-color: lightgrey;
+                    color: black;
+                    font-family: Consolas;
+                    font-size: 11pt;
+                    margin: 2px;
+                    font-weight: bold;
+                }
+            """
+        self.header_table.horizontalHeader().setStyleSheet(header_stylesheet)
+
+        # Combine common styles with mode-specific styles
+        if self.dark_mode:
+            full_stylesheet = common_styles + dark_mode_styles
+        else:
+            full_stylesheet = common_styles + light_mode_styles
+
+        # Apply the combined stylesheet
+        self.setStyleSheet(full_stylesheet)
+
+        # Apply specific font styles for the "No Header Loaded" label
+        self.header_info_label.setStyleSheet("font-family: Consolas; font-size: 9pt;")
+
+        self.update_loaded_file_label()
 
     def create_themed_messagebox(self, title, text):
         msg_box = QMessageBox(self)
@@ -384,52 +451,6 @@ class OpusHeaderInjector(QMainWindow):
     def toggle_theme(self):
         self.dark_mode = not self.dark_mode
         self.apply_styles()
-
-    def apply_styles(self):
-        # Common styles (applies to both dark and light modes)
-        common_styles = """
-            QPushButton {
-                font-family: Consolas;
-                font-size: 12pt;
-                padding: 6px;
-                border-style: outset;
-            }
-            QPushButton::hover {
-                border-style:  inset;
-            }
-        """
-        
-        # Dark mode-specific styles
-        dark_mode_styles = """
-            QMainWindow { background-color: #2b2b2b; color: #ffebcd; }
-            QTextEdit { background-color: #4d4d4d; color: #ffebcd; }
-            QLabel { color: #ffebcd; }
-            QPushButton { background-color: #4d4d4d; color: #ffebcd; border:  3px solid #ffebcd; }
-            QPushButton::hover {background-color: #ffebcd; color: #000000;}
-            QTableWidget { background-color: #4d4d4d; color: #ffebcd; gridline-color: white; }
-            QHeaderView::section { background-color: grey; color: white; }
-        """
-        
-        # Light mode-specific styles
-        light_mode_styles = """
-            QMainWindow { background-color: white; color: black; }
-            QTextEdit { background-color: white; color: black; }
-            QLabel { color: black; }
-            QPushButton { background-color: #f0f0f0; color: black; border: 3px solid #cacaca; }
-            QPushButton::hover { background-color: #cacaca;}
-            QTableWidget { background-color: #f0f0f0; color: black; gridline-color: black; }
-            QHeaderView::section { background-color: lightgrey; color: black; }
-        """
-        
-        # Combine common styles with mode-specific styles
-        if self.dark_mode:
-            full_stylesheet = common_styles + dark_mode_styles
-        else:
-            full_stylesheet = common_styles + light_mode_styles
-        
-        # Apply the combined stylesheet
-        self.setStyleSheet(full_stylesheet)
-        self.update_loaded_file_label()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

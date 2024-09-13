@@ -171,7 +171,7 @@ class AudioCalculator(QMainWindow):
             QMainWindow { background-color: #272727; color: #ffebcd; }
             QTextEdit { background-color: #404040; color: #ffebcd; border: 2px solid #ffebcd; }
             QLabel, QRadioButton { color: #ffebcd; font-weight:  bold; font-family: Consolas;}
-            QPushButton { background-color: #1e1e1e; color: #ffebcd; border:  2px solid #ffebcd; }
+            QPushButton { background-color: #4d4d4d; color: #ffebcd; border:  2px solid #ffebcd; }
             QPushButton::hover, QPushButton::pressed {background-color: #ffebcd; color: #000000;}
         """
         light_mode_styles = """

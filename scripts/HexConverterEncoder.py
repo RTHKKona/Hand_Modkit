@@ -135,6 +135,7 @@ class HexConverterEncoder(QMainWindow):
                 border: 2px solid #ffebcd;
                 border-style: outset;
                 margin:  5px;
+                padding: 3px;
             }
             QPushButton::hover {
                 background-color: #ffebcd;
@@ -165,6 +166,8 @@ class HexConverterEncoder(QMainWindow):
                 border:  2px solid #cacaca;
                 border-style: outset;
                 margin:  5px;
+                padding:  3px;
+
             }
             QPushButton::hover,QPushButton::pressed, QRadioButton::hover{
                 background-color: #cacaca;

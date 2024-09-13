@@ -1,6 +1,6 @@
 # STQ Merge
 # Version management
-VERSION = "0.6.1"
+VERSION = "0.6.2"
 
 import sys,os,struct
 from PyQt5.QtWidgets import (
@@ -152,12 +152,12 @@ class STQMergeTool(QMainWindow):
     def show_usage_dialog(self):
         """Display the Usage dialog with instructions on how to use the tool."""
         usage_text = (
-            "A quick tutorial on usage:\n"
-            "1) Press the Import Template STQR for your first stqr file that you want to merge.\n"
-            "2) Press the Import Addition STQR for your second stqr file that you want to merge.\n"
-            "3) Press the Merge button to check for conflicts.\n"
-            "4) Review the conflict checker and decide on which one you want to save.\n"
-            "5) Save your new merged STQR file."
+            "A quick tutorial on usage:\n\n"
+            "1) Press the Import Template STQR for your first stqr file that you want to merge.\n\n"
+            "2) Press the Import Addition STQR for your second stqr file that you want to merge.\n\n"
+            "3) Press the Merge button to check for conflicts.\n\n"
+            "4) Review the conflict checker and decide on which one you want to save.\n\n"
+            "5) Save your new merged STQR file.\n"
         )
         QMessageBox.information(self, "Usage", usage_text)
 
@@ -174,12 +174,14 @@ class STQMergeTool(QMainWindow):
         grid = QTableWidget(self)
         grid.setColumnCount(7)
         grid.setHorizontalHeaderLabels([
-            "File Directory", "Size of File (bytes)", "Number of Samples",
-            "Number of Channels", "Sample Rate Hz", "Loop Start (samples)",
-            "Loop End (samples)"
+            "File Directory", " Size of File (bytes) ", " Number of Samples ",
+            " Number of Channels ", " Sample Rate Hz ", " Loop Start (samples) ",
+            " Loop End (samples) "
         ])
         grid.horizontalHeader().setFont(QFont("Consolas", weight=QFont.Bold))
-        grid.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        grid.horizontalHeader().setSectionResizeMode(0,QHeaderView.Stretch)
+        for i in range (1,7):
+            grid.horizontalHeader().setSectionResizeMode(i, QHeaderView.ResizeToContents)
         grid.setEditTriggers(QTableWidget.DoubleClicked)
         return grid
 
@@ -462,10 +464,9 @@ class STQMergeTool(QMainWindow):
                 font-family: Consolas;
                 font-size: 12pt;
                 padding: 5px;
-                border: 3px;
                 border-style: outset;
             }
-            QPushButton::hover{
+            QPushButton::hover, QPushButton::pressed{
                 border-style:  inset;
             }
             QTextEdit {
@@ -487,11 +488,11 @@ class STQMergeTool(QMainWindow):
             QWidget { background-color: #2b2b2b; color: #ffebcd; }
             QTextEdit { background-color: #4d4d4d; color: #ffebcd; border: 2px solid #ffebcd; }
             QGroupBox { border: 1px solid ffebcd;}
-            QLineEdit { background-color: #4d4d4d; color: #ffebcd; border: 3px solid #ffebcd; }
-            QPushButton { background-color: #4d4d4d; color: #ffebcd; border: 3px solid #ffebcd; }
-            QPushButton::hover {background-color: #3f3f3f; color: #ffffff;}
-            QTableWidget { background-color: #464646; color: #ffebcd; gridline-color: white; }
-            QHeaderView::section { background-color: #ffebcd; color: black; }
+            QLineEdit { background-color: #4d4d4d; color: #ffebcd; border: 2px solid #ffebcd; }
+            QPushButton { background-color: #4d4d4d; color: #ffebcd; border: 2px solid #ffebcd; }
+            QPushButton::hover, QPushButton::pressed {background-color: #ffebcd; color: #000000;}
+            QTableWidget { background-color: #464646; color: #ffebcd; gridline-color: #ffffff; }
+            QHeaderView::section { background-color: #ffebcd; color: #000000; }
         """
 
         # Light mode-specific styles
@@ -499,9 +500,9 @@ class STQMergeTool(QMainWindow):
             QWidget { background-color: white; color: black; }
             QTextEdit { background-color: white; color: black; }
             QLabel { color: black; }
-            QLineEdit { background-color: white; color: black; border: 3px solid black; }
-            QPushButton { background-color: #f0f0f0; color: black; border: 3px solid #727272; }
-            QPushButton::hover {background-color: #d3d3d3;color: black;}
+            QLineEdit { background-color: white; color: black; border: 2px solid black; }
+            QPushButton { background-color: #f0f0f0; color: black; border: 2px solid #727272; }
+            QPushButton::hover {background-color: #727272; color: black;}
             QTableWidget { background-color: white; color: black; gridline-color: black; }
             QHeaderView::section { background-color: #ebebeb; color: black; }
         """
