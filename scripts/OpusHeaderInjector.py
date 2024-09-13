@@ -1,6 +1,6 @@
 # Opus Header Injector
 # Version management
-VERSION = "1.0.3"
+VERSION = "1.1.0"
 
 import sys,struct,os
 from PyQt5.QtWidgets import (
@@ -39,8 +39,10 @@ class OpusHeaderInjector(QMainWindow):
 
         # Top label and Help button
         top_layout = QHBoxLayout()
-        self.header_info_label = QLabel("No header loaded", self)
+        self.loaded_file_label = QLabel("No file loaded   ", self)
+        self.header_info_label = QLabel("      No header loaded", self)
         self.help_button = QPushButton("Help", self)
+        top_layout.addWidget(self.loaded_file_label)
         top_layout.addWidget(self.header_info_label)
         top_layout.addStretch()
         top_layout.addWidget(self.help_button)
@@ -68,9 +70,10 @@ class OpusHeaderInjector(QMainWindow):
         self.header_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.header_table.horizontalHeader().setStyleSheet("""
             QHeaderView::section{
-                background-color: #2b2b2b;
-                color: #ffebcd;
+                background-color: #ffebcd;
+                color: #000000;
                 font-family: Consolas; font: 11pt;
+                margin: 2px;
             }
         """)
         self.header_table.setEditTriggers(QTableWidget.AllEditTriggers)
@@ -80,11 +83,8 @@ class OpusHeaderInjector(QMainWindow):
 
         button_layout = QHBoxLayout()
 
-        # Display currently loaded file above 'Save As New File' button
-        self.loaded_file_label = QLabel("No file loaded", self)
-        button_layout.addWidget(self.loaded_file_label)
 
-        self.load_button = QPushButton("Load Opus File", self)
+        self.load_button = QPushButton("Load .Opus File", self)
         self.load_button.clicked.connect(self.load_file)
         button_layout.addWidget(self.load_button)
 
@@ -92,7 +92,7 @@ class OpusHeaderInjector(QMainWindow):
         self.export_button.clicked.connect(self.export_header)
         button_layout.addWidget(self.export_button)
 
-        self.inject_button = QPushButton("Inject Header to File", self)  # Updated name
+        self.inject_button = QPushButton("Inject Header to New .Opus", self)  # Updated name
         self.inject_button.clicked.connect(self.inject_header)
         button_layout.addWidget(self.inject_button)
 
@@ -183,15 +183,15 @@ class OpusHeaderInjector(QMainWindow):
 
     def show_help(self):
         help_text = (
-            "1. Import the .opus file you want to replace inside of nativeNX.\n"
-            "2. Press the Load Opus File and open your desired opus file.\n"
+            "1. Import the .opus file you want to replace inside of nativeNX.\n\n"
+            "2. Press the Load Opus File and open your desired opus file.\n\n"
             "3. Find out and edit your total number of samples of your replacement .opus file. "
-            "You can use vgmstream or XMPlay.\n"
+            "You can use vgmstream or XMPlay.\n\n"
             "4. Adjust the loop start and loop end times, in samples. Use XMPlay to listen "
-            "through and find suitable times for looping.\n"
-            "5. Export Header & Save. This part is so your edited changes are saved locally and retained.\n"
-            "6. Press Inject Header to File, and open your headerless .opus file to inject the header data.\n"
-            "7. Save the new .opus file with your desired changes.\n"
+            "through and find suitable times for looping.\n\n"
+            "5. Export Header & Save. This part is so your edited changes are saved locally and retained.\n\n"
+            "6. Press Inject Header to File, and open your headerless .opus file to inject the header data.\n\n"
+            "7. Save the new .opus file with your desired changes.\n\n"
             "8. Test your new opus file with correct looping, sample, and header, fit for MHGU."
         )
 
@@ -216,13 +216,13 @@ class OpusHeaderInjector(QMainWindow):
                 header_end_offset = self.find_full_header_size()
                 self.display_hex_content(header_end_offset)
                 self.populate_grid(header_end_offset)
-                self.header_info_label.setText(f"Header Size: {header_end_offset} bytes")
+                self.header_info_label.setText(f"   Header Size: {header_end_offset} bytes")
                 self.is_second_file_loaded = True
             self.update_loaded_file_label()
 
     def update_loaded_file_label(self):
         color = "yellow" if self.dark_mode else "darkgreen"
-        self.loaded_file_label.setText(f"Loaded File: {os.path.basename(self.loaded_file_name)}")
+        self.loaded_file_label.setText(f"Loaded File: {self.loaded_file_name}")
         self.loaded_file_label.setStyleSheet(f"color: {color}; font: 10pt; font-weight: bold; font-family: Consolas")
 
     def find_full_header_size(self):
@@ -236,18 +236,35 @@ class OpusHeaderInjector(QMainWindow):
 
     def display_hex_content(self, header_end_offset):
         hex_view = []
+        
+        # Display the hex code up to the header end offset
         for i in range(0, min(header_end_offset, len(self.original_content)), 32):
             row = ' '.join(
-                [self.original_content[i+j:i+j+4].hex().upper() for j in range(0, 32, 4)]
+                [self.original_content[i + j:i + j + 4].hex().upper() for j in range(0, 32, 4)]
             )
             hex_view.append(row)
+        
+        # Append a few lines of actual data after the header in a different color (#353535)
+        num_additional_lines = 3  # Same as the original number of fake lines
+        for i in range(header_end_offset, header_end_offset + (num_additional_lines * 32), 32):
+            if i < len(self.original_content):
+                row = ' '.join(
+                    [self.original_content[i + j:i + j + 4].hex().upper() for j in range(0, 32, 4)]
+                )
+                # Wrap the additional rows with HTML for the color
+                hex_view.append(f'<span style="color:#353535">{row}</span>')
+            else:
+                # Stop if we reach the end of the file content
+                break
 
-        # Add 3 grey rows after the header
-        grey_row = ' '.join(['00' * 4] * 8)
-        for _ in range(3):
-            hex_view.append(f'<span style="color:grey">{grey_row}</span>')
+        # Add an ellipsis at the end to indicate that it's just a preview
+        hex_view.append('<span style="color:grey">...</span>')
 
-        self.hex_view.setHtml('<br>'.join(hex_view))
+        # Convert the content into a formatted string for display
+        formatted_hex_view = '<br>'.join(hex_view)
+        
+        # Display the formatted content in the hex view
+        self.hex_view.setHtml(formatted_hex_view)
 
     def populate_grid(self, header_end_offset):
         self.header_table.setRowCount(1)
@@ -375,6 +392,10 @@ class OpusHeaderInjector(QMainWindow):
                 font-family: Consolas;
                 font-size: 12pt;
                 padding: 6px;
+                border-style: outset;
+            }
+            QPushButton::hover {
+                border-style:  inset;
             }
         """
         
@@ -383,7 +404,8 @@ class OpusHeaderInjector(QMainWindow):
             QMainWindow { background-color: #2b2b2b; color: #ffebcd; }
             QTextEdit { background-color: #4d4d4d; color: #ffebcd; }
             QLabel { color: #ffebcd; }
-            QPushButton { background-color: #4d4d4d; color: #ffebcd; }
+            QPushButton { background-color: #4d4d4d; color: #ffebcd; border:  3px solid #ffebcd; }
+            QPushButton::hover {background-color: #ffebcd; color: #000000;}
             QTableWidget { background-color: #4d4d4d; color: #ffebcd; gridline-color: white; }
             QHeaderView::section { background-color: grey; color: white; }
         """
@@ -393,7 +415,8 @@ class OpusHeaderInjector(QMainWindow):
             QMainWindow { background-color: white; color: black; }
             QTextEdit { background-color: white; color: black; }
             QLabel { color: black; }
-            QPushButton { background-color: #f0f0f0; color: black; }
+            QPushButton { background-color: #f0f0f0; color: black; border: 3px solid #cacaca; }
+            QPushButton::hover { background-color: #cacaca;}
             QTableWidget { background-color: #f0f0f0; color: black; gridline-color: black; }
             QHeaderView::section { background-color: lightgrey; color: black; }
         """

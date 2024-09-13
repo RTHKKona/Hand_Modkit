@@ -1,6 +1,6 @@
 # MCA Forge
 # Version management
-VERSION = "0.5.6"
+VERSION = "0.6.0"
 
 import os, sys, subprocess, binascii, shutil
 from PyQt5.QtWidgets import (
@@ -67,7 +67,12 @@ class MCA_Forge(QMainWindow):
         central_widget.setLayout(main_layout)
         self.setCentralWidget(central_widget)
         self.setWindowTitle('MCA Forge')
-        self.setGeometry(100, 100, 1600, 800)
+        self.setGeometry(100, 70, 1600, 800) #Where it gets created if isolated
+        
+        # Description before User Input
+        self.log(f"\n\n[INITIALISATION SUCCESS] Welcome to the MCA Forge v{VERSION} module in Handburger's Modkit. This module allows for the merging of two .MCA files, particularly within the context of Monster Hunter Generations  Ultimate (MHGU).")
+        self.log("\n\n\nPlease select the original MHGU .MCA file and the replacement .MCA file to proceed.")
+        self.log("\nIf you don't have the replacement .MCA file, please navigate to MCAConverter to acquire one.\n\n\n")
 
     def open_original_mca_file(self):
         files, _ = QFileDialog.getOpenFileNames(self, "Open Original MHGU .MCA File", "", "MCA Files (*.mca);;All Files (*)")
@@ -312,14 +317,21 @@ class MCA_Forge(QMainWindow):
             QPushButton {
                 font-family: Consolas;
                 font-size: 12pt;
+                font-weight: bold;
+                border-style: outset;
                 padding: 6px;
+                margin: 3px;
+            }
+            QPushButton::hover {
+                border-style: inset;
             }
         """
 
         dark_mode_styles = """
             QMainWindow { background-color: #2b2b2b; color: #ffebcd; }
-            QTextEdit { background-color: #4d4d4d; color: #ffebcd; }
-            QPushButton { background-color: #4d4d4d; color: #ffebcd; }
+            QTextEdit { background-color: #4d4d4d; color: #ffebcd; border: 2px solid #ffebcd; }
+            QPushButton { background-color: #4d4d4d; color: #ffebcd; border:  2px solid #ffebcd; }
+            QPushButton::hover {background-color: #ffebcd; color: #000000;}
             QMessageBox { background-color: #2b2b2b}
             QMessageBox QLabel { color: #ffebcd; }
             QMessageBox QPushButton { background-color: #4d4d4d; color: #ffebcd; }
@@ -327,8 +339,9 @@ class MCA_Forge(QMainWindow):
 
         light_mode_styles = """
             QMainWindow { background-color: #f0f0f0; color: #000000; }
-            QTextEdit { background-color: #ffffff; color: #000000; }
-            QPushButton { background-color: #ffffff; color: #000000; }
+            QTextEdit { background-color: #ffffff; color: #000000; border: 2px solid #cacaca; }
+            QPushButton { background-color: #ffffff; color: #000000; border: 2px solid #cacaca; }
+            QPushButton::hover {background-color: #cacaca; color: #262626;}
             QMessageBox { background-color: #ffffff; color: #000000; }
             QMessageBox QLabel { color: #000000; } 
             QMessageBox QPushButton { background-color: #ffffff; color: #000000; }  

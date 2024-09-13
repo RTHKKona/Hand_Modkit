@@ -1,6 +1,6 @@
 # NS Opus Converter
 # Version management
-VERSION = "1.7.5"
+VERSION = "1.7.6"
 
 import os, sys, shutil, subprocess, webbrowser, random
 from PyQt5.QtWidgets import (
@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtGui import QFont
 
-class NSOpusConverter(QMainWindow):
+class ns_OpusConverter(QMainWindow):
     def __init__(self):
         super().__init__()
         self.dark_mode = True  # Start in dark mode by default
@@ -142,7 +142,7 @@ class NSOpusConverter(QMainWindow):
             self.dependencies_valid = True
             self.browse_button.setEnabled(True)
 
-        self.log("\nBrowse audio files to convert various audio files (mp3, wav, flac) into a valid .Opus audio format used by MHGU.\n")
+        self.log("\nBrowse audio files to convert various audio files (mp3, wav, flac) into a valid .Opus audio format used by MHGU.\n\n\n\n\n")
 
     def show_dependency_error(self, missing_dependencies):
         message = (
@@ -167,10 +167,10 @@ class NSOpusConverter(QMainWindow):
 
     def show_help(self):
         help_text = (
-            "1. Pinpoint which .opus files you would like to replace and note them down.\n"
-            "2. Get your own audio files that you would like to replace, my tool supports mp4, mp3, flac, wav, and ogg.\n"
-            "3. Browse for them in the NSOpus Converter tab.\n"
-            "4. Let the conversion occur.\n"
+            "1. Pinpoint which .opus files you would like to replace and note them down.\n\n"
+            "2. Get your own audio files that you would like to replace, my tool supports mp4, mp3, flac, wav, and ogg.\n\n"
+            "3. Browse for them in the NSOpus Converter tab.\n\n"
+            "4. Let the conversion occur.\n\n"
             "5. Get your converted MHGU .opus files."
         )
         help_box = QMessageBox(self)
@@ -182,7 +182,8 @@ class NSOpusConverter(QMainWindow):
         if self.dark_mode:
             help_box.setStyleSheet("""
                 QMessageBox { background-color: #2b2b2b; color: #ffebcd; }
-                QPushButton { background-color: #4d4d4d; color: #ffebcd; }
+                QPushButton { background-color: #4d4d4d; color: #ffebcd; margin: 2px; border: 2px solid #ffebcd; }
+
             """)
         else:
             help_box.setStyleSheet("")
@@ -282,14 +283,20 @@ class NSOpusConverter(QMainWindow):
             QPushButton {
                 font-family: Consolas;
                 font-size: 12pt;
+                font-weight:  bold;
                 padding: 6px;
+                border-style: outset;
+            }
+            QPushButton::hover{
+                border-style: inset;
             }
         """
 
         dark_mode_styles = """
             QMainWindow { background-color: #2b2b2b; color: #ffebcd; }
             QTextEdit { background-color: #4d4d4d; color: #ffebcd; }
-            QPushButton { background-color: #4d4d4d; color: #ffebcd; }
+            QPushButton { background-color: #4d4d4d; color: #ffebcd; border: 2px solid #ffebcd; }
+            QPushButton::hover { background-color: #ffebcd; color: #000000}
             QMessageBox QLabel { color: #ffebcd; }  
             QMessageBox QPushButton { background-color: #4d4d4d; color: #ffebcd; }  
             QMessageBox { background-color: #4d4d4d; } 
@@ -298,7 +305,9 @@ class NSOpusConverter(QMainWindow):
         light_mode_styles = """
             QMainWindow { background-color: #f0f0f0; color: #000000; }
             QTextEdit { background-color: #ffffff; color: #000000; }
-            QPushButton { background-color: #ffffff; color: #000000; }
+            QPushButton { background-color: #ffffff; color: #000000; border: 2px solid #cacaca;}
+            QPushButton::hover { background-color:  #cacaca; }
+
             QMessageBox QLabel { color: #000000; }  
             QMessageBox QPushButton { background-color: #ffffff; color: #000000; }  
             QMessageBox { background-color: #ffffff; }  
@@ -317,6 +326,6 @@ class NSOpusConverter(QMainWindow):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    window = NSOpusConverter()
+    window = ns_OpusConverter()
     window.show()
     sys.exit(app.exec_())

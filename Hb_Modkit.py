@@ -130,7 +130,7 @@ class PoppableTabWidget(QTabWidget):
             "Audio Calculator": AudioCalculator.AudioCalculator,
             "FolderMaker": FolderMaker.FolderMaker,
             "Hex Enc/Decoder": HexConverterEncoder.HexConverterEncoder,
-            "NS Opus Converter": NSOpusConverter.NSOpusConverter,
+            "NS Opus Converter": NSOpusConverter.ns_OpusConverter,
             "Opus Metadata Extractor": OpusMetadataExtractor.OpusMetadataExtractor,
             "STQ Merge Tool": STQ_Merge.STQMergeTool,
             "MCA Converter" : MCAConverter.WavToMcaConverter,

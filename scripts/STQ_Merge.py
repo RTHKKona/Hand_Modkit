@@ -1,10 +1,8 @@
 # STQ Merge
 # Version management
-VERSION = "0.5.0"
+VERSION = "0.6.1"
 
-import sys
-import os
-import struct
+import sys,os,struct
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QPushButton, QFileDialog, 
     QMessageBox, QTextEdit, QAction,QTableWidget, QTableWidgetItem, QHeaderView, 
@@ -464,6 +462,11 @@ class STQMergeTool(QMainWindow):
                 font-family: Consolas;
                 font-size: 12pt;
                 padding: 5px;
+                border: 3px;
+                border-style: outset;
+            }
+            QPushButton::hover{
+                border-style:  inset;
             }
             QTextEdit {
                 font-family: Consolas;
@@ -473,17 +476,22 @@ class STQMergeTool(QMainWindow):
                 font-family: Consolas;
                 font-size: 12pt;
             }
+            QGroupBox {
+                padding: 12px;
+                font-size: 9pt;
+            }
         """
 
         # Dark mode-specific styles
         dark_mode_styles = """
             QWidget { background-color: #2b2b2b; color: #ffebcd; }
-            QTextEdit { background-color: #4d4d4d; color: #ffebcd; }
-            QLabel { color: #ffebcd; }
-            QLineEdit { background-color: #4d4d4d; color: #ffebcd; border: 1px solid #ffebcd; }
-            QPushButton { background-color: #4d4d4d; color: #ffebcd; }
+            QTextEdit { background-color: #4d4d4d; color: #ffebcd; border: 2px solid #ffebcd; }
+            QGroupBox { border: 1px solid ffebcd;}
+            QLineEdit { background-color: #4d4d4d; color: #ffebcd; border: 3px solid #ffebcd; }
+            QPushButton { background-color: #4d4d4d; color: #ffebcd; border: 3px solid #ffebcd; }
+            QPushButton::hover {background-color: #3f3f3f; color: #ffffff;}
             QTableWidget { background-color: #464646; color: #ffebcd; gridline-color: white; }
-            QHeaderView::section { background-color: grey; color: white; }
+            QHeaderView::section { background-color: #ffebcd; color: black; }
         """
 
         # Light mode-specific styles
@@ -491,10 +499,11 @@ class STQMergeTool(QMainWindow):
             QWidget { background-color: white; color: black; }
             QTextEdit { background-color: white; color: black; }
             QLabel { color: black; }
-            QLineEdit { background-color: white; color: black; border: 1px solid black; }
-            QPushButton { background-color: #f0f0f0; color: black; }
+            QLineEdit { background-color: white; color: black; border: 3px solid black; }
+            QPushButton { background-color: #f0f0f0; color: black; border: 3px solid #727272; }
+            QPushButton::hover {background-color: #d3d3d3;color: black;}
             QTableWidget { background-color: white; color: black; gridline-color: black; }
-            QHeaderView::section { background-color: lightgrey; color: black; }
+            QHeaderView::section { background-color: #ebebeb; color: black; }
         """
 
         # Combine the common styles with theme-specific styles

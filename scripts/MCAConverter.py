@@ -1,6 +1,6 @@
 # MCA Converter
 # Version management
-VERSION = "1.0.7"
+VERSION = "1.1.0"
 
 import os, sys,subprocess
 from concurrent.futures import ThreadPoolExecutor
@@ -92,6 +92,8 @@ class WavToMcaConverter(QMainWindow):
             with open(self.license_file, 'r') as file:
                 license_text = file.read()
             self.log(f"[INFO] Displaying License:\n{license_text}")
+            self.log(f"[INITIALISATION SUCCESS] Welcome to the MCAConverter v{VERSION} module of Handburger's Modkit. This script is used to convert audio files (.ogg, .flac, .mp3, .mp4, .wav) into MHGU compatible .mca files.")
+
         else:
             self.log("[ERROR] License file not found.")
 
@@ -157,7 +159,11 @@ class WavToMcaConverter(QMainWindow):
             QPushButton {
                 font-family: Consolas;
                 font-size: 12pt;
+                font-weight: bold;
                 padding: 6px;
+            }
+            QPushButton::hover{
+                border-style: inset;
             }
             QMessageBox QLabel{
                 font-weight: bold;
@@ -170,19 +176,21 @@ class WavToMcaConverter(QMainWindow):
         dark_mode_styles = """
             QMainWindow { background-color: #2b2b2b; color: #ffebcd; }
             QTextEdit { background-color: #4d4d4d; color: #ffebcd; }
-            QPushButton { background-color: #4d4d4d; color: #ffebcd; }
-            QMessageBox QLabel { color: #ffebcd; }  /* Ensure QLabel inside QMessageBox is styled */
-            QMessageBox QPushButton { background-color: #4d4d4d; color: #ffebcd; }  /* Button styling inside QMessageBox */
-            QMessageBox { background-color: #4d4d4d; }  /* Background styling for QMessageBox */
+            QPushButton { background-color: #4d4d4d; color: #ffebcd; border: 2px solid #ffebcd;}
+            QPushButton::hover {background-color: #ffebcd; color: #000000;}
+            QMessageBox QLabel { color: #ffebcd; }
+            QMessageBox QPushButton { background-color: #4d4d4d; color: #ffebcd; }
+            QMessageBox { background-color: #4d4d4d; } 
         """
 
         light_mode_styles = """
             QMainWindow { background-color: #f0f0f0; color: #000000; }
             QTextEdit { background-color: #ffffff; color: #000000; }
-            QPushButton { background-color: #ffffff; color: #000000; }
-            QMessageBox QLabel { color: #000000; }  /* Ensure QLabel inside QMessageBox is styled */
-            QMessageBox QPushButton { background-color: #ffffff; color: #000000; }  /* Button styling inside QMessageBox */
-            QMessageBox { background-color: #ffffff; }  /* Background styling for QMessageBox */
+            QPushButton { background-color: #ffffff; color: #000000; border: 2px solid #cacaca; }
+            QPushButton::hover {background-color: #cacaca; color: #262626;}
+            QMessageBox QLabel { color: #000000; }  
+            QMessageBox QPushButton { background-color: #ffffff; color: #000000; }  
+            QMessageBox { background-color: #ffffff; } 
         """
 
         # Apply common styles plus mode-specific styles

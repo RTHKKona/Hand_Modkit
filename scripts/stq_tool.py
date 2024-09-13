@@ -1,6 +1,6 @@
 # STQR Editor Tool
 # Version management
-VERSION = "1.5.3" 
+VERSION = "1.5.5" 
 
 import sys, struct, os, random
 from PyQt5.QtWidgets import (
@@ -151,16 +151,6 @@ class STQTool(QMainWindow):
         ])
         grid.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
         grid.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
-        grid.horizontalHeader().setStyleSheet("""
-            QHeaderView::section { 
-                background-color:  #ffebcd;
-                color: #000000; 
-                }
-            QHeaderView {
-                font-family: Consolas; 
-                font: 11pt; 
-                }
-            """)
         grid.setEditTriggers(QTableWidget.DoubleClicked)
         return grid
 
@@ -168,7 +158,7 @@ class STQTool(QMainWindow):
         layout = QHBoxLayout()
         buttons = [
             ("Load .stqr File", self.load_file),
-            ("Search Patterns", self.search_patterns),
+            ("Parse Patterns", self.search_patterns),
             ("Save Changes", self.save_changes),
             ("Clear", self.clear_data),
             ("Undo", self.undo),
@@ -430,71 +420,94 @@ class STQTool(QMainWindow):
         self.apply_styles()
 
     def apply_styles(self):
-        # Define the style for dark mode
-        dark_mode_style = """
-            QMainWindow, QDialog { 
-                background-color: #2b2b2b; 
-                color: #ffebcd;
-                }
-            QTextEdit, QTableWidget { 
-                background-color: #4d4d4d; 
-                color: #ffebcd; 
-                }
-            QLabel { 
-                color: #ffebcd; 
-                }
+        # Common styles for widgets that remain the same across themes
+        base_style = """
             QPushButton {
-                background-color: #4c4c4c; 
-                color: #ffebcd; 
-                padding-top: 5px; 
-                padding-bottom: 5px; 
+                padding:  5px;
                 border-style: outset; 
-                border-width: 2px; 
-                border-color: beige; 
+                border-width: 3px; 
                 font-family: Consolas; 
                 font-size: 12pt;
             }
             QPushButton::hover, QPushButton::pressed {
-                background-color: #4e4e4e; 
-                color: #ffebcd; 
                 border-style: inset;
             }
             QMenuBar, QMenu {
                 background-color: white; 
                 color: black;
+                padding: 5px;
+            }
+            QHeaderView::section {
+                font-family:  Consolas;
+                font: 12pt;
+                font-weight:  bold;
             }
             QMenu::item:selected, QMenu::item:pressed, QMenu::item {
-                background-color: #4e4e4e; 
-                color: #ffebcd;
+                font-family:  Consolas; 
+                font:  11pt;
             }
         """
 
-        # Define the style for light mode
+        # Styles for dark mode
+        dark_mode_style = """
+            QMainWindow, QDialog { 
+                background-color: #2b2b2b; 
+                color: #ffebcd;
+            }
+            QTextEdit, QTableWidget { 
+                background-color: #4d4d4d; 
+                color: #ffebcd; 
+            }
+            QLabel { 
+                color: #ffebcd; 
+            }
+            QPushButton {
+                background-color: #4c4c4c; 
+                color: #ffebcd;
+            }
+            QPushButton::pressed {
+                background-color: #333333;
+            }
+            QPushButton::hover {
+                background-color: #3f3f3f;
+                color: #ffffff;
+            }
+            QHeaderView::section { 
+                background-color: #ffebcd;
+                color: #000000;
+            }
+        """
+
+        # Styles for light mode
         light_mode_style = """
-            QMainWindow, QDialog, QTextEdit, QTableWidget, QLabel, QMenuBar, QMenu, QPushButton, QPushButton::pressed {
-                background-color: white; 
+            QMainWindow, QDialog, QTextEdit, QTableWidget, QLabel {
+                background-color: white;
                 color: black;
             }
             QPushButton {
-                padding-top: 5px; 
-                padding-bottom: 5px; 
-                border: none; 
-                font-family: Consolas; 
-                font-size: 12pt; 
-                border-style: outset; 
-                border-width: 2px; 
-                border-color: black;
+                background-color: white;
+                color: black;
             }
             QPushButton::hover {
-                background-color: #d3d3d3; 
-                color: black; 
-                border-style: inset;
+                background-color: #d3d3d3;
+                color: black;
+            }
+            QPushButton::pressed {
+                background-color: #d9d9d9
+            }
+            QHeaderView::section { 
+                background-color: #ebebeb;
+                color: black;
             }
         """
 
-        # Apply the appropriate style based on the dark_mode attribute
-        style = dark_mode_style if self.dark_mode else light_mode_style
-        self.setStyleSheet(style)
+        # Combine base styles with the mode-specific styles
+        theme_style = dark_mode_style if self.dark_mode else light_mode_style
+        final_style = base_style + theme_style
+
+        # Apply the final stylesheet
+        self.setStyleSheet(final_style)
+
 
     def show_about_dialog(self):
         dialog = QDialog(self)
@@ -534,14 +547,6 @@ class STQTool(QMainWindow):
         return label
 
     def create_link_layout(self, icon_path, text, url, icon_size):
-        
-        #Creates a horizontal layout with an icon and a link label.
-        
-        #:param icon_path: Path to the icon file
-        #:param text: Text to display as the link
-        #:param url: URL to open when the link is clicked
-        #:param icon_size: Size of the icon
-        #:return: A QHBoxLayout instance
         layout = QHBoxLayout()
         
         # Create the icon label

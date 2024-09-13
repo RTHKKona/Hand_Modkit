@@ -1,6 +1,6 @@
 # FolderMaker module
 # Version management
-VERSION = "1.1.1"
+VERSION = "1.1.2"
 
 import os
 import sys
@@ -41,7 +41,8 @@ class FolderMaker(QMainWindow):
         main_layout.addWidget(self.cmd_output)
 
         self.folder_input = QLineEdit(self)
-        self.folder_input.setPlaceholderText("Click 'Browse' to select a directory you'd like to analyse. (likely nativeNX)")
+        self.folder_input.setPlaceholderText("Select a directory you'd like to analyse. (likely nativeNX)")
+        self.folder_input.setFixedHeight(40)
         bottom_layout.addWidget(self.folder_input)
 
         browse_button = QPushButton("Browse", self)
@@ -50,6 +51,7 @@ class FolderMaker(QMainWindow):
 
         self.file_input = QLineEdit(self)
         self.file_input.setPlaceholderText("Input exact file you want to replace. (i.e bgm_v03.opus)")
+        self.file_input.setFixedHeight(40)
         bottom_layout.addWidget(self.file_input)
 
         create_button = QPushButton("Create Directory/Folders", self)
@@ -157,24 +159,33 @@ class FolderMaker(QMainWindow):
             QPushButton {
                 font-family: Consolas;
                 font-size: 12pt;
+                font-weight: bold;
                 padding: 6px;
+                margin: 6px;
+                min-width: 120px;
+                border-style: outset;
+            }
+            QPushButton::hover, QPushButton::pressed {
+                border-style: inset;
             }
         """
         
         dark_mode_styles = """
-            QWidget { background-color: #2b2b2b; color: #ffebcd; }
-            QTextEdit { background-color: #4d4d4d; color: #ffebcd; }
+            QWidget { background-color: #2b2b2b; color: #ffebcd; margin: 2px;}
+            QTextEdit { background-color: #4d4d4d; color: #ffebcd; margin: 2px;}
             QLabel { color: #ffebcd; }
             QLineEdit { background-color: #4d4d4d; color: #ffebcd; border: 1px solid #ffebcd; }
-            QPushButton { background-color: #4d4d4d; color: #ffebcd; }
+            QPushButton { background-color: #4d4d4d; color: #ffebcd; border:  2px solid #ffebcd; }
+            QPushButton::hover, QPushButton::pressed { background-color: #ffebcd;  color: #4d4d4d;}
         """
         
         light_mode_styles = """
-            QWidget { background-color: white; color: black; }
-            QTextEdit { background-color: white; color: black; }
-            QLabel { color: black; }
-            QLineEdit { background-color: white; color: black; border: 1px solid black; }
-            QPushButton { background-color: #f0f0f0; color: black; }
+            QWidget { background-color: #ffffff; color: #000000; margin: 2px;}
+            QTextEdit { background-color: #ffffff; color: #000000; margin: 2px;}
+            QLabel { color: #000000; }
+            QLineEdit { background-color: #ffffff; color: #000000; border: 1px solid black; }
+            QPushButton { background-color: #f0f0f0; color: #000000; border: 2px solid #cacaca; }
+            QPushButton::hover {background-color: #cacaca; color: #000000;}
         """
         
         # Combine common styles with the mode-specific styles
@@ -238,7 +249,7 @@ class FolderMaker(QMainWindow):
         self.log(art, is_preformatted=True)
         self.log(
             f"\nYou see that? That funny little characta?<br><br>"
-            f"\nThis FolderMaker tool helps you create nested directories easy. No more right-clicking and New Folder.<br>"
+            f"\n[INITIALISATION SUCCESS] FolderMaker {VERSION} module in Handburger's Modkit helps you create nested directories easily. No more right-clicking and New Folder.<br>"
         )
 
 if __name__ == '__main__':

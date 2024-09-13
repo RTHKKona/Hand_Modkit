@@ -1,6 +1,6 @@
 # Opus Metadata Extractor
 # Version management
-VERSION = "1.1.1"
+VERSION = "1.1.3"
 
 import os
 import sys
@@ -57,7 +57,6 @@ class OpusMetadataExtractor(QMainWindow):
 
         self.browse_button = QPushButton("Browse .Opus Files", self)
         self.browse_button.setFont(button_font)
-        self.browse_button.setStyleSheet("QPushButton { padding: 20px; }")  # Apply 20px buffer
         self.browse_button.clicked.connect(self.open_file)
         self.browse_button.setAcceptDrops(True)
         self.browse_button.setEnabled(False)  # Initially disabled until dependency check passes
@@ -68,7 +67,6 @@ class OpusMetadataExtractor(QMainWindow):
 
         export_button = QPushButton("Export Data", self)
         export_button.setFont(button_font)
-        export_button.setStyleSheet("QPushButton { padding: 20px; }")  # Apply 20px buffer
         export_button.setEnabled(False)  # Initially disabled until metadata is processed
         export_button.clicked.connect(self.show_export_menu)
         self.export_button = export_button
@@ -76,13 +74,11 @@ class OpusMetadataExtractor(QMainWindow):
 
         help_button = QPushButton("Help", self)
         help_button.setFont(button_font)
-        help_button.setStyleSheet("QPushButton { padding: 20px; }")  # Apply 20px buffer
         help_button.clicked.connect(self.show_help)
         bottom_layout.addWidget(help_button)
 
         self.toggle_theme_btn = QPushButton("Toggle Theme", self)
         self.toggle_theme_btn.setFont(button_font)
-        self.toggle_theme_btn.setStyleSheet("QPushButton { padding: 20px; }")  # Apply 20px buffer
         self.toggle_theme_btn.clicked.connect(self.toggle_theme)
         bottom_layout.addWidget(self.toggle_theme_btn)
 
@@ -149,6 +145,7 @@ class OpusMetadataExtractor(QMainWindow):
             with open(self.license_file, 'r') as file:
                 license_text = file.read()
             self.log("[INFO] Displaying License:\n" + license_text)
+            self.log(f"\n\n[INITIALISATION SUCCESS] Welcome to Opus Metadata Extractor v{VERSION}, a script within Handburger's Modkit. This tool helps you gather the metadata from Opus files for further modifications.\n\n")
         else:
             self.log("[ERROR] vgm_COPYING.txt License file not found.")
     
@@ -220,14 +217,12 @@ class OpusMetadataExtractor(QMainWindow):
             self.browse_button.setText(f"Import {event.mimeData().urls()[0].fileName()}")
             self.browse_button.setStyleSheet("""
                 QPushButton {
-                    border: 2px solid #FFD700;
-                    padding: 30px 10px;  /* Increase padding when dragging */
+                    border: 2px solid #FFD700;  
                 }
             """)
 
     def dragLeaveEvent(self, event):
         self.browse_button.setText("Browse .Opus Files")
-        self.browse_button.setStyleSheet("QPushButton { padding: 20px; }")
 
     def dropEvent(self, event):
         if not self.dependencies_valid:
@@ -236,7 +231,6 @@ class OpusMetadataExtractor(QMainWindow):
         files = [url.toLocalFile() for url in event.mimeData().urls()]
         self.log(f"Selected Files: {', '.join(files)}")
         self.browse_button.setText("Browse .Opus Files")
-        self.browse_button.setStyleSheet("QPushButton { padding: 20px; }")
         self.extract_metadata(files)
         self.export_button.setEnabled(True)  # Enable the export button after processing
 
@@ -436,23 +430,34 @@ class OpusMetadataExtractor(QMainWindow):
             QPushButton {
                 font-family: Consolas;
                 font-size: 12pt;
-                padding: 6px;
+                padding: 5px;
+                border: 3px;
+                border-style: outset;
+            }
+            QPushButton::hover, QPushButton::pressed {
+                border-style: inset;
             }
         """
 
         dark_mode_styles = """
-            QMainWindow { background-color: #2b2b2b; color: #ffebcd; }
-            QTextEdit { background-color: #4d4d4d; color: #ffebcd; }
-            QPushButton { background-color: #4d4d4d; color: #ffebcd; }
-            QMessageBox QLabel { color: #ffebcd; }  
-            QMessageBox QPushButton { background-color: #4d4d4d; color: #ffebcd; }  
+            QMainWindow { background-color: #2b2b2b; color: #ffebcd;}
+            QTextEdit { background-color: #4d4d4d; color: #ffebcd; margin: 3px; padding-bottom: 5px;}
+            QPushButton { background-color: #4d4d4d; color: #ffebcd; border: 3px solid #ffebcd; }
+            QPushButton::hover{
+                background-color: #3b3b3b;
+            }
+            QMessageBox::QLabel { color: #ffebcd; }  
+            QMessageBox::QPushButton { background-color: #4d4d4d; color: #ffebcd; }  
             QMessageBox { background-color: #4d4d4d; } 
         """
 
         light_mode_styles = """
             QMainWindow { background-color: #f0f0f0; color: #000000; }
-            QTextEdit { background-color: #ffffff; color: #000000; }
-            QPushButton { background-color: #ffffff; color: #000000; }
+            QTextEdit { background-color: #ffffff; color: #000000; margin: 3px; padding-bottom: 5px;}
+            QPushButton { background-color: #ffffff; color: #000000; border: 3px solid #4c4c4c; }
+            QPushButton::hover{
+                background-color: #d2d2d2;
+            }
             QMessageBox QLabel { color: #000000; }  
             QMessageBox QPushButton { background-color: #ffffff; color: #000000; }  
             QMessageBox { background-color: #ffffff; }  
