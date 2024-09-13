@@ -256,7 +256,7 @@ class HbModkit(QMainWindow):
     def __init__(self):
         super().__init__()
         self.locale_manager = LocaleManager(
-            supported_locales={'eng', 'zho', 'spa', 'ind'},  ## Add locale support here
+            supported_locales={'eng', 'zho', 'yue', 'fra'},  ## Add locale support here
             default_locale='eng'
         )
         self.init_ui()
@@ -312,7 +312,7 @@ class HbModkit(QMainWindow):
 
         ## Language selection submenu
         language_menu = QMenu(self.locale_manager.get_translation("language_label", "Language"), self)
-        for language, locale in {'English': 'eng', '中文': 'zho', 'Español': 'spa', 'Bahasa Indonesia': 'ind'}.items():
+        for language, locale in {'English (UK)': 'eng', '繁体字': 'yue', '简体字': 'zho', 'Español': 'spa', 'Bahasa Indonesia': 'ind', 'Français': 'fra'}.items():
             language_menu.addAction(language, lambda l=locale: self.set_locale(l))
         settings_menu.addMenu(language_menu)
 
@@ -663,7 +663,7 @@ if __name__ == '__main__':
     
     splash = SplashScreen()
     splash.show()
-    splash_duration = random.randint(3000,7000)
+    splash_duration = random.randint(3000,4550) # 3 Seconds - 4.5second boot time
 
     event_loop = QEventLoop()
     QTimer.singleShot(splash_duration, event_loop.quit)
