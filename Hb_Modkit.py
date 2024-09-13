@@ -312,8 +312,28 @@ class HbModkit(QMainWindow):
 
         ## Language selection submenu
         language_menu = QMenu(self.locale_manager.get_translation("language_label", "Language"), self)
-        for language, locale in {'English (UK)': 'eng', '繁体字': 'yue', '简体字': 'zho', 'Español': 'spa', 'Bahasa Indonesia': 'ind', 'Français': 'fra'}.items():
+        # Dictionary of common languages and their ISO 639-3 codes
+        languages = {
+            'English (UK)': 'eng',
+            '繁体字 (Cantonese)': 'yue',  # Cantonese
+            '简体字 (Simplified Chinese)': 'zho',  # Simplified Chinese
+            'Español (Spanish)': 'spa',  # Spanish
+            'Bahasa Indonesia': 'ind',  # Indonesian
+            'Français (French)': 'fra',  # French
+            'Deutsch (German)': 'deu',  # German
+            '日本語 (Japanese)': 'jpn',  # Japanese
+            '한국어 (Korean)': 'kor',  # Korean
+            'Русский (Russian)': 'rus',  # Russian
+            'Português (Portuguese)': 'por',  # Portuguese
+            'Italiano (Italian)': 'ita',  # Italian
+            'हिन्दी (Hindi)': 'hin',  # Hindi
+            'العربية (Arabic)': 'ara'  # Arabic
+        }
+
+        # Adding each language to the menu
+        for language, locale in languages.items():
             language_menu.addAction(language, lambda l=locale: self.set_locale(l))
+
         settings_menu.addMenu(language_menu)
 
     def add_tabs(self):
@@ -394,6 +414,8 @@ class HbModkit(QMainWindow):
                 QTextBrowser {
                     background-color: #2c2c2c;
                     color: #ffebcd;
+                    font:  13pt Consolas;
+
                 }
             """)
         else:
@@ -520,6 +542,8 @@ class MainHubTab(QWidget):
                 background-color: #2c2c2c;
                 color: #ffebcd;
                 border: 2px solid #ffebcd;
+                font:  13pt Consolas;
+
             }
             QScrollBar:vertical {
                 background-color: #2b2b2b;
