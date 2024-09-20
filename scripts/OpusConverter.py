@@ -1,6 +1,6 @@
 # NS Opus Converter
 # Version management
-VERSION = "1.7.7"
+VERSION = "1.7.8"
 
 import os, sys, shutil, subprocess, webbrowser, random
 from PyQt5.QtWidgets import (
@@ -9,7 +9,10 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtGui import QFont
 
-class ns_OpusConverter(QMainWindow):
+# Debug Toggle
+DEBUG = False
+
+class OpusConverter(QMainWindow):
     def __init__(self):
         super().__init__()
         self.dark_mode = True  # Start in dark mode by default
@@ -77,7 +80,7 @@ class ns_OpusConverter(QMainWindow):
         central_widget.setLayout(main_layout)
         self.setCentralWidget(central_widget)
 
-        self.setWindowTitle('NS Opus Converter')
+        self.setWindowTitle('Opus Converter')
         self.setGeometry(100, 100, 1600, 800)  # Set the window size to 1600x800, positioned at 100,100
 
         # Ensure the window is visible before proceeding
@@ -87,7 +90,7 @@ class ns_OpusConverter(QMainWindow):
 
     def show_about_dialog(self):
         about_text = (
-            "NS Opus Converter\n"
+            "Opus Converter\n"
             f"Version {VERSION}\n\n"
             "Converts various audio files (.mp3, .wav, .flac, .ogg) into valid .Opus audio format used by MHGU."
         )
@@ -141,8 +144,13 @@ class ns_OpusConverter(QMainWindow):
             self.log("\nAll dependencies found. Dependency check complete.\n")
             self.dependencies_valid = True
             self.browse_button.setEnabled(True)
-        self.log(f"[INITIALISATION SUCCESS] NS Opus Converter v{VERSION} is an audio conversion module within Handburger's Modkit.\n")
+        self.log(f"[INITIALISATION SUCCESS] Opus Converter v{VERSION} is an audio conversion module within Handburger's Modkit.\n")
         self.log("\n[REQUEST] Browse audio files to convert various audio files (mp3, wav, flac) into a valid .Opus audio format used by MHGU.\n\n\n\n\n")
+        #if DEBUG ==  True:
+        #    self.log("[DEBUG] Debug mode is enabled.")
+        #else:
+        #    self.log("[DEBUG] Debug mode is disabled.")
+
 
     def show_dependency_error(self, missing_dependencies):
         message = (
@@ -169,7 +177,7 @@ class ns_OpusConverter(QMainWindow):
         help_text = (
             "1. Pinpoint which .opus files you would like to replace and note them down.\n\n"
             "2. Get your own audio files that you would like to replace, my tool supports mp4, mp3, flac, wav, and ogg.\n\n"
-            "3. Browse for them in the NSOpus Converter tab.\n\n"
+            "3. Browse for them in the Opus Converter tab.\n\n"
             "4. Let the conversion occur.\n\n"
             "5. Get your converted MHGU .opus files."
         )
@@ -200,53 +208,56 @@ class ns_OpusConverter(QMainWindow):
             self.convert_to_opus(files)
 
     def convert_to_opus(self, files):
-        if not files:
-            self.log("No files selected for conversion.")
-            return
+            if not files:
+                self.log("No files selected for conversion.")
+                return
 
-        if not os.path.exists(self.temp_folder):
-            os.makedirs(self.temp_folder)
+            if not os.path.exists(self.temp_folder):
+                os.makedirs(self.temp_folder)
+                self.log(f"[INFO] Temporary folder created at: {self.temp_folder}")
+            else:
+                self.log(f"[INFO] Temporary folder exists at: {self.temp_folder}")
 
-        if not os.path.exists(self.output_folder):
-            os.makedirs(self.output_folder)
+            if not os.path.exists(self.output_folder):
+                os.makedirs(self.output_folder)
 
-        try:
-            for file in files:
-                self.log(f"Processing: {file}")
-                self.update_progress(0, f"Starting Conversion...", file)
+            try:
+                for file in files:
+                    self.log(f"Processing: {file}")
+                    self.update_progress(0, f"Starting Conversion...", file)
 
-                temp_wav = os.path.join(self.temp_folder, f"{os.path.basename(file)}_temp.wav")
-                resampled_wav = os.path.join(self.temp_folder, f"{os.path.basename(file)}_resampled.wav")
-                raw_file = os.path.join(self.temp_folder, f"{os.path.basename(file)}.raw")
-                output_file = os.path.join(self.output_folder, f"{os.path.splitext(os.path.basename(file))[0]}.opus")
+                    temp_wav = os.path.join(self.temp_folder, f"{os.path.basename(file)}_temp.wav")
+                    resampled_wav = os.path.join(self.temp_folder, f"{os.path.basename(file)}_resampled.wav")
+                    raw_file = os.path.join(self.temp_folder, f"{os.path.basename(file)}.raw")
+                    output_file = os.path.join(self.output_folder, f"{os.path.splitext(os.path.basename(file))[0]}.opus")
 
-                if not file.lower().endswith('.wav'):
-                    command_convert_wav = f"\"{self.ffmpeg_path}\" -i \"{file}\" \"{temp_wav}\""
-                    self.run_command(command_convert_wav, "Detected non .wav, converting to WAV", temp_wav)
-                    self.update_progress(int(random.randint(1,10)), "Detected non .wav, converting to WAV", file)
-                else:
-                    temp_wav = file
+                    if not file.lower().endswith('.wav'):
+                        command_convert_wav = f"\"{self.ffmpeg_path}\" -i \"{file}\" \"{temp_wav}\""
+                        self.run_command(command_convert_wav, "Detected non .wav, converting to WAV", temp_wav)
+                        self.update_progress(int(random.randint(1, 10)), "Detected non .wav, converting to WAV", file)
+                    else:
+                        temp_wav = file
 
-                command_resample = f"\"{self.ffmpeg_path}\" -i \"{temp_wav}\" -ar 48000 -ac 2 -hide_banner -loglevel error \"{resampled_wav}\""
-                self.run_command(command_resample, "Resampling WAV", resampled_wav)
-                self.update_progress(int(random.randint(14,40)), "Resampled .wav into 48kHz", file)
+                    command_resample = f"\"{self.ffmpeg_path}\" -i \"{temp_wav}\" -ar 48000 -ac 2 -hide_banner -loglevel error \"{resampled_wav}\""
+                    self.run_command(command_resample, "Resampling WAV", resampled_wav)
+                    self.update_progress(int(random.randint(14, 40)), "Resampled .wav into 48kHz", file)
 
-                command_pcm = f"\"{self.ffmpeg_path}\" -i \"{resampled_wav}\" -f s16le -acodec pcm_s16le -hide_banner -loglevel error \"{raw_file}\""
-                self.run_command(command_pcm, "Convert to PCM", raw_file)
-                self.update_progress(int(random.randint(41,93)), "PCM Conversion Done", file)
+                    command_pcm = f"\"{self.ffmpeg_path}\" -i \"{resampled_wav}\" -f s16le -acodec pcm_s16le -hide_banner -loglevel error \"{raw_file}\""
+                    self.run_command(command_pcm, "Convert to PCM", raw_file)
+                    self.update_progress(int(random.randint(41, 93)), "Converting .wav to raw PCM", file)
 
-                command_opus = f"\"{self.nxaenc_path}\" -i \"{raw_file}\" -o \"{output_file}\""
-                self.run_command(command_opus, "Convert to Opus", output_file)
-                self.update_progress(100, f"Conversion Completed.", file)
+                    command_opus = f"\"{self.nxaenc_path}\" -i \"{raw_file}\" -o \"{output_file}\""
+                    self.run_command(command_opus, "Convert to Opus", output_file)
+                    self.update_progress(100, f"Converted raw PCM to Opus.", file)
 
-            self.log("All conversions completed successfully.")
-            webbrowser.open(self.output_folder)
+                self.log("All conversions completed successfully.")
+                webbrowser.open(self.output_folder)
 
-        except Exception as e:
-            self.log(f"Error during conversion: {e}")
-        finally:
-            self.cleanup_temp_files()
-
+            except Exception as e:
+                self.log(f"Error during conversion: {e}")
+            finally:
+                self.cleanup_temp_files()
+            
     def run_command(self, command, step_description, output_file):
         result = subprocess.run(command, capture_output=True, text=True, shell=True)
         if result.returncode != 0 or not os.path.exists(output_file):
@@ -254,12 +265,18 @@ class ns_OpusConverter(QMainWindow):
             raise Exception(f"{step_description} failed.")
 
     def cleanup_temp_files(self):
+        # Only delete temporary files if DEBUG mode is off
+        if DEBUG:
+            self.log("[DEBUG] Debug mode enabled, skipping temporary folder deletion.")
+            self.log(f"[DEBUG] Temporary files can be found in: {self.temp_folder}")
+            return  # Skip folder deletion in debug mode
+
         try:
             if os.path.exists(self.temp_folder):
                 shutil.rmtree(self.temp_folder)
+                self.log("[INFO] Temporary files deleted.")
         except Exception as e:
             self.log(f"Error deleting temporary folder: {e}")
-
 
     def update_progress(self, progress, status, file):
         progress_bar_length = 50  # Length of the progress bar
@@ -322,10 +339,8 @@ class ns_OpusConverter(QMainWindow):
         # Apply the combined stylesheet
         self.setStyleSheet(full_stylesheet)
 
-
-
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    window = ns_OpusConverter()
+    window = OpusConverter()
     window.show()
     sys.exit(app.exec_())

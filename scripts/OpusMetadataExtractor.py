@@ -1,6 +1,6 @@
 # Opus Metadata Extractor
 # Version management
-VERSION = "1.1.3"
+VERSION = "1.1.4"
 
 import os
 import sys
@@ -182,6 +182,7 @@ class OpusMetadataExtractor(QMainWindow):
             "3. The metadata will be processed and displayed in the output log.\n"
             "4. You can choose to save the metadata in CSV, JSON, or XML format."
         )
+        
         help_box = QMessageBox(self)
         help_box.setWindowTitle("Help")
         help_box.setText(help_text)
@@ -190,11 +191,42 @@ class OpusMetadataExtractor(QMainWindow):
         # Apply the current theme to the help box
         if self.dark_mode:
             help_box.setStyleSheet("""
-                QMessageBox { background-color: #2b2b2b; color: #ffebcd; }
-                QPushButton { background-color: #4d4d4d; color: #ffebcd; }
+                QMessageBox {
+                    background-color: #2b2b2b; 
+                    color: #ffebcd;
+                }
+                QLabel {
+                    color: #ffebcd;
+                }
+                QPushButton {
+                    background-color: #4d4d4d; 
+                    color: #ffebcd; 
+                    border: 2px solid #ffebcd;
+                }
+                QPushButton:hover {
+                    background-color: #ffebcd;
+                    color: #000000;
+                }
             """)
         else:
-            help_box.setStyleSheet("")
+            help_box.setStyleSheet("""
+                QMessageBox {
+                    background-color: #f0f0f0; 
+                    color: #000000;
+                }
+                QLabel {
+                    color: #000000;
+                }
+                QPushButton {
+                    background-color: #ffffff; 
+                    color: #000000; 
+                    border: 2px solid #4c4c4c;
+                }
+                QPushButton:hover {
+                    background-color: #4c4c4c;
+                    color: #ffffff;
+                }
+            """)
 
         help_box.exec_()
 

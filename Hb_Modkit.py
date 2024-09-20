@@ -11,8 +11,8 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtGui import QIcon, QPixmap, QFont
 from PyQt5.QtCore import Qt, QTimer, QEventLoop
 from scripts import (
-    stq_tool, OpusHeaderInjector, AudioCalculator, FolderMaker, HexConverterEncoder, 
-    NSOpusConverter, OpusMetadataExtractor, STQ_Merge, MCAConverter, MCA_Forge
+    OpusConverter, stq_tool, OpusHeaderInjector, AudioCalculator, FolderMaker, HexConverterEncoder, 
+    OpusMetadataExtractor, STQ_Merge, MCAConverter, MCA_Forge
 )
 
 logging.basicConfig(level=logging.ERROR, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -161,7 +161,7 @@ class PoppableTabWidget(QTabWidget):
             "Audio Calculator": AudioCalculator.AudioCalculator,
             "FolderMaker": FolderMaker.FolderMaker,
             "Hex Enc/Decoder": HexConverterEncoder.HexConverterEncoder,
-            "NS Opus Converter": NSOpusConverter.ns_OpusConverter,
+            "Opus Converter": OpusConverter.OpusConverter,
             "Opus Metadata Extractor": OpusMetadataExtractor.OpusMetadataExtractor,
             "STQ Merge Tool": STQ_Merge.STQMergeTool,
             "MCA Converter" : MCAConverter.WavToMcaConverter,
@@ -347,7 +347,7 @@ class HbModkit(QMainWindow):
             "Audio Calculator": AudioCalculator.AudioCalculator,
             "FolderMaker": FolderMaker.FolderMaker,
             "Hex Enc/Decoder": HexConverterEncoder.HexConverterEncoder,
-            "NS Opus Converter": NSOpusConverter.ns_OpusConverter,
+            "Opus Converter": OpusConverter.OpusConverter,
             "Opus Metadata Extractor": OpusMetadataExtractor.OpusMetadataExtractor,
             "STQ Merge Tool": STQ_Merge.STQMergeTool,
             "MCA Converter": MCAConverter.WavToMcaConverter,
@@ -664,10 +664,10 @@ class MainHubTab(QWidget):
             "Opus Header Injector": (OpusHeaderInjector.VERSION, translations.get('opus_header_injector_desc', "Allows users to inject or modify .Opus headers within .Opus files.<br>")),
             "Audio Calculator": (AudioCalculator.VERSION, translations.get('audio_calculator_desc', "A utility for calculating audio properties such as bitrate, file size, and duration.<br>")),
             "FolderMaker": (FolderMaker.VERSION, translations.get('foldermaker_desc', "Helps in organizing and creating folders necessary for modding projects.<br>")),
-            "MCA Converter": (MCAConverter.VERSION, translations.get('mcaconvert_desc', "Converts audio files into .MCA format. For use with the MCA Header Injector for modding.<br>")),
+            "MCA Converter": (MCAConverter.VERSION, translations.get('mcaconvert_desc', "Converts audio files into .MCA format. For use alongside MCA Forge.<br>")),
             "MCA Forge": (MCA_Forge.VERSION, translations.get('mcaforge_desc', "Allows users to import two .MCA files—an original and a replacement—and merge key elements to create a new custom header with a preset structure.<br>")),
             "Hex Enc/Decoder": (HexConverterEncoder.VERSION, translations.get('hex_enc_decoder_desc', "Encodes or decodes hexadecimal data, useful for file conversions and analysis.<br>")),
-            "NS Opus Converter": (NSOpusConverter.VERSION, translations.get('nsopus_converter_desc', "Converts audio files to Opus format, with support for Nintendo Switch Opus MHGU-specific formats.<br>")),
+            "Opus Converter": (OpusConverter.VERSION, translations.get('nsopus_converter_desc', "Converts audio files to Opus format, with support for Nintendo Switch Opus MHGU-specific formats.<br>")),
             "Opus Metadata Extractor": (OpusMetadataExtractor.VERSION, translations.get('opus_metadata_extractor_desc', "Extracts metadata from Opus files for easier management and editing.<br>"))
         }
 
@@ -687,7 +687,7 @@ if __name__ == '__main__':
     
     splash = SplashScreen()
     splash.show()
-    splash_duration = random.randint(3000,4550) # 3 Seconds - 4.5second boot time
+    splash_duration = random.randint(2950,5000) # Boot time
 
     event_loop = QEventLoop()
     QTimer.singleShot(splash_duration, event_loop.quit)

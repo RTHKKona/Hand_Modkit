@@ -1,6 +1,6 @@
 # Opus Header Injector
 # Version management
-VERSION = "1.1.2"
+VERSION = "1.1.5"
 
 import sys, struct, os
 from PyQt5.QtWidgets import (
@@ -15,6 +15,7 @@ class OpusHeaderInjector(QMainWindow):
         super().__init__()
         self.dark_mode = True  # Start in dark mode by default
         self.loaded_file_name = ""
+        self.injected_file_name = ""  # New: To remember the file for header injection
         self.edited_header = b""
         self.is_second_file_loaded = False  # Clearer naming
         self.headers = [
@@ -26,6 +27,7 @@ class OpusHeaderInjector(QMainWindow):
         ]
         self.target_pattern = b"\x01\x00\x00\x80\x18\x00\x00\x00\x00\x02\xF0\x00\x80\xBB\x00\x00" \
                               b"\x20\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x78\x00\x00\x00"
+        self.save_count = 0  # Tracks how many times a file has been saved
         self.init_ui()
 
     def init_ui(self):
@@ -145,7 +147,7 @@ class OpusHeaderInjector(QMainWindow):
             QHeaderView::section { background-color: lightgrey; color: black; }
         """
 
-            # Header stylesheet depending on the mode
+        # Header stylesheet depending on the mode
         if self.dark_mode:
             header_stylesheet = """
                 QHeaderView::section{
@@ -216,15 +218,16 @@ class OpusHeaderInjector(QMainWindow):
         return msg_box
 
     def clear_headers(self):
-        self.loaded_file_name = ""
         self.edited_header = b""
-        self.hex_view.clear()
-        self.header_table.clearContents()  # Updated to new table name
+        self.hex_view.clear()  # Clear the hex view
+        self.header_table.clearContents()
         self.header_table.setRowCount(0)
         self.header_info_label.setText("No header loaded")
-        self.setWindowTitle("Opus Header Injector")
+        self.setWindowTitle(f"Opus Header Injector - Editing: {os.path.basename(self.loaded_file_name)}")
         self.is_second_file_loaded = False
-        msg_box = self.create_themed_messagebox("Cleared", "All Data has been cleared successfully.")
+
+        # Don't reset the loaded file label, but clear header-related data
+        msg_box = self.create_themed_messagebox("Cleared", "Header data has been cleared successfully.")
         msg_box.exec_()
 
     def init_menu(self):
@@ -288,9 +291,13 @@ class OpusHeaderInjector(QMainWindow):
             self.update_loaded_file_label()
 
     def update_loaded_file_label(self):
-        color = "yellow" if self.dark_mode else "darkgreen"
-        self.loaded_file_label.setText(f"Loaded File: {self.loaded_file_name}")
-        self.loaded_file_label.setStyleSheet(f"color: {color}; font: 10pt; font-weight: bold; font-family: Consolas")
+        if self.loaded_file_name:  # If a file is loaded
+            color = "yellow" if self.dark_mode else "darkgreen"
+            self.loaded_file_label.setText(f"Loaded File: {self.loaded_file_name}")
+            self.loaded_file_label.setStyleSheet(f"color: {color}; font: 10pt; font-weight: bold; font-family: Consolas")
+        else:  # No file is loaded
+            self.loaded_file_label.setText("No file loaded")
+            self.loaded_file_label.setStyleSheet("color: grey; font: 10pt; font-family: Consolas")
 
     def find_full_header_size(self):
         # Search from the beginning
@@ -303,20 +310,20 @@ class OpusHeaderInjector(QMainWindow):
 
     def display_hex_content(self, header_end_offset):
         hex_view = []
-        
+
         # Display the hex code up to the header end offset
-        for i in range(0, min(header_end_offset, len(self.original_content)), 32):
+        for i in range(0, min(header_end_offset, len(self.original_content)), 32):  # Adjust to 32-byte rows
             row = ' '.join(
-                [self.original_content[i + j:i + j + 4].hex().upper() for j in range(0, 32, 4)]
+                [self.original_content[i + j:i + j + 4].hex().upper().ljust(8) for j in range(0, 32, 4)]
             )
             hex_view.append(row)
-        
+
         # Append a few lines of actual data after the header in a different color (#353535)
         num_additional_lines = 3  # Same as the original number of fake lines
         for i in range(header_end_offset, header_end_offset + (num_additional_lines * 32), 32):
             if i < len(self.original_content):
                 row = ' '.join(
-                    [self.original_content[i + j:i + j + 4].hex().upper() for j in range(0, 32, 4)]
+                    [self.original_content[i + j:i + j + 4].hex().upper().ljust(8) for j in range(0, 32, 4)]
                 )
                 # Wrap the additional rows with HTML for the color
                 hex_view.append(f'<span style="color:#353535">{row}</span>')
@@ -329,7 +336,7 @@ class OpusHeaderInjector(QMainWindow):
 
         # Convert the content into a formatted string for display
         formatted_hex_view = '<br>'.join(hex_view)
-        
+
         # Display the formatted content in the hex view
         self.hex_view.setHtml(formatted_hex_view)
 
@@ -360,7 +367,7 @@ class OpusHeaderInjector(QMainWindow):
         cursor = self.hex_view.textCursor()
         cursor.movePosition(cursor.Start)
         cursor.movePosition(cursor.Down, cursor.MoveAnchor, row)
-        cursor.movePosition(cursor.Right, cursor.MoveAnchor, col * 8)  # Move to the correct column
+        cursor.movePosition(cursor.Right, cursor.MoveAnchor, col * 9)  # Move to the correct column (8 bytes + 1 space)
         cursor.movePosition(cursor.Right, cursor.KeepAnchor, 8)  # Select the hex string
         cursor.insertText(hex_value.hex().upper(), format)
 
@@ -372,7 +379,10 @@ class OpusHeaderInjector(QMainWindow):
 
         base_name = os.path.basename(self.loaded_file_name)
         directory = os.path.dirname(self.loaded_file_name)
-        export_file_name = os.path.join(directory, f"new_{base_name}")
+        # Use save_count to increment the saved file name
+        export_file_name = os.path.join(directory, f"{self.save_count}_{base_name}")
+        self.save_count += 1  # Increment save count for each new save
+
         options = QFileDialog.Options()
         export_file_name, _ = QFileDialog.getSaveFileName(self, "Save OPUS File As", export_file_name, "Opus Files (*.opus);;All Files (*)", options=options)
         if export_file_name:
@@ -397,24 +407,29 @@ class OpusHeaderInjector(QMainWindow):
             msg_box.exec_()
             return
 
-        options = QFileDialog.Options()
-        file_name, _ = QFileDialog.getOpenFileName(self, "Open OPUS File to Append Header", "", "Opus Files (*.opus);;All Files (*)", options=options)
-        if file_name:
-            with open(file_name, "rb") as file:
+        if not self.injected_file_name:  # Prompt only if no file was selected earlier
+            options = QFileDialog.Options()
+            file_name, _ = QFileDialog.getOpenFileName(self, "Open OPUS File to Prepend Header", "", "Opus Files (*.opus);;All Files (*)", options=options)
+            if file_name:
+                self.injected_file_name = file_name
+
+        if self.injected_file_name:  # Inject the header into the previously selected file
+            with open(self.injected_file_name, "rb") as file:
                 original_content = file.read()
 
-            base_name = os.path.basename(file_name)
-            directory = os.path.dirname(file_name)
-            save_file_name = os.path.join(directory, f"new_{base_name}")
+            base_name = os.path.basename(self.injected_file_name)
+            directory = os.path.dirname(self.injected_file_name)
+            save_file_name = os.path.join(directory, f"{self.save_count}_{base_name}")
+            self.save_count += 1  # Increment save count for each new save
+
             options = QFileDialog.Options()
-            save_file_name, _ = QFileDialog.getSaveFileName(self, "Save Appended OPUS File As", save_file_name, "Opus Files (*.opus);;All Files (*)", options=options)
+            save_file_name, _ = QFileDialog.getSaveFileName(self, "Save Preprended OPUS File As", save_file_name, "Opus Files (*.opus);;All Files (*)", options=options)
             if save_file_name:
                 with open(save_file_name, "wb") as file:
                     file.write(self.edited_header + original_content)
 
-                msg_box = self.create_themed_messagebox("Saved", f"Appended file saved as: {os.path.basename(save_file_name)}")
+                msg_box = self.create_themed_messagebox("Saved", f"Prepended file saved as: {os.path.basename(save_file_name)}")
                 msg_box.exec_()
-                self.clear_headers()
 
     def preview_injected_header(self):  # Updated function name
         if not self.edited_header:
