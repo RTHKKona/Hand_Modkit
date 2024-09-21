@@ -1,15 +1,18 @@
 # Handburger's Hb_Modkit alpha release 
 # Version management
-VERSION = "0.6.2a"
+VERSION = "0.6.2b"
 
-import sys, os, random, json, logging
+import sys
+import os
+import json
+import logging
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QTabWidget, QVBoxLayout, QWidget, QLabel, 
-    QDesktopWidget, QHBoxLayout, QTextBrowser, QPushButton, QStyle, QMenu,
-    QProgressBar, QSpacerItem, QSizePolicy, QMessageBox
+    QDesktopWidget, QHBoxLayout, QTextBrowser, QPushButton, QMenu,
+    QProgressBar, QSpacerItem, QSizePolicy, QMessageBox, QStyle
 )
 from PyQt5.QtGui import QIcon, QPixmap, QFont
-from PyQt5.QtCore import Qt, QTimer, QEventLoop
+from PyQt5.QtCore import Qt, QTimer
 from scripts import (
     OpusConverter, stq_tool, OpusHeaderInjector, AudioCalculator, FolderMaker, HexConverterEncoder, 
     OpusMetadataExtractor, STQ_Merge, MCAConverter, MCA_Forge
@@ -37,6 +40,7 @@ class LocaleManager:
         self.supported_locales = supported_locales
         self.current_locale = default_locale
         self.translations = {}
+        self.language_name = ""
         self.load_translations(self.current_locale)
 
     def set_locale(self, locale):
@@ -47,25 +51,34 @@ class LocaleManager:
                 self.load_translations(locale)
 
     def load_translations(self, locale):
-        locale_file = os.path.join(os.path.dirname(__file__), 'locales', f'{locale}.json')
+        locale_file = os.path.join(sys.path[0], 'locales', f'{locale}.json')
         try:
             with open(locale_file, 'r', encoding='utf-8') as f:
                 self.translations = json.load(f)
+                self.language_name = self.translations.get('language_name', locale)
         except FileNotFoundError:
             logging.error(f"Locale file not found: {locale_file}")
+            self.show_error_message(f"Locale file not found: {locale_file}")
             self.translations = {}  # Use empty translations
         except json.JSONDecodeError:
             logging.error(f"Error decoding JSON file: {locale_file}")
+            self.show_error_message(f"Error decoding JSON file: {locale_file}")
             self.translations = {}  # Proceed with empty translations
         except Exception as e:
             logging.error(f"Unexpected error while loading translations: {str(e)}")
+            self.show_error_message(f"Unexpected error while loading translations: {str(e)}")
             self.translations = {}  # Fallback to empty translations
 
     def get_translation(self, key, default_value=None):
         ## Retrieve a translation for the given key.
         return self.translations.get(key, default_value)
-    
-    
+
+    def show_error_message(self, message):
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Critical)
+        msg.setWindowTitle("Error")
+        msg.setText(message)
+        msg.exec_()
 
 class CustomTitleBar(QWidget):
     ## Custom title bar with minimize, maximize/restore, and close buttons.
@@ -167,7 +180,7 @@ class PoppableTabWidget(QTabWidget):
             "MCA Converter" : MCAConverter.WavToMcaConverter,
             "MCA Forge" : MCA_Forge.MCA_Forge
         }
-        self.tabBar().setFont(QFont("Proggy", 11))
+        self.tabBar().setFont(QFont("Arial", 11))
 
     def show_tab_context_menu(self, position):
         ## Show context menu for tab options like popping out.
@@ -194,14 +207,14 @@ class PoppableTabWidget(QTabWidget):
             except Exception as e:
                 logging.error(f"Failed to create tool instance '{tool_name}': {str(e)}")
                 self.show_error_message(f"Failed to create tool instance '{tool_name}'. Please try again.")
+
     def show_error_message(self, message):
-        from PyQt5.QtWidgets import QMessageBox
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Critical)
         msg.setWindowTitle("Error")
         msg.setText(message)
         msg.exec_()
-    
+
     def serialize_tab_state(self, widget):
         ## Serialize the state of the tab for potential restoration.
         state = {'title': self.tabText(self.indexOf(widget))}
@@ -256,10 +269,46 @@ class HbModkit(QMainWindow):
     def __init__(self):
         super().__init__()
         self.locale_manager = LocaleManager(
-            supported_locales={'eng', 'zho', 'yue', 'fra'},  ## Add locale support here
+            supported_locales=self.get_supported_locales(),
             default_locale='eng'
         )
         self.init_ui()
+
+    def get_supported_locales(self):
+        ## Automatically detect available locales by scanning the 'locales' directory.
+        locales_dir = os.path.join(sys.path[0], 'locales')
+        supported_locales = set()
+        if os.path.exists(locales_dir):
+            for filename in os.listdir(locales_dir):
+                if filename.endswith('.json'):
+                    locale_code = os.path.splitext(filename)[0]
+                    supported_locales.add(locale_code)
+        else:
+            logging.error(f"Locales directory not found at {locales_dir}")
+            self.show_error_message("Locales directory not found.")
+        return supported_locales
+
+    def get_available_languages(self):
+        ## Build a mapping from language names to locale codes by reading 'language_name' from each locale file.
+        locales_dir = os.path.join(sys.path[0], 'locales')
+        languages = {}
+        if os.path.exists(locales_dir):
+            for filename in os.listdir(locales_dir):
+                if filename.endswith('.json'):
+                    locale_code = os.path.splitext(filename)[0]
+                    locale_file = os.path.join(locales_dir, filename)
+                    try:
+                        with open(locale_file, 'r', encoding='utf-8') as f:
+                            translations = json.load(f)
+                            language_name = translations.get('language_name', locale_code)
+                            languages[language_name] = locale_code
+                    except Exception as e:
+                        logging.error(f"Error loading locale file {locale_file}: {str(e)}")
+                        continue
+        else:
+            logging.error(f"Locales directory not found at {locales_dir}")
+            self.show_error_message("Locales directory not found.")
+        return languages
 
     def init_ui(self):
         ## Initialize the main UI.
@@ -281,6 +330,13 @@ class HbModkit(QMainWindow):
         
         self.toggle_stylesheet_based_on_tab(0)
     
+    def show_error_message(self, message):
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Critical)
+        msg.setWindowTitle("Error")
+        msg.setText(message)
+        msg.exec_()
+
     def create_menu_bar(self):
         ## Create the settings menu and apply translations.
         menu_bar = self.menuBar()
@@ -312,23 +368,7 @@ class HbModkit(QMainWindow):
 
         ## Language selection submenu
         language_menu = QMenu(self.locale_manager.get_translation("language_label", "Language"), self)
-        # Dictionary of common languages and their ISO 639-3 codes
-        languages = {
-            'English (UK)': 'eng',
-            '繁体字 (Cantonese)': 'yue',  # Cantonese
-            '简体字 (Simplified Chinese)': 'zho',  # Simplified Chinese
-            'Español (Spanish)': 'spa',  # Spanish
-            'Bahasa Indonesia': 'ind',  # Indonesian
-            'Français (French)': 'fra',  # French
-            'Deutsch (German)': 'deu',  # German
-            '日本語 (Japanese)': 'jpn',  # Japanese
-            '한국어 (Korean)': 'kor',  # Korean
-            'Русский (Russian)': 'rus',  # Russian
-            'Português (Portuguese)': 'por',  # Portuguese
-            'Italiano (Italian)': 'ita',  # Italian
-            'हिन्दी (Hindi)': 'hin',  # Hindi
-            'العربية (Arabic)': 'ara'  # Arabic
-        }
+        languages = self.get_available_languages()
 
         # Adding each language to the menu
         for language, locale in languages.items():
@@ -364,10 +404,9 @@ class HbModkit(QMainWindow):
             except Exception as e:
                 print(f"Error adding tab '{name}': {e}")
 
-
     def get_icon_path(self, icon_name):
         try:
-            assets_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets')
+            assets_dir = os.path.join(sys.path[0], 'assets')
             icon_path = os.path.join(assets_dir, icon_name)
             if not os.path.exists(icon_path):
                 raise FileNotFoundError(f"Icon not found at {icon_path}")
@@ -377,7 +416,6 @@ class HbModkit(QMainWindow):
             self.show_error_message(f"Icon '{icon_name}' not found. Please check your assets directory.")
             return None
 
-    
     def set_locale(self, locale):
         ## Set the application locale and reload translations.
         self.locale_manager.set_locale(locale)
@@ -407,15 +445,14 @@ class HbModkit(QMainWindow):
             # Apply the stylesheet when the "Main Hub" tab is selected
             self.setStyleSheet("""
                 QMainWindow {
-                    font-family: Consolas;
+                    font-family: Arial;
                     background-color: #2c2c2c;
                     color: #ffebcd;
                 }
                 QTextBrowser {
                     background-color: #2c2c2c;
                     color: #ffebcd;
-                    font:  13pt Consolas;
-
+                    font:  13pt Arial;
                 }
             """)
         else:
@@ -439,8 +476,12 @@ class SplashScreen(QMainWindow):
 
         ## Funny Splash Image
         splash_label = QLabel(self)
-        pixmap = QPixmap(self.get_splash_image_path()).scaled(1000, 800, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        splash_label.setPixmap(pixmap)
+        pixmap = QPixmap(self.get_splash_image_path())
+        if pixmap.isNull():
+            splash_label.setText("Splash image not found.")
+        else:
+            pixmap = pixmap.scaled(1000, 800, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            splash_label.setPixmap(pixmap)
         splash_label.setAlignment(Qt.AlignCenter)
 
         ## Loading Bar
@@ -460,7 +501,6 @@ class SplashScreen(QMainWindow):
             QProgressBar::chunk {
                 background-color: #30d5c8;
                 width: 10px;
-
             }          
         """)
         self.progress_bar.setMaximum(100)
@@ -474,7 +514,7 @@ class SplashScreen(QMainWindow):
 
     def get_splash_image_path(self):
         try:
-            assets_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets')
+            assets_dir = os.path.join(sys.path[0], 'assets')
             for file_name in os.listdir(assets_dir):
                 if file_name.lower().startswith("hbmodkit") and file_name.lower().endswith(('.png', '.jpg', '.jpeg')):
                     return os.path.join(assets_dir, file_name)
@@ -484,6 +524,12 @@ class SplashScreen(QMainWindow):
             self.show_error_message("Splash image not found. Please make sure the assets directory contains a valid splash image.")
             return None
 
+    def show_error_message(self, message):
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Critical)
+        msg.setWindowTitle("Error")
+        msg.setText(message)
+        msg.exec_()
 
     def center_on_screen(self):
         ## Center the splash screen on the user's display.
@@ -493,10 +539,18 @@ class SplashScreen(QMainWindow):
 
     def show_splash_screen(self):
         ## Display the splash screen with a simulated loading process.
-        for i in range(101):
-            QTimer.singleShot(i * 30, lambda v=i: self.progress_bar.setValue(v))
-        QTimer.singleShot(3000, self.close)
+        self.progress = 0
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.update_progress)
+        self.timer.start(30)  # Update every 30 ms
         self.show()
+
+    def update_progress(self):
+        self.progress += 1
+        self.progress_bar.setValue(self.progress)
+        if self.progress >= 100:
+            self.timer.stop()
+            self.close()
 
 class MainHubTab(QWidget):
     def __init__(self, locale_manager):
@@ -505,11 +559,7 @@ class MainHubTab(QWidget):
         self.scale_factor = 0.70  # 70% Scaling
         self.portrait_label = QLabel(self)
 
-        # Timer to throttle resizing events
-        self.resize_timer = QTimer(self)
-        self.resize_timer.setSingleShot(True)
-        self.resize_timer.timeout.connect(self.set_character_portrait)
-
+        # Initialize UI
         self.init_ui()
 
     def init_ui(self):
@@ -517,8 +567,8 @@ class MainHubTab(QWidget):
         self.setStyleSheet("""
             QWidget {
                 color: #ffebcd;             /* Text color */
-                font-family: "JetBrains Mono";  /* Font style */
-                font-size: 13px;  /* Font size for consistency */
+                font-family: Arial;         /* Font style */
+                font-size: 13px;            /* Font size for consistency */
             }
         """)
         # Create the main layout (horizontal: text on the left, portrait on the right)
@@ -542,19 +592,7 @@ class MainHubTab(QWidget):
                 background-color: #2c2c2c;
                 color: #ffebcd;
                 border: 2px solid #ffebcd;
-                font:  13pt Consolas;
-
-            }
-            QScrollBar:vertical {
-                background-color: #2b2b2b;
-                width: 16px;
-                margin: 16px 0 16px 0;
-                border: 1px solid #444;
-            }
-            QScrollBar::handle:vertical {
-                background-color: #555;
-                min-height: 20px;
-                border-radius: 4px;
+                font: 13pt Arial;
             }
         """)
         right_layout.addWidget(self.text_browser)
@@ -573,32 +611,33 @@ class MainHubTab(QWidget):
         # Add the links once during the initial setup
         self.add_links()
 
-        # Initially set up the translations (this won't add links again)
-        self.update_translations({})
+        # Initially set up the translations
+        self.update_translations(self.locale_manager.translations)
 
     def set_character_portrait(self):
         # Set and scale the character portrait based on window size.
         try:
             portrait_path = self.get_resource_path("HandburgerPortrait.png")
-            pixmap = QPixmap(portrait_path)
-
-            # Calculate the scaled height as 60% of the window's height
-            scaled_height = int(self.height())
-            scaled_pixmap = pixmap.scaledToHeight(
-                scaled_height,
-                Qt.SmoothTransformation
-            )
-
-            self.portrait_label.setPixmap(scaled_pixmap)
-            self.portrait_label.setAlignment(Qt.AlignCenter)
-            self.portrait_label.setStyleSheet("""
-                QLabel {
-                    border: 2px solid black; /* Thickness and Colour */
-                    border-radius: 5px; /*Rounded */
-                }
-            """)
-        except FileNotFoundError:
-            self.portrait_label.setText("Portrait not found.")
+            if portrait_path:
+                pixmap = QPixmap(portrait_path)
+                scaled_pixmap = pixmap.scaledToHeight(
+                    int(self.height()),
+                    Qt.SmoothTransformation
+                )
+                self.portrait_label.setPixmap(scaled_pixmap)
+                self.portrait_label.setAlignment(Qt.AlignCenter)
+                self.portrait_label.setStyleSheet("""
+                    QLabel {
+                        border: 2px solid black; /* Thickness and Colour */
+                        border-radius: 5px; /*Rounded */
+                    }
+                """)
+            else:
+                self.portrait_label.setText("Portrait not found.")
+                self.portrait_label.setAlignment(Qt.AlignCenter)
+        except Exception as e:
+            logging.error(str(e))
+            self.portrait_label.setText("Error loading portrait.")
             self.portrait_label.setAlignment(Qt.AlignCenter)
 
     def get_resource_path(self, filename):
@@ -606,25 +645,39 @@ class MainHubTab(QWidget):
         script_dir = os.path.dirname(os.path.abspath(__file__))
         assets_path = os.path.join(script_dir, 'assets', filename)
         if not os.path.exists(assets_path):
-            raise FileNotFoundError(f"Resource not found: {filename}")
+            logging.error(f"Resource not found: {filename}")
+            self.show_error_message(f"Resource not found: {filename}")
+            return None
         return assets_path
+
+    def show_error_message(self, message):
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Critical)
+        msg.setWindowTitle("Error")
+        msg.setText(message)
+        msg.exec_()
 
     def add_links(self):
         # Add the GitHub and Ko-fi links to the layout
         try:
-            self.link_layout.addLayout(self.create_link_layout(
-                self.get_resource_path("github.png"),
-                self.locale_manager.get_translation('github_link', "GitHub - RTHKKona"),
-                "https://github.com/RTHKKona", 64
-            ))
+            github_icon = self.get_resource_path("github.png")
+            kofi_icon = self.get_resource_path("ko-fi.png")
 
-            self.link_layout.addLayout(self.create_link_layout(
-                self.get_resource_path("ko-fi.png"),
-                self.locale_manager.get_translation('kofi_link', "Ko-fi - Handburger"),
-                "https://ko-fi.com/handburger", 64
-            ))
-        except FileNotFoundError:
-            pass
+            if github_icon:
+                self.link_layout.addLayout(self.create_link_layout(
+                    github_icon,
+                    self.locale_manager.get_translation('github_link', "GitHub - RTHKKona"),
+                    "https://github.com/RTHKKona", 64
+                ))
+
+            if kofi_icon:
+                self.link_layout.addLayout(self.create_link_layout(
+                    kofi_icon,
+                    self.locale_manager.get_translation('kofi_link', "Ko-fi - Handburger"),
+                    "https://ko-fi.com/handburger", 64
+                ))
+        except Exception as e:
+            logging.error(str(e))
 
     def create_link_layout(self, icon_path, text, url, icon_size):
         # Create a layout for a hyperlink with an icon.
@@ -648,7 +701,8 @@ class MainHubTab(QWidget):
         <html>
         <body>
         <h2>{translations.get('handburger_modkit_title', "Handburger's Modkit")}</h2>
-        <p>{translations.get('version', f'This is version v{VERSION}.').replace('{version}', VERSION)}<br><br></p>
+        <p>{translations.get('version', f'This is version v{VERSION}.').replace('{version}', VERSION)}</p>
+        <br>
         <p>{translations.get('about_content', 'This multi-use modkit was developed to assist with and automate various modding tasks for Monster Hunter Generations Ultimate.')}</p>
         <p>{translations.get('tutorial', 'Click on any tab to use it. Right-click a tab to pop-out or create a new instance of a particular tab.')}</p>
         <p>{translations.get('plug', 'Find more about the developer (me!) and support them below.')}</p>
@@ -659,16 +713,16 @@ class MainHubTab(QWidget):
         """
 
         tools = {
-            "STQ Editor Tool": (stq_tool.VERSION, translations.get('stq_editor_tool_desc', "A tool for editing and viewing STQ/STQR files, including hex pattern analysis.<br>")),
-            "STQ Merge Tool": (STQ_Merge.VERSION, translations.get('stq_merge_tool_desc', "Merging and managing STQR file conflicts between multiple mods.<br>")),
-            "Opus Header Injector": (OpusHeaderInjector.VERSION, translations.get('opus_header_injector_desc', "Allows users to inject or modify .Opus headers within .Opus files.<br>")),
-            "Audio Calculator": (AudioCalculator.VERSION, translations.get('audio_calculator_desc', "A utility for calculating audio properties such as bitrate, file size, and duration.<br>")),
-            "FolderMaker": (FolderMaker.VERSION, translations.get('foldermaker_desc', "Helps in organizing and creating folders necessary for modding projects.<br>")),
-            "MCA Converter": (MCAConverter.VERSION, translations.get('mcaconvert_desc', "Converts audio files into .MCA format. For use alongside MCA Forge.<br>")),
-            "MCA Forge": (MCA_Forge.VERSION, translations.get('mcaforge_desc', "Allows users to import two .MCA files—an original and a replacement—and merge key elements to create a new custom header with a preset structure.<br>")),
-            "Hex Enc/Decoder": (HexConverterEncoder.VERSION, translations.get('hex_enc_decoder_desc', "Encodes or decodes hexadecimal data, useful for file conversions and analysis.<br>")),
-            "Opus Converter": (OpusConverter.VERSION, translations.get('nsopus_converter_desc', "Converts audio files to Opus format, with support for Nintendo Switch Opus MHGU-specific formats.<br>")),
-            "Opus Metadata Extractor": (OpusMetadataExtractor.VERSION, translations.get('opus_metadata_extractor_desc', "Extracts metadata from Opus files for easier management and editing.<br>"))
+            "Audio Calculator": (AudioCalculator.VERSION, translations.get('audio_calculator_desc', "A utility for calculating audio properties such as bitrate, file size, and duration.")),
+            "FolderMaker": (FolderMaker.VERSION, translations.get('foldermaker_desc', "Helps in organizing and creating folders necessary for modding projects.")),
+            "Hex Enc/Decoder": (HexConverterEncoder.VERSION, translations.get('hex_enc_decoder_desc', "Encodes or decodes hexadecimal data, useful for file conversions and analysis.")),
+            "MCA Converter": (MCAConverter.VERSION, translations.get('mcaconvert_desc', "Converts audio files into .MCA format. For use alongside MCA Forge.")),
+            "MCA Forge": (MCA_Forge.VERSION, translations.get('mcaforge_desc', "Allows users to import two .MCA files—an original and a replacement—and merge key elements to create a new custom header with a preset structure.")),
+            "Opus Converter": (OpusConverter.VERSION, translations.get('nsopus_converter_desc', "Converts audio files to Opus format, with support for Nintendo Switch Opus MHGU-specific formats.")),
+            "Opus Header Injector": (OpusHeaderInjector.VERSION, translations.get('opus_header_injector_desc', "Allows users to inject or modify .Opus headers within .Opus files.")),
+            "Opus Metadata Extractor": (OpusMetadataExtractor.VERSION, translations.get('opus_metadata_extractor_desc', "Extracts metadata from Opus files for easier management and editing.")),
+            "STQ Editor Tool": (stq_tool.VERSION, translations.get('stq_editor_tool_desc', "A tool for editing and viewing STQ/STQR files, including hex pattern analysis.")),
+            "STQ Merge Tool": (STQ_Merge.VERSION, translations.get('stq_merge_tool_desc', "Merging and managing STQR file conflicts between multiple mods."))
         }
 
         sorted_tools = dict(sorted(tools.items()))
@@ -679,22 +733,10 @@ class MainHubTab(QWidget):
 
         self.text_browser.setHtml(about_text)
 
-
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    
-    main_window = HbModkit()
-    
     splash = SplashScreen()
-    splash.show()
-    splash_duration = random.randint(2950,5000) # Boot time
-
-    event_loop = QEventLoop()
-    QTimer.singleShot(splash_duration, event_loop.quit)
-    
-    event_loop.exec_()
-
-    main_window.setWindowState(Qt.WindowNoState)    
-    main_window.showNormal()
-
+    main_window = HbModkit()
+    # Close splash and show main window after a delay
+    QTimer.singleShot(3000, lambda: (splash.close(), main_window.show()))
     sys.exit(app.exec_())
