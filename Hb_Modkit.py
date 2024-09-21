@@ -1,6 +1,6 @@
 # Handburger's Hb_Modkit alpha release 
 # Version management
-VERSION = "0.6.2b"
+VERSION = "0.6.2c"
 
 import sys
 import os
