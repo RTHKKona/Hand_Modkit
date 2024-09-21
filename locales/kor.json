@@ -1,5 +1,6 @@
 {
     "language_name": "한국어 (Korean)",
+    "font_family": "Noto Sans CJK KR, Segoe UI, Arial, MS Shell Dlg 2",
     "settings_label": "설정",
     "language_label": "언어",
     "handburger_modkit_title": "Handburger의 Modkit",
@@ -15,7 +16,7 @@
     "mcaconvert_desc": "오디오 파일을 .MCA 형식으로 변환합니다. MCA Forge와 함께 사용합니다.",
     "mcaforge_desc": "사용자가 두 개의 .MCA 파일—하나는 원본 파일이고 하나는 대체 파일—을 가져와 주요 요소를 병합하여 사전 설정된 구조의 새로운 사용자 정의 헤더를 만들 수 있도록 합니다.",
     "nsopus_converter_desc": "Nintendo Switch Opus MHGU 전용 형식을 지원하는 Opus 형식으로 오디오 파일을 변환합니다.",
-    "opus_header_injector_desc": ".Opus 파일 내에서 .Opus 헤더를 주입하거나 수정할 수 있게 합니다.",
+    "opus_header_injector_desc": ".Opus 파일 내에서 .Opus 헤더를 주입 또는 수정할 수 있게 합니다.",
     "opus_metadata_extractor_desc": "Opus 파일에서 메타데이터를 추출하여 관리 및 편집을 용이하게 합니다.",
     "stq_editor_tool_desc": "STQ/STQR 파일을 편집 및 보기 위한 도구로, 16진 패턴 분석을 포함합니다.",
     "stq_merge_tool_desc": "여러 모드 간의 STQR 파일 충돌을 통합 및 관리합니다.",

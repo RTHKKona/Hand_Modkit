@@ -1,5 +1,6 @@
 {
     "language_name": "简体字 (Simplified Chinese)",
+    "font_family": "Noto Sans CJK SC, Segoe UI, Arial, MS Shell Dlg 2",
     "settings_label": "设置",
     "language_label": "语言",
     "handburger_modkit_title": "Handburger的Mod工具包",

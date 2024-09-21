@@ -41,6 +41,7 @@ class LocaleManager:
         self.current_locale = default_locale
         self.translations = {}
         self.language_name = ""
+        self.font_family = "Arial"  # Default font
         self.load_translations(self.current_locale)
 
     def set_locale(self, locale):
@@ -56,18 +57,22 @@ class LocaleManager:
             with open(locale_file, 'r', encoding='utf-8') as f:
                 self.translations = json.load(f)
                 self.language_name = self.translations.get('language_name', locale)
+                self.font_family = self.translations.get('font_family', "Arial")
         except FileNotFoundError:
             logging.error(f"Locale file not found: {locale_file}")
             self.show_error_message(f"Locale file not found: {locale_file}")
-            self.translations = {}  # Use empty translations
+            self.translations = {}
         except json.JSONDecodeError:
             logging.error(f"Error decoding JSON file: {locale_file}")
             self.show_error_message(f"Error decoding JSON file: {locale_file}")
-            self.translations = {}  # Proceed with empty translations
+            self.translations = {}
         except Exception as e:
             logging.error(f"Unexpected error while loading translations: {str(e)}")
             self.show_error_message(f"Unexpected error while loading translations: {str(e)}")
-            self.translations = {}  # Fallback to empty translations
+            self.translations = {}
+
+    def get_font_family(self):
+        return self.font_family
 
     def get_translation(self, key, default_value=None):
         ## Retrieve a translation for the given key.
@@ -272,7 +277,20 @@ class HbModkit(QMainWindow):
             supported_locales=self.get_supported_locales(),
             default_locale='eng'
         )
+        self.set_application_font()
         self.init_ui()
+        
+    def set_application_font(self):
+        font_family = self.locale_manager.get_font_family()
+        app.setFont(QFont(font_family, 10))
+
+    def set_locale(self, locale):
+        ## Set the application locale and reload translations.
+        self.locale_manager.set_locale(locale)
+        self.set_application_font()  # Update the application font
+        self.create_menu_bar()  ## Recreate menu bar to apply translations
+        self.update_main_hub_tab()  ## Update the Main Hub tab with new translations
+        self.update_tool_translations()  ## Update all tool translations
 
     def get_supported_locales(self):
         ## Automatically detect available locales by scanning the 'locales' directory.

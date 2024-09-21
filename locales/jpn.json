@@ -1,5 +1,6 @@
 {
     "language_name": "日本語 (Japanese)",
+    "font_family": "Noto Sans CJK JP, Segoe UI, Arial, MS Shell Dlg 2",
     "settings_label": "設定",
     "language_label": "言語",
     "handburger_modkit_title": "HandburgerのModキット",
@@ -7,7 +8,7 @@
     "about_content": "この多機能Modキットは、モンスターハンター世代究極版のさまざまなモッディングタスクを支援および自動化するために開発されました。",
     "tutorial": "任意のタブをクリックして使用してください。タブを右クリックすると、タブをポップアウトしたり、特定のタブの新しいインスタンスを作成したりできます。",
     "plug": "以下で開発者（私！）について詳しく知り、サポートしてください。",
-    "thanks": "翻訳者の皆さん、変換機能と依存関係を提供してくれたffmpeg & Dasding、MHGU用のNXAencバリエーションを提供してくれたmasagrator、音声ソフトウェアと依存関係を提供してくれたvgmstreamに心から感謝します。",
+    "thanks": "翻訳者の皆さん、変換機能と依存関係を提供してくれたffmpeg & Dasding、MHGU用のNXAencバリエーションを提供してくれたmasagrator、およびvgmstreamの音声ソフトウェアと依存関係に心から感謝します。",
     "tool_descriptions_title": "ツールの説明",
     "audio_calculator_desc": "ビットレート、ファイルサイズ、持続時間などのオーディオプロパティを計算するためのユーティリティです。",
     "foldermaker_desc": "モッディングプロジェクトに必要なフォルダを整理および作成するのに役立ちます。",
