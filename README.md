@@ -1,5 +1,5 @@
 
-# Handburger's Modkit
+#OBSOLETE OBSOLETE Handburger's Modkit OBSOLETE OBSOLETE
 
 Hand_Modkit, also known as Handburger's Modkit or H.Modkit, is a versatile multi-use tool designed for modding *Monster Hunter Generations Ultimate* (MHGU). With a suite of specialized utilities, this toolkit gives modders tools to easily edit, analyze, and manage various game files. Whether you're injecting audio headers, calculating audio properties, or organizing mod folders, Hand_Modkit simplifies the complex tasks involved in MHGU modding.
 
